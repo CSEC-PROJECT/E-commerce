@@ -1,9 +1,9 @@
 import React from 'react'
-import DetailsPage from './pages/detailsPage'
+import DetailsPage from './pages/DetailsPage'
 const App = () => {
   return (
     <>
-    <DetailsPage></DetailsPage>
+    <DetailsPage/>
     </>
   )
 }

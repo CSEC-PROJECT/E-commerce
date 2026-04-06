@@ -46,13 +46,12 @@
     --radius-2xl: calc(var(--radius) * 1.8);
     --radius-3xl: calc(var(--radius) * 2.2);
     --radius-4xl: calc(var(--radius) * 2.6);
-    --color-brand-primary: var(--brand-primary);
-    --color-brand-light: var(--brand-light);
+    
+    /* Plain Naming Fixes */
+    --color-light: var(--light);
     --color-text-main: var(--text-main);
     --color-text-muted: var(--text-muted);
-  --color-surface-soft: var(--surface-soft);
-  --color-text-main: var(--foreground);
-  --color-text-muted: var(--muted-foreground);
+    --color-surface-soft: var(--surface-soft);
 }
 
 :root {
@@ -62,7 +61,7 @@
     --card-foreground: oklch(0.145 0 0);
     --popover: oklch(1 0 0);
     --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
+    --primary: #5c53e5;
     --primary-foreground: oklch(0.985 0 0);
     --secondary: oklch(0.97 0 0);
     --secondary-foreground: oklch(0.205 0 0);
@@ -88,14 +87,10 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.708 0 0);
-    --brand-primary: #5c53e5;
-    --brand-light: #f3f4ff;
     --text-main: #1a1a1a;
     --text-muted: #666666;
-  --brand-light: oklch(0.95 0.02 264);
-  --surface-soft: oklch(0.98 0 0);
-
-    
+    --light: oklch(0.95 0.02 264);
+    --surface-soft: oklch(0.98 0 0);
 }
 
 .dark {
@@ -105,7 +100,7 @@
     --card-foreground: oklch(0.985 0 0);
     --popover: oklch(0.205 0 0);
     --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
+    --primary: #7c73ff; 
     --primary-foreground: oklch(0.205 0 0);
     --secondary: oklch(0.269 0 0);
     --secondary-foreground: oklch(0.985 0 0);
@@ -130,9 +125,10 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
-    --brand-primary: #7c73ff; /* Slightly brighter for dark mode */
-    --brand-light: oklch(0.25 0.02 264);
+    --light: oklch(0.25 0.02 264);
     --surface-soft: oklch(0.2 0 0);
+    --text-main: oklch(0.985 0 0);
+    --text-muted: oklch(0.708 0 0);
 }
 
 @layer base {
