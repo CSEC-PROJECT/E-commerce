@@ -1,8 +1,10 @@
 import React from 'react'
-
+import DetailsPage from './pages/detailsPage'
 const App = () => {
   return (
-    <div>App</div>
+    <>
+    <DetailsPage></DetailsPage>
+    </>
   )
 }
 
