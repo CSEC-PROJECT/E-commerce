@@ -27,6 +27,18 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     }
+    ,
+    // hashed refresh token for refresh-token flow (single device)
+    refreshTokenHash: {
+        type: String,
+    },
+    // password reset token (hashed) and expiry
+    passwordResetToken: {
+        type: String,
+    },
+    passwordResetExpires: {
+        type: Date,
+    }
 
 },
     {timestamps: true}
