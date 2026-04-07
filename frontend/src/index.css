@@ -49,8 +49,8 @@
     
     /* Plain Naming Fixes */
     --color-light: var(--light);
-    --color-text-main: var(--text-main);
-    --color-text-muted: var(--text-muted);
+    --color-text-main: var(--foreground);
+    --color-text-muted: var(--muted-foreground);
     --color-surface-soft: var(--surface-soft);
 }
 
