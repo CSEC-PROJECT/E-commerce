@@ -33,11 +33,11 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   
   const productGallery = [
-    "https://images.pexels.com/photos/4207892/pexels-photo-4207892.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/2100063/pexels-photo-2100063.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/6612392/pexels-photo-6612392.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/1570779/pexels-photo-1570779.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/4480535/pexels-photo-4480535.jpeg?auto=compress&cs=tinysrgb&w=400"
+    "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=800", // Wireless Headphones
+    "https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?auto=compress&cs=tinysrgb&w=400", // Close up ear cup
+    "https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=400", // Headphones on desk
+    "https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=400", // Audio jack/detail
+    "https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=400"  // Lifestyle use
   ];
 
   const [activeImage, setActiveImage] = useState(productGallery[0]);
@@ -52,7 +52,7 @@ const ProductDetail = () => {
           <div className="aspect-[4/5] w-full bg-muted rounded-3xl overflow-hidden relative border border-border">
               <img 
                 src={activeImage} 
-                alt="Lumina Sculptural Object main view" 
+                alt="Premium Electronics main view" 
                 className="w-full h-full object-cover transition-opacity duration-300" 
                 onError={(e) => { e.target.src = "https://via.placeholder.com/800x1000?text=Image+Not+Found"; }}
               />
@@ -277,9 +277,9 @@ const RecommendationCard = ({ category, name, price, rating, stockStatus, imageU
 // 7. Recommendations Section
 const RecommendationsSection = () => {
   const products = [
-    { category: "Furniture", name: "Minimalist Stool", price: 185, rating: 4.9, stockStatus: "In Stock", imageUrl: "https://images.pexels.com/photos/1350789/pexels-photo-1350789.jpeg?auto=compress&cs=tinysrgb&w=400" },
-    { category: "Lighting", name: "Orbital Desk Lamp", price: 210, rating: 4.8, stockStatus: "Low Stock", imageUrl: "https://images.pexels.com/photos/112811/pexels-photo-112811.jpeg?auto=compress&cs=tinysrgb&w=400" },
-    { category: "Decor", name: "Ceramic Vessel", price: 95, rating: 4.7, stockStatus: "In Stock", imageUrl: "https://images.pexels.com/photos/4006714/pexels-photo-4006714.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { category: "Wearables", name: "Smart Watch Series X", price: 299, rating: 4.9, stockStatus: "In Stock", imageUrl: "https://images.pexels.com/photos/437037/pexels-photo-437037.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { category: "Audio", name: "Compact Bluetooth Speaker", price: 85, rating: 4.8, stockStatus: "Low Stock", imageUrl: "https://images.pexels.com/photos/1034651/pexels-photo-1034651.jpeg?auto=compress&cs=tinysrgb&w=400" },
+    { category: "Computing", name: "Mechanical Keyboard", price: 155, rating: 4.7, stockStatus: "In Stock", imageUrl: "https://images.pexels.com/photos/2582937/pexels-photo-2582937.jpeg?auto=compress&cs=tinysrgb&w=400" },
   ];
 
   return (

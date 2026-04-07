@@ -1,9 +1,11 @@
 import React from 'react'
-import ProductsPage from './pages/ProductsPage'
+// import ProductsPage from './pages/ProductsPage'
+import DetailsPage from './pages/DetailsPage'
 const App = () => {
   return (
     <>
-    <ProductsPage/>
+    {/* <ProductsPage/> */}
+    <DetailsPage/>
     </>
   )
 }
