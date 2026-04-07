@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "title": "Sana Vase",
+    "price": "$185.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500&q=80"
+  },
+  {
+    "id": 2,
+    "title": "Lunar Horizon",
+    "price": "$420.00",
+    "status": "LOW STOCK",
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80"
+  },
+  {
+    "id": 3,
+    "title": "Echo Audio S1",
+    "price": "$349.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"
+  },
+  {
+    "id": 4,
+    "title": "Bespoke Lounge",
+    "price": "$1,250.00",
+    "status": "OUT OF STOCK",
+    "image": "https://images.unsplash.com/photo-1506459225024-1428097a7e18?w=500&q=80"
+  },
+  {
+    "id": 5,
+    "title": "Atlas Wallet",
+    "price": "$85.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80"
+  },
+  {
+    "id": 6,
+    "title": "Aviator Pro",
+    "price": "$210.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80"
+  },
+  {
+    "id": 7,
+    "title": "Moment Cam",
+    "price": "$129.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80"
+  },
+  {
+    "id": 8,
+    "title": "Earth Bowl Set",
+    "price": "$115.00",
+    "status": "IN STOCK",
+    "image": "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80"
+  }
+]

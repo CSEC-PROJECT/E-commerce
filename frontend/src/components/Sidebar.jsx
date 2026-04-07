@@ -1,30 +1,35 @@
 import React, { useState } from 'react';
+import categoriesData from './categoriesData.json';
 
 const Sidebar = () => {
+  const [categories, setCategories] = useState(categoriesData);
+  const [activeCategory, setActiveCategory] = useState("all");
+
   return (
     <aside className="w-64 flex-shrink-0 pr-8">
       {/* Category Section */}
       <div className="mb-10">
         <h3 className="text-xs font-bold text-text-muted tracking-wider mb-4 uppercase">Category</h3>
         <div className="space-y-3">
-          <label className="flex items-center cursor-pointer group">
-            <div className="w-4 h-4 rounded border border-border bg-primary/10 flex flex-shrink-0 justify-center items-center mr-3 transition-colors">
-              <svg className="w-3 h-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </div>
-            <span className="text-sm text-text-main group-hover:text-primary transition-colors">All Collections</span>
-          </label>
-          <label className="flex items-center cursor-pointer group">
-            <div className="w-4 h-4 rounded border border-border bg-surface-soft flex flex-shrink-0 justify-center items-center mr-3 transition-colors group-hover:bg-primary/5"></div>
-            <span className="text-sm text-text-muted group-hover:text-primary transition-colors">Home Decor</span>
-          </label>
-          <label className="flex items-center cursor-pointer group">
-            <div className="w-4 h-4 rounded border border-border bg-surface-soft flex flex-shrink-0 justify-center items-center mr-3 transition-colors group-hover:bg-primary/5"></div>
-            <span className="text-sm text-text-muted group-hover:text-primary transition-colors">Accessories</span>
-          </label>
-          <label className="flex items-center cursor-pointer group">
-            <div className="w-4 h-4 rounded border border-border bg-surface-soft flex flex-shrink-0 justify-center items-center mr-3 transition-colors group-hover:bg-primary/5"></div>
-            <span className="text-sm text-text-muted group-hover:text-primary transition-colors">Workspace</span>
-          </label>
+          {categories.map((category) => {
+            const isActive = category.id === activeCategory;
+            return (
+              <label 
+                key={category.id} 
+                className="flex items-center cursor-pointer group"
+                onClick={() => setActiveCategory(category.id)}
+              >
+                <div className={`w-4 h-4 rounded border border-border flex flex-shrink-0 justify-center items-center mr-3 transition-colors ${isActive ? 'bg-primary/10' : 'bg-surface-soft group-hover:bg-primary/5'}`}>
+                  {isActive && (
+                    <svg className="w-3 h-3 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                  )}
+                </div>
+                <span className={`text-sm transition-colors group-hover:text-primary ${isActive ? 'text-text-main' : 'text-text-muted'}`}>
+                  {category.label}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </div>
 

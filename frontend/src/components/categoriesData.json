@@ -1,0 +1,6 @@
+[
+  { "id": "all", "label": "All Collections" },
+  { "id": "home-decor", "label": "Home Decor" },
+  { "id": "accessories", "label": "Accessories" },
+  { "id": "workspace", "label": "Workspace" }
+]
