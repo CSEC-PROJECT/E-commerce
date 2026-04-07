@@ -1,18 +1,29 @@
-const express = require('express');
+import express from 'express';
+import dotenv from 'dotenv';
+import userRoutes from "./routes/user.route.js";
+import connectDB from './config/db.js';
 
+dotenv.config();
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use("/api/auth",userRoutes)
 
 app.get('/', (req, res) => {
   res.send('Server is running 🚀');
 });
+ 
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+};
 
-app.get('/api/test', (req, res) => {
-  res.json({ message: 'API is working ✅' });
-}); 
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+startServer();
