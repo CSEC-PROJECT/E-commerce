@@ -1,9 +1,10 @@
 import React from 'react'
-import DetailsPage from './pages/DetailsPage'
+import Frame4Page from './pages/Frame4Page'
+
 const App = () => {
   return (
     <>
-    <DetailsPage/>
+      <Frame4Page />
     </>
   )
 }
