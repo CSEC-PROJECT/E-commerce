@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import userRoutes from "./routes/user.route.js";
+import productRoutes from "./routes/product.route.js";
+import productAdminRoutes from "./routes/admin/product.route.js";
 import connectDB from './config/db.js';
 import errorHandler from './middleware/error.middleware.js';
 
@@ -14,6 +16,8 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', credentials: true }));
 app.use("/api/auth",userRoutes)
+app.use("/api/products",productRoutes)
+app.use("/api/products",productAdminRoutes)
 
 app.get('/', (req, res) => {
   res.send('Server is running 🚀');
