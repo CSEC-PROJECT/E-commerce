@@ -20,6 +20,11 @@ const App = () => {
       {/* <Footer /> */}
     </>
   )
+import Home from './pages/home'
+
+const App = () => {
+  return <Home />;
+ main
 }
 
 export default App
