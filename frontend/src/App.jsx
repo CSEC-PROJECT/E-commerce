@@ -1,30 +1,25 @@
-import React from 'react'
-// import ProductsPage from './pages/ProductsPage'
-// import DetailsPage from './pages/DetailsPage'
-import NavBar from './components/Common/NavBar'
-// import Card1 from './components/Common/Card1'
-// import Card2 from './components/Common/Card2'
-// import Card4 from './components/Common/Card4'
-// import Card3 from './components/Common/Card3'
-// import Footer from './components/Common/Footer'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './components/Common/Layout';
+import Home from './pages/home';
+import ProductsPage from './pages/ProductsPage';
+import DetailsPage from './pages/detailsPage';
+import AboutPage from './pages/AboutPage';
+
 const App = () => {
   return (
-    <>
-      {/* <ProductsPage/> */}
-      {/* <DetailsPage/> */}
-      <NavBar />
-      {/* <Card1 /> */}
-      {/* <Card2 /> */}
-      {/* <Card4 /> */}
-      {/* <Card3 /> */}
-      {/* <Footer /> */}
-    </>
-  )
-import Home from './pages/home'
+    <Router>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<ProductsPage />} />
+          <Route path="/product/:id" element={<DetailsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/collections" element={<ProductsPage />} />
+        </Route>
+      </Routes>
+    </Router>
+  );
+};
 
-const App = () => {
-  return <Home />;
- main
-}
-
-export default App
+export default App;

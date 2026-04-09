@@ -1,12 +1,12 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import Card3 from '../components/Common/Card3';
 import Sidebar from '../components/Sidebar';
-import ProductCard from '../components/ProductCard';
 import Pagination from '../components/Pagination';
-
-import productsData from '../components/productsData.json';
+import shopProducts from '../data/shopProducts.json';
 
 const ProductsPage = () => {
-  const [products, setProducts] = React.useState(productsData);
+  const [products] = React.useState(shopProducts);
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,30 +25,31 @@ const ProductsPage = () => {
                 <input
                   type="text"
                   placeholder="Search curated products..."
-                  className="block w-full pl-12 pr-4 py-3.5 bg-[#f5f6fa] rounded-xl text-[15px] font-medium text-[#2d3748] placeholder:text-[#9ea4b5] placeholder:font-normal outline-none border-none focus:ring-0 transition-colors"
+                  className="block w-full pl-12 pr-4 py-3.5 bg-muted rounded-xl text-[15px] font-medium text-foreground placeholder:text-muted-foreground placeholder:font-normal outline-none border-none focus:ring-0 transition-colors"
                 />
               </div>
 
-              <div className="flex items-center text-sm text-text-muted shrink-0 space-x-4">
+              <div className="flex items-center text-sm text-muted-foreground shrink-0 space-x-4">
                 <span>Showing {products.length} products</span>
                 <div className="h-4 w-px bg-border"></div>
-                <button className="flex items-center text-text-main font-medium hover:text-primary transition-colors">
+                <button className="flex items-center text-foreground font-medium hover:text-primary transition-colors">
                   Sort by: Newest
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down ml-1"><path d="m6 9 6 6 6-6" /></svg>
                 </button>
               </div>
             </div>
 
-            {/* Product Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10">
+            {/* Product Grid using Card3 */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
               {products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  title={product.title}
-                  price={product.price}
-                  status={product.status}
-                  image={product.image}
-                />
+                <Link to={`/product/${product.id}`} key={product.id}>
+                  <Card3
+                    image={product.image}
+                    title={product.title}
+                    price={product.price}
+                    inStock={product.inStock}
+                  />
+                </Link>
               ))}
             </div>
 
