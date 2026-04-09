@@ -16,8 +16,9 @@ const userSchema = new mongoose.Schema({
         type:String
     },
     role:{
-        type: [String],
-        default:["user"]
+        type: String,
+        enum: ["user", "admin"],
+        default:"user"
     }
     ,
     verificationToken: {
@@ -28,11 +29,9 @@ const userSchema = new mongoose.Schema({
         default: false,
     }
     ,
-    // hashed refresh token for refresh-token flow (single device)
     refreshTokenHash: {
         type: String,
     },
-    // password reset token (hashed) and expiry
     passwordResetToken: {
         type: String,
     },
