@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 const TechnicalDetail = ({ iconPath, label, value }) => (
   <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border transition-colors">
     <div className="shrink-0">
+
       <img src={iconPath} alt="icon image" className="w-5 h-5 object-contain opacity-80" aria-hidden="true" />
     </div>
     <div>
@@ -159,6 +160,7 @@ const ProductDetail = () => {
                 <div key={item.text} className={`flex flex-col items-center gap-2 ${i === 1 ? 'border-x border-border' : ''}`}>
                   <img 
                     src={item.icon} 
+
                     alt="item icon" 
                     className="w-5 h-5" 
                     style={{ filter: 'brightness(0) saturate(100%) invert(20%) sepia(90%) saturate(3000%) hue-rotate(240deg)' }} 

@@ -1,15 +1,10 @@
 import React from 'react'
 // import ProductsPage from './pages/ProductsPage'
-// import DetailsPage from './pages/DetailsPage'
-import AboutPage from './pages/AboutPage'
+import Home from './pages/home'
+
 const App = () => {
-  return (
-    <>
-    {/* <ProductsPage/> */}
-    {/* <DetailsPage/> */}
-    <AboutPage/>
-    </>
-  )
+  return <Home />;
+ main
 }
 
 export default App
