@@ -3,10 +3,15 @@ import { mongo } from "mongoose";
 import Product from "../../models/product.model.js";
 
 const createProduct = async(req,res) =>{
-    const { name, description, price, category, imageUrl, stock } = req.body;
+    const { name, description, price, category, imageUrl, stock, status } = req.body;
     try{
         if (!name || !description || !category || !imageUrl || price == null || stock == null) {
             return res.status(400).json({ message: "All fields are required" });
+        }
+        // Validate optional status
+        const validStatuses = ["used", "slightly used", "new"];
+        if (status && !validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status value" });
         }
         if (Number(price) < 0) {
             return res.status(400).json({ message: "Invalid price value" });
@@ -21,7 +26,8 @@ const createProduct = async(req,res) =>{
             price,
             category,
             imageUrl,
-            stock
+            stock,
+            status
         });
         await newProduct.save();
         return res.status(201).json({

@@ -15,6 +15,11 @@ const productSchema = new mongoose.Schema({
         type:Number,
         required: true,
     },
+    status:{
+        type:String,
+        enum:["used","slightly used","new"],
+        default:"new"
+    },
     category:{
         type:String,
         required: true,

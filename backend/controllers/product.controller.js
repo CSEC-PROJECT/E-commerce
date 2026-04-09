@@ -1,10 +1,10 @@
 // controllers/product.controller.js
-import { mongo } from "mongoose";
+import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 
 const getProducts = async (req, res) => {
     try{
-        const { search, category, minPrice, maxPrice, page = 1, limit = 10 } = req.query;
+        const { search, category, minPrice, maxPrice, status, page = 1, limit = 10 } = req.query;
 
         const pageNum = Number(page) || 1;
         const limitNum = Number(limit) || 10;
@@ -15,6 +15,9 @@ const getProducts = async (req, res) => {
         }
         if (category) {
             filter.category = category;
+        }
+        if (status) {
+            filter.status = status;
         }
         if (minPrice || maxPrice) {
             filter.price = {};
@@ -43,7 +46,7 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
     const { id } = req.params;
     try {
-        if (mongo.ObjectId.isValid(id) === false) {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid product ID" });
         }
         const product = await Product.findById(id);
