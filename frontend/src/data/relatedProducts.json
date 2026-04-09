@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "image": "https://images.unsplash.com/photo-1437037453448-25ab8300ec2a?w=800&auto=format&fit=crop&q=60",
+    "category": "WEARABLES",
+    "title": "Smart Watch Series X",
+    "price": "$299.00",
+    "rating": 4.9,
+    "reviews": 88,
+    "inStock": true
+  },
+  {
+    "id": 2,
+    "image": "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=800&auto=format&fit=crop&q=60",
+    "category": "AUDIO",
+    "title": "Compact Bluetooth Speaker",
+    "price": "$85.00",
+    "rating": 4.8,
+    "reviews": 134,
+    "inStock": false
+  },
+  {
+    "id": 3,
+    "image": "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=60",
+    "category": "COMPUTING",
+    "title": "Mechanical Keyboard",
+    "price": "$155.00",
+    "rating": 4.7,
+    "reviews": 56,
+    "inStock": true
+  },
+  {
+    "id": 4,
+    "image": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&auto=format&fit=crop&q=60",
+    "category": "FRAGRANCE",
+    "title": "Luxe Perfume Edition",
+    "price": "$95.00",
+    "rating": 4.6,
+    "reviews": 42,
+    "inStock": true
+  }
+]

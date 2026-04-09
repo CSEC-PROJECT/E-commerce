@@ -1,5 +1,6 @@
 import { Button } from "../ui/button";
 import { Truck, RotateCcw } from "lucide-react";
+import { Link } from "react-router-dom";
 import hero1 from "../../assets/ImagesForHome/hero1.png"
 
 export default function Hero() {
@@ -37,12 +38,16 @@ export default function Hero() {
 
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-14">
-              <Button className="bg-[#5c53e5] hover:bg-[#4840b8] text-white px-10 py-7 rounded-xl text-lg font-bold transition-transform duration-300 shadow-lg shadow-[#5c53e5]/25 hover:-translate-y-1">
-                Shop Collection
-              </Button>
-              <Button variant="outline" className="border-gray-500 text-white bg-black/20 hover:bg-white hover:text-black px-10 py-7 rounded-xl text-lg font-bold transition-all duration-300 backdrop-blur-sm">
-                View Lookbook
-              </Button>
+              <Link to="/products">
+                <Button className="bg-[#5c53e5] hover:bg-[#4840b8] text-white px-10 py-7 rounded-xl text-lg font-bold transition-transform duration-300 shadow-lg shadow-[#5c53e5]/25 hover:-translate-y-1">
+                  Shop Collection
+                </Button>
+              </Link>
+              <Link to="/about">
+                <Button variant="outline" className="border-gray-500 text-white bg-black/20 hover:bg-white hover:text-black px-10 py-7 rounded-xl text-lg font-bold transition-all duration-300 backdrop-blur-sm">
+                  View Lookbook
+                </Button>
+              </Link>
             </div>
 
             {/* Features */}

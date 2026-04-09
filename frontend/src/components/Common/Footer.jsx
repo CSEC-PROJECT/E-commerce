@@ -1,8 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
-        <footer className="w-full bg-surface-soft bg-muted pt-16 pb-8 border-t border-border mt-16">
+        <footer className="w-full bg-muted pt-16 pb-8 border-t border-border mt-16">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
                 {/* Main Content Layout */}
@@ -10,7 +11,9 @@ const Footer = () => {
 
                     {/* Left Section: Brand & About */}
                     <div className="md:col-span-4 flex flex-col">
-                        <h2 className="text-3xl font-bold text-foreground mb-4">E-Shop</h2>
+                        <Link to="/" className="inline-block">
+                            <h2 className="text-3xl font-bold text-foreground mb-4">E-Shop</h2>
+                        </Link>
                         <p className="text-muted-foreground leading-relaxed mb-8 max-w-sm text-[15px]">
                             The Digital Atelier. Where curated aesthetics meet modern functionality in every piece we offer.
                         </p>
@@ -45,10 +48,10 @@ const Footer = () => {
                                 Shop
                             </h3>
                             <ul className="flex flex-col space-y-4">
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">All Products</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">New Arrivals</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Featured</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Sale</a></li>
+                                <li><Link to="/products" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">All Products</Link></li>
+                                <li><Link to="/products" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">New Arrivals</Link></li>
+                                <li><Link to="/products" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Featured</Link></li>
+                                <li><Link to="/products" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Sale</Link></li>
                             </ul>
                         </div>
 
@@ -58,10 +61,10 @@ const Footer = () => {
                                 Support
                             </h3>
                             <ul className="flex flex-col space-y-4">
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Shipping & Returns</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">FAQ</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Terms of Service</a></li>
-                                <li><a href="#" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Privacy Policy</a></li>
+                                <li><Link to="/about" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Shipping & Returns</Link></li>
+                                <li><Link to="/about" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">FAQ</Link></li>
+                                <li><Link to="/about" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Terms of Service</Link></li>
+                                <li><Link to="/about" className="text-[15px] text-muted-foreground hover:text-foreground hover:underline transition-all decoration-primary underline-offset-4">Privacy Policy</Link></li>
                             </ul>
                         </div>
 
@@ -109,7 +112,7 @@ const Footer = () => {
                         © 2024 Digital Atelier. All rights reserved.
                     </p>
 
-                    {/* Payment/Trust Icons Placeholder */}
+                    {/* Payment/Trust Icons */}
                     <div className="flex items-center gap-2.5">
                         <div className="w-8 h-5 rounded-[4px] bg-muted-foreground/20 flex items-center justify-center shadow-sm">
                             <span className="sr-only">Visa</span>

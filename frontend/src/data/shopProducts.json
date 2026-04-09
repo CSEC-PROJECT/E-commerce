@@ -1,0 +1,86 @@
+[
+  {
+    "id": 1,
+    "image": "https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=500&q=80",
+    "title": "Sana Vase",
+    "price": "$185.00",
+    "inStock": true
+  },
+  {
+    "id": 2,
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+    "title": "Lunar Horizon",
+    "price": "$420.00",
+    "inStock": false
+  },
+  {
+    "id": 3,
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+    "title": "Echo Audio S1",
+    "price": "$349.00",
+    "inStock": true
+  },
+  {
+    "id": 4,
+    "image": "https://images.unsplash.com/photo-1506459225024-1428097a7e18?w=500&q=80",
+    "title": "Bespoke Lounge",
+    "price": "$1,250.00",
+    "inStock": false
+  },
+  {
+    "id": 5,
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80",
+    "title": "Atlas Wallet",
+    "price": "$85.00",
+    "inStock": true
+  },
+  {
+    "id": 6,
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80",
+    "title": "Aviator Pro",
+    "price": "$210.00",
+    "inStock": true
+  },
+  {
+    "id": 7,
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80",
+    "title": "Moment Cam",
+    "price": "$129.00",
+    "inStock": true
+  },
+  {
+    "id": 8,
+    "image": "https://images.unsplash.com/photo-1578500494198-246f612d3b3d?w=500&q=80",
+    "title": "Earth Bowl Set",
+    "price": "$115.00",
+    "inStock": true
+  },
+  {
+    "id": 9,
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=500&q=80",
+    "title": "Artisan Notebook",
+    "price": "$45.00",
+    "inStock": true
+  },
+  {
+    "id": 10,
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=500&q=80",
+    "title": "Classic Parka",
+    "price": "$180.00",
+    "inStock": true
+  },
+  {
+    "id": 11,
+    "image": "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=500&q=80",
+    "title": "Leather Tote",
+    "price": "$320.00",
+    "inStock": true
+  },
+  {
+    "id": 12,
+    "image": "https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=500&q=80",
+    "title": "Luxe Perfume",
+    "price": "$95.00",
+    "inStock": true
+  }
+]

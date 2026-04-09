@@ -1,0 +1,82 @@
+[
+  {
+    "id": 1,
+    "image": "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop&q=60",
+    "category": "OUTERWEAR",
+    "title": "Classic Winter Parka",
+    "price": "$180.00",
+    "rating": 4.8,
+    "reviews": 124,
+    "inStock": true
+  },
+  {
+    "id": 2,
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=60",
+    "category": "AUDIO",
+    "title": "Studio Headphones Pro",
+    "price": "$289.00",
+    "rating": 4.9,
+    "reviews": 84,
+    "inStock": true
+  },
+  {
+    "id": 3,
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=60",
+    "category": "WEARABLES",
+    "title": "Lunar Horizon Watch",
+    "price": "$420.00",
+    "rating": 4.7,
+    "reviews": 56,
+    "inStock": false
+  },
+  {
+    "id": 4,
+    "image": "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=800&auto=format&fit=crop&q=60",
+    "category": "PHOTOGRAPHY",
+    "title": "Moment Cam Retro",
+    "price": "$129.00",
+    "rating": 4.5,
+    "reviews": 112,
+    "inStock": true
+  },
+  {
+    "id": 5,
+    "image": "https://images.unsplash.com/photo-1627123424574-724758594e93?w=800&auto=format&fit=crop&q=60",
+    "category": "ACCESSORIES",
+    "title": "Atlas Leather Wallet",
+    "price": "$85.00",
+    "rating": 4.6,
+    "reviews": 98,
+    "inStock": true
+  },
+  {
+    "id": 6,
+    "image": "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=800&auto=format&fit=crop&q=60",
+    "category": "EYEWEAR",
+    "title": "Aviator Pro Sunglasses",
+    "price": "$210.00",
+    "rating": 4.8,
+    "reviews": 76,
+    "inStock": true
+  },
+  {
+    "id": 7,
+    "image": "https://images.unsplash.com/photo-1544816155-12df9643f363?w=800&auto=format&fit=crop&q=60",
+    "category": "STATIONERY",
+    "title": "Artisan Notebook",
+    "price": "$45.00",
+    "rating": 4.9,
+    "reviews": 203,
+    "inStock": true
+  },
+  {
+    "id": 8,
+    "image": "https://images.unsplash.com/photo-1584916201218-f4242ceb4809?w=800&auto=format&fit=crop&q=60",
+    "category": "BAGS",
+    "title": "Artisan Leather Tote",
+    "price": "$320.00",
+    "rating": 4.7,
+    "reviews": 67,
+    "inStock": true
+  }
+]
