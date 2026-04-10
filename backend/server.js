@@ -7,6 +7,7 @@ import productRoutes from "./routes/product.route.js";
 import productAdminRoutes from "./routes/admin/product.route.js";
 import connectDB from './config/db.js';
 import errorHandler from './middleware/error.middleware.js';
+import adminOrder from "./routes/admin/order.route.js"
 
 dotenv.config();
 const app = express();
@@ -18,6 +19,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL || 'http://localhost:5173', cred
 app.use("/api/auth",userRoutes)
 app.use("/api/products",productRoutes)
 app.use("/api/products",productAdminRoutes)
+app.use("/api/order",adminOrder)
 
 app.get('/', (req, res) => {
   res.send('Server is running 🚀');
