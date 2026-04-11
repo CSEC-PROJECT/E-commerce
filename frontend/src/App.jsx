@@ -1,25 +1,29 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Common/Layout';
-import Home from './pages/home';
-import ProductsPage from './pages/ProductsPage';
-import DetailsPage from './pages/detailsPage';
-import AboutPage from './pages/AboutPage';
+import React from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom"
+import NavBar from './components/Common/NavBar'
+import Footer from './components/Common/Footer'
+
+// Pages
+import Home from './pages/home'
+import AboutPage from './pages/AboutPage'
+import ProductsPage from './pages/ProductsPage'
+import CartPage from './pages/CartPage'
+// import DetailsPage from './pages/detailsPage'
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter>
+      <NavBar />
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/product/:id" element={<DetailsPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/collections" element={<ProductsPage />} />
-        </Route>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
       </Routes>
-    </Router>
-  );
-};
+      <Footer />
+    </BrowserRouter>
+  )
+}
 
-export default App;
+export default App
