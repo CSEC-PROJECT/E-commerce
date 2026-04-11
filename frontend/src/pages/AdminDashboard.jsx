@@ -1,18 +1,13 @@
 import React from 'react';
 import { 
-  LayoutDashboard, ShoppingCart, Users, Settings, 
-  Plus, Pencil, Trash2, ShieldUser, ArrowRight, 
-  UserCog, Maximize 
+  ShoppingCart, Users, Plus, Pencil, Trash2, 
+  ShieldUser, ArrowRight, UserCog, Maximize 
 } from 'lucide-react';
+import Sidebar from '../components/Common/Sidebar'; // Importing the new component
+
+
 
 /** * CONSTANTS */
-const NAVIGATION_ITEMS = [
-  { id: 'dashboard', text: 'Dashboard', icon: LayoutDashboard, active: true },
-  { id: 'products', text: 'Products', icon: ShoppingCart },
-  { id: 'users', text: 'Users', icon: Users },
-  { id: 'settings', text: 'Settings', icon: Settings },
-];
-
 const PRODUCT_DATA = [
   { id: 1, name: "Lunar Ceramic Vase", category: "Home Decor", price: "$185.00", stock: "12 Units", variant: "neutral" },
   { id: 2, name: "Atelier Linen Shirt", category: "Apparel", price: "$120.00", stock: "48 Units", variant: "success" },
@@ -24,8 +19,9 @@ const USER_DATA = [
   { id: 2, initial: "MS", name: "Marcus Smith", email: "m.smith@studio.io", role: "CONTENT EDITOR" },
 ];
 
-/** * SUB-COMPONENTS */
 
+
+/** * SUB-COMPONENTS */
 const StatCard = ({ title, value, change, changeText, icon: Icon, statusColorClass }) => (
   <div className="bg-white p-6 rounded-[1.25rem] border border-[#DEE3E7] flex-1 flex flex-col justify-between shadow-sm transition-shadow hover:shadow-md" style={{ aspectRatio: '304/144' }}>
     <div className="flex items-center justify-between">
@@ -69,56 +65,23 @@ const TableHeader = ({ cols }) => (
   </thead>
 );
 
+
+
 /** * MAIN COMPONENT */
 const AdminDashboard = () => {
   return (
     <div className="flex min-h-screen bg-white font-sans antialiased text-[#101928]">
+      
 
 
-
-      {/* Sidebar Navigation - Narrowed from w-80 to w-64 */}
-      <aside className="w-64 bg-[#E0E2FF] p-6 flex flex-col shrink-0 border-r border-[#DEE3E7]">
-        <nav className="flex-1 space-y-2">
-          {NAVIGATION_ITEMS.map((item) => (
-            <a
-              key={item.id}
-              href={`#${item.id}`}
-              className={`flex items-center gap-3 p-3 rounded-lg text-sm font-semibold transition-colors
-                ${item.active 
-                  ? 'bg-[#4338CA] text-white shadow-md' 
-                  : 'text-[#5A606D] hover:bg-white/50 hover:text-[#101928]'}`}
-            >
-              <item.icon size={20} strokeWidth={1.5} className={item.active ? 'text-white' : 'text-[#848199]'} />
-              {item.text}
-            </a>
-          ))}
-        </nav>
-
-
-
-        {/* User Profile Mini-Card */}
-        <div className="mt-auto flex items-center gap-3 bg-white p-3 rounded-xl border border-[#DEE3E7] shadow-sm">
-          <img 
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=100&auto=format&fit=crop" 
-            alt="Admin Avatar" 
-            className="w-10 h-10 rounded-lg object-cover" 
-          />
-          <div className="overflow-hidden">
-            <p className="text-[10px] uppercase tracking-wider text-[#848199] font-bold">Admin</p>
-            <p className="text-sm font-bold truncate">Alex Rivers</p>
-          </div>
-        </div>
-      </aside>
-
-
+      {/* Sidebar used from Common folder */}
+      <Sidebar />
 
       {/* Main Content Area */}
-
       <main className="flex-1 p-10 overflow-y-auto space-y-12">
 
 
-
-        {/* Analytics Section - Colors set to Green, Green, Red */}
+        {/* Analytics Section */}
 
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -151,7 +114,6 @@ const AdminDashboard = () => {
 
 
         {/* Inventory Section */}
-        
         <section>
           <header className="flex justify-between items-end mb-6">
             <h2 className="text-2xl font-bold tracking-tight">Products Inventory</h2>
@@ -191,6 +153,8 @@ const AdminDashboard = () => {
             </table>
           </div>
         </section>
+
+
 
         {/* Users Section */}
         <section>
