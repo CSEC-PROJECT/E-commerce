@@ -37,7 +37,9 @@ const userSchema = new mongoose.Schema({
     },
     passwordResetExpires: {
         type: Date,
-    }
+    },
+    profilePic: String,
+    cloudinaryId: String
 
 },
     {timestamps: true}
