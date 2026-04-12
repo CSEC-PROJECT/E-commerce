@@ -1,12 +1,12 @@
 import express from 'express';
-import {createOrder,getMyOrder,getOrderById} from "../../controllers/user/order.controller"
+import { createOrder, getMyOrder, getOrderById } from "../../controllers/user/order.controller.js";
+import { authenticate } from "../../middleware/role.middleware.js";
 
 const router = express.Router();
 
-router.post('/orders',createOrder)
-router.get('/orders/my',getMyOrder)
-router.get('/orders/:id',getOrderById)
+router.post('/orders', authenticate, createOrder);
+router.get('/orders/my', authenticate, getMyOrder);
+router.get('/orders/:id', authenticate, getOrderById);
 
-// POST /api/orders        → create order (checkout)
-// GET /api/orders/my      → user orders
-// GET /api/orders/:id     → single order
+export default router;
+
