@@ -51,6 +51,11 @@ const NavBar = () => {
 
     const isActive = (path) => location.pathname === path;
 
+    // Do not render NavBar on Login or Signup pages
+    if (location.pathname === '/login' || location.pathname === '/signup') {
+        return null;
+    }
+
     const navLinkClass = (path) =>
         `px-1 text-[15px] font-semibold h-[72px] flex items-center transition-colors ${isActive(path)
             ? 'text-primary border-b-[2.5px] border-primary'
@@ -165,7 +170,7 @@ const NavBar = () => {
                             {/* Desktop Sign In */}
                             <div className="hidden md:block">
                                 <Link
-                                    to="/"
+                                    to="/login"
                                     className="flex items-center gap-1.5 px-3 py-2 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[6px] text-[15px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
                                 >
                                     <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -307,7 +312,7 @@ const NavBar = () => {
                         </Link>
 
                         <Link
-                            to="/"
+                            to="/login"
                             onClick={() => setIsMobileMenuOpen(false)}
                             className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-white bg-primary hover:bg-primary/90 rounded-md shadow-sm transition-colors focus:outline-none"
                         >
