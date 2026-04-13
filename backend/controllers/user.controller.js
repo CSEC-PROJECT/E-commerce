@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import User from "../models/user.js"
+import User from "../models/user.model.js"
 
 
 const generateAccessToken = (user) => {
@@ -99,7 +99,10 @@ export const register = async (req, res) => {
             email: normalizedEmail,
             password,
             verificationToken,
-            isVerified: false 
+            isVerified: false,
+            profilePic: req.file?.path || req.file?.secure_url || undefined,
+            cloudinaryId: req.file?.filename || req.file?.public_id || undefined,
+
         });
 
         await newUser.save();

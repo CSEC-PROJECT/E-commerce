@@ -8,10 +8,11 @@ import {
 	requestPasswordReset,
 	confirmPasswordReset,
 } from "../controllers/user.controller.js";
+import { upload } from "../config/cloudinaryConfig.js";
 
 const router = express.Router();
 
-router.post("/register", register);
+router.post("/register", upload.single('profilePic'), register);
 router.post("/login", login);
 router.post("/refresh", refreshToken);
 router.post("/logout", logout);

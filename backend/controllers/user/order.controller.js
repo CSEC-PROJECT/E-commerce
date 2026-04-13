@@ -58,7 +58,6 @@ const getOrderById = async(req,res) =>{
         if(!order){
             return res.status(404).json({message:"Order not found"});
         }
-        // Enforce ownership: only the order owner or an admin can access
         if (!req.user || !req.user._id) {
             return res.status(401).json({ message: "Unauthorized" });
         }

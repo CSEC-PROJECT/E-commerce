@@ -1,9 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Footer = () => {
+    const location = useLocation();
+
+    // Do not render Footer on Login or Signup pages
+    if (location.pathname === '/login' || location.pathname === '/signup') {
+        return null;
+    }
+
     return (
-        <footer className="w-full bg-muted pt-16 pb-8 border-t border-border mt-16">
+        <footer className="w-full bg-muted pt-16 pb-8 border-t border-border mt-0">
             <div className="max-w-7xl mx-auto px-6 lg:px-8">
 
                 {/* Main Content Layout */}

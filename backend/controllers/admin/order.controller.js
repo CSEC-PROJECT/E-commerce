@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import Order from "../../models/order.model.js";
 
 
-// getAllOrder,updateOrderStatus
 const getAllOrder = async (req,res) =>{
     try{
         const orders = await Order.find().populate("userId", "name email").sort({ createdAt: -1 });
@@ -21,7 +20,6 @@ const updateOrderStatus = async (req,res) =>{
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: "Invalid order ID" });
         }
-        // Require a status value to be provided
         if (!status) {
             return res.status(400).json({ message: "Status is required" });
         }

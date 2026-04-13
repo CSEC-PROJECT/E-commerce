@@ -1,4 +1,3 @@
-// controllers/admin/product.controller.js
 import { mongo } from "mongoose";
 import Product from "../../models/product.model.js";
 
@@ -8,7 +7,6 @@ const createProduct = async(req,res) =>{
         if (!name || !description || !category || !imageUrl || price == null || stock == null) {
             return res.status(400).json({ message: "All fields are required" });
         }
-        // Validate optional status
         const validStatuses = ["used", "slightly used", "new"];
         if (status && !validStatuses.includes(status)) {
             return res.status(400).json({ message: "Invalid status value" });

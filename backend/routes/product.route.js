@@ -8,5 +8,3 @@ router.get("/:id",getProductById)
 
 export default router
 
-// GET /api/products
-// GET /api/products/:id

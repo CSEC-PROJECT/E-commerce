@@ -1,14 +1,15 @@
-import express from "express"
-import {getCart,createCart,updateCartById,deleteCartById} from "../../controllers/user/cart.controller.js"
+import express from "express";
+import { getCart, createCart, updateCartById, deleteCartById } from "../../controllers/user/cart.controller.js";
+import { authenticate } from "../../middleware/role.middleware.js";
 
 const router = express.Router();
 
-router.get("/",getCart)
-router.post("/",createCart)
-router.put("/:id",updateCartById)
-router.delete("/:id",deleteCartById)
+router.get("/", authenticate, getCart);
+router.post("/", authenticate, createCart);
+router.put("/:id", authenticate, updateCartById);
+router.delete("/:id", authenticate, deleteCartById);
 
-// GET /api/cart
-// POST /api/cart        → add item
-// PUT /api/cart/:id     → update quantity
-// DELETE /api/cart/:id  → remove item
+
+export default router;
+
+
