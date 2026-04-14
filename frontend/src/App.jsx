@@ -8,13 +8,18 @@ import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
+import AddProduct from './pages/AddProduct'
+import ProductPreview from './pages/ProductPreview'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
-import AuthLayout from './components/Auth/AuthLayout'
-// import DetailsPage from './pages/detailsPage'
+import DetailsPage from './pages/detailsPage'
+import AdminProducts from './pages/AdminProducts'
 
 const App = () => {
   return (
+
+
+
     <BrowserRouter>
       <NavBar />
       <Routes>
