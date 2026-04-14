@@ -31,7 +31,7 @@ const sendVerificationEmail = async (email, token) => {
     const verificationLink = `${serverUrl}/api/auth/verify?token=${token}`;
 
     const mailOptions = {
-        from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+        from: `"CSEC_E_COMMERCE" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: "Verify your email address",
         html: `
@@ -98,7 +98,7 @@ export const register = async (req, res) => {
             name,
             email: normalizedEmail,
             password,
-            verificationToken,
+            verificationToken:verificationToken,
             isVerified: false,
             profilePic: req.file?.path || req.file?.secure_url || undefined,
             cloudinaryId: req.file?.filename || req.file?.public_id || undefined,
@@ -114,7 +114,6 @@ export const register = async (req, res) => {
         return res.status(201).json({
             message: "User registered successfully. Please check your email to verify.",
             data: userData,
-            accessToken: generateAccessToken(newUser)
         });
 
     } catch (error) {
@@ -125,25 +124,25 @@ export const register = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
     const { token } = req.query;
+    const frontendUrl = process.env.FRONTEND_URL || `http://localhost:5173`;
 
     try {
-        if (!token) {
-            return res.status(400).json({ message: "Verification token is missing" });
-        }
+        if (!token) return res.status(400).json({ message: "Token missing" });
 
         const user = await User.findOne({ verificationToken: token });
 
         if (!user) {
+            console.log(`Verification failed for token: ${token}`);
             return res.status(400).json({ message: "Invalid or expired token" });
         }
 
         user.isVerified = true;
         user.verificationToken = undefined; 
-        await user.save();
-
-        const frontendUrl = process.env.FRONTEND_URL || process.env.CLIENT_URL || `http://localhost:${process.env.FRONTEND_PORT || 5173}`;
-        return res.redirect(`${frontendUrl}/login?verified=true`);
         
+        await user.save(); 
+
+        console.log(`User ${user.email} verified successfully.`);
+        return res.redirect(`${frontendUrl}/login?verified=true`);
     } catch (error) {
         console.error("Verify Error:", error);
         return res.status(500).json({ message: "Internal server error" });
