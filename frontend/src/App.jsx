@@ -13,26 +13,29 @@ import CartPage from './pages/CartPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 // import DetailsPage from './pages/detailsPage'
+import SettingPage from './pages/SettingPage'
 
 const App = () => {
   return (
+    <>
+      <SettingPage />
+    </>
 
 
-
-    <BrowserRouter>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/products" element={<ProductsPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/admin/add-product" element={<AddProduct />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-        {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
-      </Routes>
-      <Footer />
-    </BrowserRouter>
+    // <BrowserRouter>
+    //   <NavBar />
+    //   <Routes>
+    //     <Route path="/" element={<Home />} />
+    //     <Route path="/about" element={<AboutPage />} />
+    //     <Route path="/products" element={<ProductsPage />} />
+    //     <Route path="/cart" element={<CartPage />} />
+    //     <Route path="/admin/add-product" element={<AddProduct />} />
+    //     <Route path="/login" element={<LoginPage />} />
+    //     <Route path="/signup" element={<SignupPage />} />
+    //     {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
+    //   </Routes>
+    //   <Footer />
+    // </BrowserRouter>
   )
 }
 
