@@ -27,15 +27,20 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/addproduct" element={<AddProduct />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        
+        {/* Auth Routes with shared persistent layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
+
+        
         {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
       </Routes>
       <Footer />
     </BrowserRouter>
   )
 }
+
 
 export default App
