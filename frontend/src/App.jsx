@@ -10,6 +10,7 @@ import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
+import AuthLayout from './components/Auth/AuthLayout'
 // import DetailsPage from './pages/detailsPage'
 
 const App = () => {
@@ -21,13 +22,20 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
+        
+        {/* Auth Routes with shared persistent layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
+
+        
         {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
       </Routes>
       <Footer />
     </BrowserRouter>
   )
 }
+
 
 export default App
