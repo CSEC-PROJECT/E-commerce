@@ -10,7 +10,18 @@ import connectDB from './config/db.js';
 import errorHandler from './middleware/error.middleware.js';
 import orderAdminRoutes from "./routes/admin/order.route.js";
 import orderUserRoutes from "./routes/user/order.route.js";
-import cartUserRoutes from "./routes/user/cart.route.js"
+import cartUserRoutes from "./routes/user/cart.route.js";
+
+import swaggerUi from "swagger-ui-express";
+import YAML from "yamljs";
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const swaggerDocument = YAML.load(path.join(__dirname, "docs", "swagger.yaml"));
+
 
 dotenv.config();
 const app = express();
@@ -29,8 +40,10 @@ app.use("/api/products", productRoutes);
 app.use("/api/admin/products", productAdminRoutes);
 app.use("/api/admin/users", userAdminRoutes);
 app.use("/api/admin/orders", orderAdminRoutes);
-app.use("/api/user", orderUserRoutes);
+app.use("/api/user/orders", orderUserRoutes);
 app.use("/api/user/cart", cartUserRoutes);
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(errorHandler);
 

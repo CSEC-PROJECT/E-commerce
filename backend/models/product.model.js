@@ -25,10 +25,28 @@ const productSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    imageUrl:{
-        type:String,
+    madeIn: {
+        type: String,
+        trim: true,
+    },
+    material: {
+        type: String,
+        trim: true,
+    },
+    coverImage: {
+        type: String,
         required: true,
-        trim: true
+        trim: true,
+    },
+    detailImages: {
+        type: [String],
+        validate: {
+            validator: function (arr) {
+                return arr.length <= 3;
+            },
+            message: "detailImages can contain at most 3 images",
+        },
+        default: [],
     },
     stock:{
         type:Number,
