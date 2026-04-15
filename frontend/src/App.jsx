@@ -15,6 +15,7 @@ import SignupPage from './pages/SignupPage'
 import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
+import AdminUsers from './pages/AdminUsers'
 
 const App = () => {
   return (
@@ -25,6 +26,9 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/addproduct" element={<AddProduct />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
