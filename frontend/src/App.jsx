@@ -8,35 +8,38 @@ import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
-// import AddProduct from './pages/AddProduct'
-// import ProductPreview from './pages/ProductPreview'
+import AddProduct from './pages/AddProduct'
+import ProductPreview from './pages/ProductPreview'
 import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
-// import DetailsPage from './pages/detailsPage'
+import SignupPage from './pages/SignupPage' import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
+import DetailsPage from './pages/detailsPage'
+import AdminProducts from './pages/AdminProducts'
 
 const App = () => {
   return (
-    <>
-      <SettingPage />
-    </>
 
+    <BrowserRouter>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/products" element={<ProductsPage />} />
+        <Route path="/cart" element={<CartPage />} />
+        
+        {/* Auth Routes with shared persistent layout */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
 
-    // <BrowserRouter>
-    //   <NavBar />
-    //   <Routes>
-    //     <Route path="/" element={<Home />} />
-    //     <Route path="/about" element={<AboutPage />} />
-    //     <Route path="/products" element={<ProductsPage />} />
-    //     <Route path="/cart" element={<CartPage />} />
-    //     <Route path="/admin/add-product" element={<AddProduct />} />
-    //     <Route path="/login" element={<LoginPage />} />
-    //     <Route path="/signup" element={<SignupPage />} />
-    //     {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
-    //   </Routes>
-    //   <Footer />
-    // </BrowserRouter>
+        
+        <Route path="/product/:id" element={<DetailsPage />} /> 
+      </Routes />
+      <Footer />
+    </BrowserRouter />
   )
 }
+
 
 export default App
