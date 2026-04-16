@@ -11,6 +11,9 @@ import errorHandler from './middleware/error.middleware.js';
 import orderAdminRoutes from "./routes/admin/order.route.js";
 import orderUserRoutes from "./routes/user/order.route.js";
 import cartUserRoutes from "./routes/user/cart.route.js";
+import paymentRoutes from "./routes/payment.route.js"
+import successMessage from './routes/payCheck.route.js';
+
 
 import swaggerUi from "swagger-ui-express";
 import YAML from "yamljs";
@@ -42,6 +45,8 @@ app.use("/api/admin/users", userAdminRoutes);
 app.use("/api/admin/orders", orderAdminRoutes);
 app.use("/api/user/orders", orderUserRoutes);
 app.use("/api/user/cart", cartUserRoutes);
+app.use("/api/pay",paymentRoutes)
+app.use("/checkout",successMessage)
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

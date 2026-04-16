@@ -142,7 +142,7 @@ export const verifyEmail = async (req, res) => {
         await user.save(); 
 
         console.log(`User ${user.email} verified successfully.`);
-        return res.redirect(`${frontendUrl}/login?verified=true`);
+        return res.redirect(`${frontendUrl}/login`);
     } catch (error) {
         console.error("Verify Error:", error);
         return res.status(500).json({ message: "Internal server error" });
