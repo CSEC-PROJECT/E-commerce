@@ -85,8 +85,8 @@ export const successMessage = (req, res) => {
                 
                 <span class="ref-badge">${tx_ref}</span>
                 
-                <a href="http://localhost:5173/" class="btn">
-                    Go to Dashboard
+                <a href="http://localhost:5173/products" class="btn">
+                    Go to product
                 </a>
             </div>
         </body>
