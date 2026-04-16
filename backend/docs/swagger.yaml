@@ -6,6 +6,8 @@ info:
 
 servers:
   - url: http://localhost:3000
+  - url: https://e-commerce-he4h.onrender.com
+
 
 tags:
   - name: Auth

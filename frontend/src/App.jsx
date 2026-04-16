@@ -11,15 +11,14 @@ import CartPage from './pages/CartPage'
 import AddProduct from './pages/AddProduct'
 import ProductPreview from './pages/ProductPreview'
 import LoginPage from './pages/LoginPage'
-import SignupPage from './pages/SignupPage'
+import SignupPage from './pages/SignupPage' 
 import DetailsPage from './pages/detailsPage'
+import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
+import AdminUsers from './pages/AdminUsers'
 
 const App = () => {
   return (
-
-
-
     <BrowserRouter>
       <NavBar />
       <Routes>
@@ -27,20 +26,20 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
-        
-        {/* Auth Routes with shared persistent layout */}
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-        </Route>
-
-        
-        {/* <Route path="/product/:id" element={<DetailsPage />} /> */}
+        <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/addproduct" element={<AddProduct />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
+        <Route path="/product/:id" element={<DetailsPage />} />
+        <Route path="/settings" element={<SettingPage />} />
+        <Route path="/admin/products" element={<AdminProducts />} />
+        <Route path="/admin/add-product" element={<AddProduct />} />
+        <Route path="/admin/product-preview" element={<ProductPreview />} />
       </Routes>
       <Footer />
     </BrowserRouter>
   )
 }
-
 
 export default App
