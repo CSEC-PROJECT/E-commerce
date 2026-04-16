@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
+import RequireRole from './components/auth/RequireRole'
 
 // Pages
 import Home from './pages/home'
@@ -26,9 +27,30 @@ const App = () => {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/addproduct" element={<AddProduct />} />
+        <Route
+          path="/admin/products"
+          element={
+            <RequireRole roles={["admin"]}>
+              <AdminProducts />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/users"
+          element={
+            <RequireRole roles={["admin"]}>
+              <AdminUsers />
+            </RequireRole>
+          }
+        />
+        <Route
+          path="/admin/addproduct"
+          element={
+            <RequireRole roles={["admin"]}>
+              <AddProduct />
+            </RequireRole>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
