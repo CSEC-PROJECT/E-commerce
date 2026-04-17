@@ -1,4 +1,3 @@
-// backend/controllers/admin/order.controller.js
 import mongoose from "mongoose";
 import Order from "../../models/order.model.js";
 

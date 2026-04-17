@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { User } from 'lucide-react';
+import { useAuthStore } from '../../store/authStore';
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -11,6 +13,7 @@ const NavBar = () => {
         return false;
     });
     const location = useLocation();
+    const accessToken = useAuthStore((state) => state.accessToken);
 
     // Dark mode toggle
     const toggleDarkMode = () => {
@@ -107,7 +110,7 @@ const NavBar = () => {
                                 <Link to="/products" className={navLinkClass('/products')}>
                                     Products
                                 </Link>
-                                <Link to="/products" className={navLinkClass('/collections')}>
+                                <Link to="/cart" className={navLinkClass('/cart')}>
                                     Collections
                                 </Link>
                                 <Link to="/about" className={navLinkClass('/about')}>
@@ -169,15 +172,25 @@ const NavBar = () => {
 
                             {/* Desktop Sign In */}
                             <div className="hidden md:block">
-                                <Link
-                                    to="/login"
-                                    className="flex items-center gap-1.5 px-3 py-2 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[6px] text-[15px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
-                                >
-                                    <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Sign In
-                                </Link>
+                                {accessToken ? (
+                                    <Link
+                                        to="/"
+                                        className="flex items-center justify-center w-10 h-10 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
+                                        aria-label="User profile"
+                                    >
+                                        <User size={20} />
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        to="/login"
+                                        className="flex items-center gap-1.5 px-3 py-2 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[6px] text-[15px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
+                                    >
+                                        <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Sign In
+                                    </Link>
+                                )}
                             </div>
 
                             {/* Mobile menu button */}
@@ -283,7 +296,7 @@ const NavBar = () => {
                         <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/products')}>
                             Products
                         </Link>
-                        <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/collections')}>
+                        <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
                             Collections
                         </Link>
                         <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
@@ -311,16 +324,27 @@ const NavBar = () => {
                             </span>
                         </Link>
 
-                        <Link
-                            to="/login"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-white bg-primary hover:bg-primary/90 rounded-md shadow-sm transition-colors focus:outline-none"
-                        >
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            Sign In
-                        </Link>
+                        {accessToken ? (
+                            <Link
+                                to="/"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-primary border border-primary/40 bg-background hover:bg-primary/5 rounded-md shadow-sm transition-colors focus:outline-none"
+                            >
+                                <User size={18} />
+                                Account
+                            </Link>
+                        ) : (
+                            <Link
+                                to="/login"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-white bg-primary hover:bg-primary/90 rounded-md shadow-sm transition-colors focus:outline-none"
+                            >
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Sign In
+                            </Link>
+                        )}
                     </div>
                 </div>
             </div>
