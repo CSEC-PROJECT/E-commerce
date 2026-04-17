@@ -110,7 +110,7 @@ const NavBar = () => {
                                 <Link to="/products" className={navLinkClass('/products')}>
                                     Products
                                 </Link>
-                                <Link to="/products" className={navLinkClass('/collections')}>
+                                <Link to="/cart" className={navLinkClass('/cart')}>
                                     Collections
                                 </Link>
                                 <Link to="/about" className={navLinkClass('/about')}>
@@ -296,7 +296,7 @@ const NavBar = () => {
                         <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/products')}>
                             Products
                         </Link>
-                        <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/collections')}>
+                        <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
                             Collections
                         </Link>
                         <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
