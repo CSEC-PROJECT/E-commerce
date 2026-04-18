@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useCartStore } from '../../store/cartStore';
 import toast from 'react-hot-toast';
 
 // ── Shared category list – matches backend values exactly ──
@@ -30,6 +31,9 @@ const NavBar = () => {
     const logout = useAuthStore((state) => state.logout);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
+    const cartCount = useCartStore((state) => state.cartCount);
+    const fetchCart = useCartStore((state) => state.fetchCart);
+    const clearCart = useCartStore((state) => state.clearCart);
 
     const isAdmin = Array.isArray(user?.role)
         ? user.role.includes('admin')
@@ -45,8 +49,18 @@ const NavBar = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Fetch real cart count on mount; re-fetch when auth changes
+    useEffect(() => {
+        if (accessToken) {
+            fetchCart();
+        } else {
+            clearCart();
+        }
+    }, [accessToken, fetchCart, clearCart]);
+
     const handleLogout = async () => {
         setUserMenuOpen(false);
+        clearCart();
         try {
             await logout();
             toast.success('Signed out');
@@ -209,9 +223,11 @@ const NavBar = () => {
                                     <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white border-[2.5px] border-background">
-                                        3
-                                    </span>
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white border-[2.5px] border-background">
+                                            {cartCount > 99 ? '99+' : cartCount}
+                                        </span>
+                                    )}
                                 </Link>
 
                                 {/* Dark / Light Mode Toggle Button */}
@@ -449,9 +465,11 @@ const NavBar = () => {
                                 </svg>
                                 <span>Cart Items</span>
                             </div>
-                            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                                3
-                            </span>
+                            {cartCount > 0 && (
+                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+                                    {cartCount > 99 ? '99+' : cartCount}
+                                </span>
+                            )}
                         </Link>
 
                         {accessToken ? (
