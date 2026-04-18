@@ -1,6 +1,73 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuthStore } from '../../store/authStore';
+import { apiRequest } from '../../lib/apiClient';
+import toast from 'react-hot-toast';
 
-const OrderSummary = ({ subtotal, tax, total }) => {
+const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
+    const { user } = useAuthStore();
+    const [loading, setLoading] = useState(false);
+
+    const handleCheckout = async () => {
+        if (!cartItems || cartItems.length === 0) {
+            toast.error("Your cart is empty");
+            return;
+        }
+        if (!user) {
+            toast.error("Please login to checkout");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const orderPayload = {
+                items: cartItems.map(item => ({
+                    product: item.product?._id || item.product,
+                    quantity: item.quantity,
+                    price: item.price
+                })),
+                totalPrice: total,
+                status: 'pending'
+            };
+
+            // 1. Create Order
+            const orderResponse = await apiRequest('/api/user/orders', {
+                method: 'POST',
+                body: orderPayload
+            });
+
+            const orderId = orderResponse?.order?._id;
+            if (!orderId) {
+                throw new Error("Order creation failed");
+            }
+
+            // 2. Initialize Payment with Chapa
+            const payPayload = {
+                amount: total,
+                currency: 'ETB',
+                email: user.email || 'customer@example.com',
+                orderId: orderId
+            };
+
+            const payResponse = await apiRequest('/api/pay', {
+                method: 'POST',
+                body: payPayload
+            });
+
+            if (payResponse?.data?.checkout_url) {
+                // Redirect to Chapa
+                window.location.href = payResponse.data.checkout_url;
+            } else {
+                throw new Error("Failed to get checkout URL from payment gateway");
+            }
+
+        } catch (error) {
+            console.error("Checkout error:", error);
+            toast.error(error.message || "Transaction failed. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="bg-card rounded-2xl shadow-sm border border-border/50 p-6 sm:p-8 sticky top-24">
             <h2 className="text-2xl font-bold text-foreground mb-6">Order Summary</h2>
@@ -45,11 +112,16 @@ const OrderSummary = ({ subtotal, tax, total }) => {
             </div>
 
             {/* Checkout Button */}
-            <button className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl py-4 flex items-center justify-center gap-2 font-bold text-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card mb-8">
-                Checkout
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+            <button 
+                onClick={handleCheckout}
+                disabled={loading || (cartItems && cartItems.length === 0)}
+                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:bg-primary disabled:cursor-not-allowed text-white rounded-xl py-4 flex items-center justify-center gap-2 font-bold text-lg shadow-md transition-all hover:shadow-lg hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card mb-8">
+                {loading ? 'Processing...' : 'Checkout'}
+                {!loading && (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                )}
             </button>
 
             {/* Trust Badges */}
@@ -64,7 +136,7 @@ const OrderSummary = ({ subtotal, tax, total }) => {
                 </div>
                 <div className="flex items-center gap-3">
                     <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Secure checkout powered by Stripe
+                    Secure checkout powered by Chapa
                 </div>
             </div>
 
@@ -75,9 +147,6 @@ const OrderSummary = ({ subtotal, tax, total }) => {
                 </div>
                 <div className="w-10 h-6 bg-muted rounded flex items-center justify-center">
                     <span className="text-[10px] font-bold text-muted-foreground">MC</span>
-                </div>
-                <div className="w-10 h-6 bg-[#63b3ed]/20 rounded flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-[#3182ce]">AMEX</span>
                 </div>
             </div>
         </div>

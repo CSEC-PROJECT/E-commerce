@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card4 from '../components/Common/Card4';
 import relatedProducts from '../data/relatedProducts.json';
-
-
-// 1. Technical Detail Component
+import useCartStore from '../store/cartStore';
+import toast from 'react-hot-toast';
 const TechnicalDetail = ({ iconPath, label, value }) => (
   <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border transition-colors">
     <div className="shrink-0">
@@ -34,6 +33,8 @@ const StarRating = ({ rating = 5, size = "sm" }) => (
 // 3. Product Detail Section
 const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
+  const { id } = useParams();
+  const addToCart = useCartStore(state => state.addToCart);
 
   const productGallery = [
     "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=800",
@@ -44,6 +45,19 @@ const ProductDetail = () => {
   ];
 
   const [activeImage, setActiveImage] = useState(productGallery[0]);
+
+  const handleAddToCart = async () => {
+      try {
+          await addToCart({
+              product: id || "65dcd1e1e1e1e1e1e1e1e1e1", // Default to dummy ObjectId if no ID in URL
+              quantity: quantity,
+              price: 240.00
+          });
+          toast.success("Added to cart successfully");
+      } catch (error) {
+          toast.error("Failed to add to cart");
+      }
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 font-sans text-foreground">
@@ -144,7 +158,7 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <button type="button" className="flex-1 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-widest text-xs h-[56px]">
+              <button type="button" onClick={handleAddToCart} className="flex-1 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-widest text-xs h-[56px]">
                 Add to Cart
               </button>
 

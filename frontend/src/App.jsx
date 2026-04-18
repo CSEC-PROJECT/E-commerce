@@ -25,6 +25,7 @@ import AdminSettings from './pages/AdminSettings'
 import AdminEarnings from './pages/AdminEarnings'
 import AddProduct from './pages/AddProduct'
 import ProductPreview from './pages/ProductPreviewPage'
+import TransactionStatusPage from './pages/TransactionStatusPage'
 
 function AppRoutes() {
   const location = useLocation()
@@ -43,6 +44,8 @@ function AppRoutes() {
 
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+        <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
+        <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
 
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
