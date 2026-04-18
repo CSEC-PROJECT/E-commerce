@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import toast from 'react-hot-toast';
 
 // ── Shared category list – matches backend values exactly ──
 const CATEGORIES = [
@@ -15,14 +16,45 @@ const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
     const [isDark, setIsDark] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return document.documentElement.classList.contains('dark');
-        }
-        return false;
+        if (typeof window === 'undefined') return false;
+        const saved = localStorage.getItem('theme');
+        const dark = saved === 'dark';
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+        return dark;
     });
     const location = useLocation();
     const navigate = useNavigate();
     const accessToken = useAuthStore((state) => state.accessToken);
+    const user = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+
+    const isAdmin = Array.isArray(user?.role)
+        ? user.role.includes('admin')
+        : user?.role === 'admin';
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handleLogout = async () => {
+        setUserMenuOpen(false);
+        try {
+            await logout();
+            toast.success('Signed out');
+            navigate('/');
+        } catch {
+            toast.error('Could not sign out');
+        }
+    };
 
     // Detect active category from URL for navbar highlight
     const searchParams = new URLSearchParams(location.search);
@@ -45,18 +77,6 @@ const NavBar = () => {
             localStorage.setItem('theme', 'light');
         }
     };
-
-    // Initialize dark mode from localStorage
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            setIsDark(true);
-        } else {
-            document.documentElement.classList.remove('dark');
-            setIsDark(false);
-        }
-    }, []);
 
     // Prevent body scrolling when drawer is open
     useEffect(() => {
@@ -147,7 +167,7 @@ const NavBar = () => {
                                                 to="/products"
                                                 className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
                                             >
-                                                View All Products →
+                                                View All Products
                                             </Link>
                                         </div>
                                     </div>
@@ -197,7 +217,7 @@ const NavBar = () => {
                                 {/* Dark / Light Mode Toggle Button */}
                                 <button
                                     onClick={toggleDarkMode}
-                                    className="text-foreground/80 hover:text-primary transition-all duration-300 focus:outline-none hidden sm:flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted"
+                                    className="text-foreground/80 hover:text-primary transition-all duration-300 focus:outline-none hidden sm:flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted cursor-pointer"
                                     aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                                     title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                                 >
@@ -216,16 +236,57 @@ const NavBar = () => {
                                 </button>
                             </div>
 
-                            {/* Desktop Sign In */}
-                            <div className="hidden md:block">
+                            {/* Desktop Sign In / User menu */}
+                            <div className="hidden md:block relative" ref={userMenuRef}>
                                 {accessToken ? (
-                                    <Link
-                                        to="/"
-                                        className="flex items-center justify-center w-10 h-10 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
-                                        aria-label="User profile"
-                                    >
-                                        <User size={20} />
-                                    </Link>
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setUserMenuOpen((o) => !o)}
+                                            className="flex items-center justify-center w-10 h-10 border-[1.5px] border-none text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background cursor-pointer"
+                                            aria-expanded={userMenuOpen}
+                                            aria-haspopup="menu"
+                                            aria-label="Account menu"
+                                        >
+                                            <User size={20} />
+                                        </button>
+                                        {userMenuOpen && (
+                                            <div
+                                                role="menu"
+                                                className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg z-50"
+                                            >
+                                                <Link
+                                                    to="/products"
+                                                    role="menuitem"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+                                                >
+                                                    <Package size={16} />
+                                                    My products
+                                                </Link>
+                                                {isAdmin && (
+                                                    <Link
+                                                        to="/admin/dashboard"
+                                                        role="menuitem"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+                                                    >
+                                                        <LayoutDashboard size={16} />
+                                                        Admin dashboard
+                                                    </Link>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLogout}
+                                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold hover:bg-muted cursor-pointer"
+                                                >
+                                                    <LogOut size={16} />
+                                                    Log out
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <Link
                                         to="/login"
@@ -234,7 +295,7 @@ const NavBar = () => {
                                         <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Sign In
+                                        Sign in
                                     </Link>
                                 )}
                             </div>
@@ -356,7 +417,7 @@ const NavBar = () => {
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="block px-4 py-2 text-xs font-bold text-primary hover:opacity-80 transition-opacity rounded-md mt-1"
                                     >
-                                        View All →
+                                        View All
                                     </Link>
                                 </div>
                             </div>
@@ -394,14 +455,37 @@ const NavBar = () => {
                         </Link>
 
                         {accessToken ? (
-                            <Link
-                                to="/"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-primary border border-primary/40 bg-background hover:bg-primary/5 rounded-md shadow-sm transition-colors focus:outline-none"
-                            >
-                                <User size={18} />
-                                Account
-                            </Link>
+                            <div className="flex flex-col gap-2">
+                                <Link
+                                    to="/products"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-foreground border border-border bg-background hover:bg-muted rounded-md transition-colors"
+                                >
+                                    <Package size={18} />
+                                    My products
+                                </Link>
+                                {isAdmin && (
+                                    <Link
+                                        to="/admin/dashboard"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-primary border border-primary/40 bg-background hover:bg-primary/5 rounded-md transition-colors"
+                                    >
+                                        <LayoutDashboard size={18} />
+                                        Admin dashboard
+                                    </Link>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsMobileMenuOpen(false);
+                                        handleLogout();
+                                    }}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-destructive border border-destructive/30 bg-background hover:bg-destructive/10 rounded-md transition-colors"
+                                >
+                                    <LogOut size={18} />
+                                    Log out
+                                </button>
+                            </div>
                         ) : (
                             <Link
                                 to="/login"
