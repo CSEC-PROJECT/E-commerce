@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Card4 from '../components/Common/Card4';
 import relatedProducts from '../data/relatedProducts.json';
 import useCartStore from '../store/cartStore';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Ban, Trash2, Filter, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const UsersTable = ({ users, currentPage, totalPages, setCurrentPage, totalUsers, onDelete, onBan }) => {
+const UsersTable = ({ users, currentPage, setCurrentPage, totalUsers, onDelete, onBan }) => {
   return (
     <div className="bg-white rounded-[20px] shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 overflow-hidden mb-8">
       {/* Table Header / Title */}

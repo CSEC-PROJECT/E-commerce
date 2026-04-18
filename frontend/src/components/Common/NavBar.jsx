@@ -1,29 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import useCartStore from '../../store/cartStore';
+import toast from 'react-hot-toast';
+
+// ── Shared category list – matches backend values exactly ──
+const CATEGORIES = [
+  { label: 'Footwear',    value: 'Footwear' },
+  { label: 'Accessories', value: 'Accessories' },
+  { label: 'Apparel',     value: 'Apparel' },
+  { label: 'Electronics', value: 'Electronics' },
+];
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
     const [isDark, setIsDark] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return document.documentElement.classList.contains('dark');
-        }
-        return false;
+        if (typeof window === 'undefined') return false;
+        const saved = localStorage.getItem('theme');
+        const dark = saved === 'dark';
+        if (dark) document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
+        return dark;
     });
     const location = useLocation();
+    const navigate = useNavigate();
     const accessToken = useAuthStore((state) => state.accessToken);
-    const { cart, getCart } = useCartStore();
+    const user = useAuthStore((state) => state.user);
+    const logout = useAuthStore((state) => state.logout);
+    const [userMenuOpen, setUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+
+    const isAdmin = Array.isArray(user?.role)
+        ? user.role.includes('admin')
+        : user?.role === 'admin';
 
     useEffect(() => {
-        if (accessToken) {
-            getCart();
-        }
-    }, [accessToken, getCart]);
+        const handleClickOutside = (e) => {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+                setUserMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
-    const cartItemCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
+    const handleLogout = async () => {
+        setUserMenuOpen(false);
+        try {
+            await logout();
+            toast.success('Signed out');
+            navigate('/');
+        } catch {
+            toast.error('Could not sign out');
+        }
+    };
+
+    // Detect active category from URL for navbar highlight
+    const searchParams = new URLSearchParams(location.search);
+    const activeCategory = searchParams.get('category') || '';
+    const isCategoryActive = location.pathname === '/products' && activeCategory !== '';
+
+    const handleCategoryNav = (value) => {
+        navigate(`/products?category=${encodeURIComponent(value)}`);
+    };
 
     // Dark mode toggle
     const toggleDarkMode = () => {
@@ -37,18 +77,6 @@ const NavBar = () => {
             localStorage.setItem('theme', 'light');
         }
     };
-
-    // Initialize dark mode from localStorage
-    useEffect(() => {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
-            setIsDark(true);
-        } else {
-            document.documentElement.classList.remove('dark');
-            setIsDark(false);
-        }
-    }, []);
 
     // Prevent body scrolling when drawer is open
     useEffect(() => {
@@ -104,16 +132,44 @@ const NavBar = () => {
 
                                 {/* Categories Dropdown */}
                                 <div className="relative group h-[72px] flex items-center">
-                                    <button className="flex items-center px-1 text-[15px] text-muted-foreground hover:text-primary transition-colors font-semibold">
+                                    <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
+                                        isCategoryActive
+                                            ? 'text-primary border-b-[2.5px] border-primary h-full'
+                                            : 'text-muted-foreground hover:text-primary'
+                                    }`}>
                                         Categories
                                         <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
-                                    <div className="absolute top-full left-0 hidden group-hover:block w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Electronics</Link>
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Fashion</Link>
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Home & Garden</Link>
+                                    <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
+                                        <div className="px-3 py-1.5 mb-1">
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Shop by Category</span>
+                                        </div>
+                                        {CATEGORIES.map((cat) => (
+                                            <button
+                                                key={cat.value}
+                                                onClick={() => handleCategoryNav(cat.value)}
+                                                className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                    activeCategory === cat.value
+                                                        ? 'text-primary bg-primary/8 font-semibold'
+                                                        : 'text-foreground hover:bg-muted hover:text-primary'
+                                                }`}
+                                            >
+                                                {activeCategory === cat.value && (
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                                                )}
+                                                {cat.label}
+                                            </button>
+                                        ))}
+                                        <div className="border-t border-border mt-2 pt-2 px-4">
+                                            <Link
+                                                to="/products"
+                                                className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
+                                            >
+                                                View All Products
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -153,17 +209,15 @@ const NavBar = () => {
                                     <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
-                                    {cartItemCount > 0 && (
                                     <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white border-[2.5px] border-background">
-                                        {cartItemCount}
+                                        3
                                     </span>
-                                    )}
                                 </Link>
 
                                 {/* Dark / Light Mode Toggle Button */}
                                 <button
                                     onClick={toggleDarkMode}
-                                    className="text-foreground/80 hover:text-primary transition-all duration-300 focus:outline-none hidden sm:flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted"
+                                    className="text-foreground/80 hover:text-primary transition-all duration-300 focus:outline-none hidden sm:flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted cursor-pointer"
                                     aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                                     title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                                 >
@@ -182,16 +236,57 @@ const NavBar = () => {
                                 </button>
                             </div>
 
-                            {/* Desktop Sign In */}
-                            <div className="hidden md:block">
+                            {/* Desktop Sign In / User menu */}
+                            <div className="hidden md:block relative" ref={userMenuRef}>
                                 {accessToken ? (
-                                    <Link
-                                        to="/"
-                                        className="flex items-center justify-center w-10 h-10 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
-                                        aria-label="User profile"
-                                    >
-                                        <User size={20} />
-                                    </Link>
+                                    <>
+                                        <button
+                                            type="button"
+                                            onClick={() => setUserMenuOpen((o) => !o)}
+                                            className="flex items-center justify-center w-10 h-10 border-[1.5px] border-none text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background cursor-pointer"
+                                            aria-expanded={userMenuOpen}
+                                            aria-haspopup="menu"
+                                            aria-label="Account menu"
+                                        >
+                                            <User size={20} />
+                                        </button>
+                                        {userMenuOpen && (
+                                            <div
+                                                role="menu"
+                                                className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg z-50"
+                                            >
+                                                <Link
+                                                    to="/products"
+                                                    role="menuitem"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+                                                >
+                                                    <Package size={16} />
+                                                    My products
+                                                </Link>
+                                                {isAdmin && (
+                                                    <Link
+                                                        to="/admin/dashboard"
+                                                        role="menuitem"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+                                                    >
+                                                        <LayoutDashboard size={16} />
+                                                        Admin dashboard
+                                                    </Link>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={handleLogout}
+                                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold hover:bg-muted cursor-pointer"
+                                                >
+                                                    <LogOut size={16} />
+                                                    Log out
+                                                </button>
+                                            </div>
+                                        )}
+                                    </>
                                 ) : (
                                     <Link
                                         to="/login"
@@ -200,7 +295,7 @@ const NavBar = () => {
                                         <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                         </svg>
-                                        Sign In
+                                        Sign in
                                     </Link>
                                 )}
                             </div>
@@ -295,12 +390,35 @@ const NavBar = () => {
                             </button>
 
                             <div
-                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileCategoryOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}
+                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileCategoryOpen ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}
                             >
-                                <div className="pt-1 pb-2 pl-6 pr-4 space-y-1 ml-4 border-l-2 border-muted/50 mt-1">
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Electronics</Link>
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Fashion</Link>
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Home & Garden</Link>
+                                <div className="pt-1 pb-2 pl-6 pr-4 space-y-0.5 ml-4 border-l-2 border-muted/50 mt-1">
+                                    {CATEGORIES.map((cat) => (
+                                        <button
+                                            key={cat.value}
+                                            onClick={() => {
+                                                handleCategoryNav(cat.value);
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                                                activeCategory === cat.value
+                                                    ? 'text-primary bg-primary/10 font-semibold'
+                                                    : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                                            }`}
+                                        >
+                                            {activeCategory === cat.value && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                                            )}
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                    <Link
+                                        to="/products"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="block px-4 py-2 text-xs font-bold text-primary hover:opacity-80 transition-opacity rounded-md mt-1"
+                                    >
+                                        View All
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -331,22 +449,43 @@ const NavBar = () => {
                                 </svg>
                                 <span>Cart Items</span>
                             </div>
-                            {cartItemCount > 0 && (
                             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                                {cartItemCount}
+                                3
                             </span>
-                            )}
                         </Link>
 
                         {accessToken ? (
-                            <Link
-                                to="/"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-primary border border-primary/40 bg-background hover:bg-primary/5 rounded-md shadow-sm transition-colors focus:outline-none"
-                            >
-                                <User size={18} />
-                                Account
-                            </Link>
+                            <div className="flex flex-col gap-2">
+                                <Link
+                                    to="/products"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-foreground border border-border bg-background hover:bg-muted rounded-md transition-colors"
+                                >
+                                    <Package size={18} />
+                                    My products
+                                </Link>
+                                {isAdmin && (
+                                    <Link
+                                        to="/admin/dashboard"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-primary border border-primary/40 bg-background hover:bg-primary/5 rounded-md transition-colors"
+                                    >
+                                        <LayoutDashboard size={18} />
+                                        Admin dashboard
+                                    </Link>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setIsMobileMenuOpen(false);
+                                        handleLogout();
+                                    }}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-destructive border border-destructive/30 bg-background hover:bg-destructive/10 rounded-md transition-colors"
+                                >
+                                    <LogOut size={18} />
+                                    Log out
+                                </button>
+                            </div>
                         ) : (
                             <Link
                                 to="/login"
