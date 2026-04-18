@@ -1,8 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
     Store, Bell, Shield, CreditCard, Palette, LogOut, RotateCcwKey,
-    Sun, Moon, History, Wallet
+    Sun, Moon, History, Wallet, ChevronDown
 } from "lucide-react";
+import AdminChangePassword from '../components/Admin/AdminChangePassword';
+import useThemeStore from '../store/themeStore';
+
+const CustomSelect = ({ options, value, onChange }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const selectRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (selectRef.current && !selectRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative w-full" ref={selectRef}>
+            <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full bg-muted text-foreground px-3 py-2 rounded-lg flex justify-between items-center border border-transparent focus:outline-none focus:ring-1 focus:ring-primary"
+            >
+                <span className="text-sm">{value}</span>
+                <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+            </button>
+            {isOpen && (
+                <div className="absolute top-full left-0 w-full mt-1 bg-card border rounded-lg shadow-md z-50 max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-200">
+                    {options.map((option, idx) => (
+                        <div
+                            key={idx}
+                            onClick={() => {
+                                onChange(option);
+                                setIsOpen(false);
+                            }}
+                            className={`px-3 py-2 cursor-pointer text-sm hover:bg-surface-soft transition-colors ${value === option ? 'text-primary font-medium' : 'text-foreground'}`}
+                        >
+                            {option}
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
 
 const Toggle = ({ active, onClick }) => (
     <div
@@ -27,7 +73,13 @@ const SettingPage = () => {
         compactInterface: false,
     });
 
-    const [theme, setTheme] = useState('light');
+    const { theme, setTheme } = useThemeStore();
+    const [openChangePassword, setOpenChangePassword] = useState(false);
+    
+    // Select dropdown states
+    const [currency, setCurrency] = useState('USD ($)');
+    const [timezone, setTimezone] = useState('(GMT-08:00) Pacific');
+    const [language, setLanguage] = useState('English (US)');
 
     const handleToggle = (key) => {
         setToggles(prev => ({ ...prev, [key]: !prev[key] }));
@@ -52,13 +104,13 @@ const SettingPage = () => {
             </div>
 
             {/* Main Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 items-start">
 
                 {/* Left Column */}
                 <div className="flex flex-col gap-6">
 
                     {/* Store Information */}
-                    <div className="bg-card border rounded-xl p-6">
+                    <div className="bg-card border rounded-xl p-4 md:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-secondary rounded-lg text-primary">
                                 <Store size={20} />
@@ -106,36 +158,36 @@ const SettingPage = () => {
                             />
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-6 pb-2">
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Currency</label>
-                                <select className="w-full bg-transparent text-foreground text-sm border-none focus:outline-none cursor-pointer p-0 font-medium h-auto">
-                                    <option>USD ($)</option>
-                                    <option>EUR (€)</option>
-                                    <option>GBP (£)</option>
-                                </select>
+                                <CustomSelect 
+                                    options={['USD ($)', 'EUR (€)', 'GBP (£)']} 
+                                    value={currency} 
+                                    onChange={setCurrency} 
+                                />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Timezone</label>
-                                <select className="w-full bg-transparent text-foreground text-sm border-none focus:outline-none cursor-pointer p-0 font-medium h-auto">
-                                    <option>(GMT-08:00) Pacific</option>
-                                    <option>(GMT-05:00) Eastern</option>
-                                    <option>(GMT+00:00) UTC</option>
-                                </select>
+                                <CustomSelect 
+                                    options={['(GMT-08:00) Pacific', '(GMT-05:00) Eastern', '(GMT+00:00) UTC']} 
+                                    value={timezone} 
+                                    onChange={setTimezone} 
+                                />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Language</label>
-                                <select className="w-full bg-transparent text-foreground text-sm border-none focus:outline-none cursor-pointer p-0 font-medium h-auto">
-                                    <option>English (US)</option>
-                                    <option>Spanish (ES)</option>
-                                    <option>French (FR)</option>
-                                </select>
+                                <CustomSelect 
+                                    options={['English (US)', 'Spanish (ES)', 'French (FR)']} 
+                                    value={language} 
+                                    onChange={setLanguage} 
+                                />
                             </div>
                         </div>
                     </div>
 
                     {/* Security */}
-                    <div className="bg-card border rounded-xl p-6">
+                    <div className="bg-card border rounded-xl p-4 md:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-secondary rounded-lg text-primary">
                                 <Shield size={20} />
@@ -162,7 +214,10 @@ const SettingPage = () => {
                             <Toggle active={toggles.sessionTimeout} onClick={() => handleToggle('sessionTimeout')} />
                         </div>
 
-                        <button className="w-full flex items-center justify-center gap-2 bg-secondary text-primary font-bold py-2.5 rounded-lg mb-3 hover:opacity-90 transition-opacity text-sm">
+                        <button 
+                            onClick={() => setOpenChangePassword(true)}
+                            className="w-full flex items-center justify-center gap-2 bg-secondary text-primary font-bold py-2.5 rounded-lg mb-3 hover:opacity-90 transition-opacity text-sm"
+                        >
                             <RotateCcwKey size={16} /> Change Password
                         </button>
                         <button className="w-full flex items-center justify-center gap-2 text-destructive font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity text-sm">
@@ -171,7 +226,7 @@ const SettingPage = () => {
                     </div>
 
                     {/* Appearance */}
-                    <div className="bg-card border rounded-xl p-6">
+                    <div className="bg-card border rounded-xl p-4 md:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-secondary rounded-lg text-primary">
                                 <Palette size={20} />
@@ -184,16 +239,16 @@ const SettingPage = () => {
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                             <span className="text-sm font-bold text-foreground">Theme Mode</span>
-                            <div className="flex items-center gap-1 p-1 bg-muted rounded-lg self-start sm:self-auto">
+                            <div className="flex items-center gap-2 self-start sm:self-auto">
                                 <button
                                     onClick={() => setTheme('light')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-colors ${theme === 'light' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-surface-soft hover:text-foreground'}`}
                                 >
                                     <Sun size={14} /> Light
                                 </button>
                                 <button
                                     onClick={() => setTheme('dark')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-colors ${theme === 'dark' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-surface-soft hover:text-foreground'}`}
                                 >
                                     <Moon size={14} /> Dark
                                 </button>
@@ -215,7 +270,7 @@ const SettingPage = () => {
                 <div className="flex flex-col gap-6">
 
                     {/* Notification Settings */}
-                    <div className="bg-card border rounded-xl p-6">
+                    <div className="bg-card border rounded-xl p-4 md:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-secondary rounded-lg text-primary">
                                 <Bell size={20} />
@@ -256,7 +311,7 @@ const SettingPage = () => {
                     </div>
 
                     {/* Payment Settings */}
-                    <div className="bg-card border rounded-xl p-6">
+                    <div className="bg-card border rounded-xl p-4 md:p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-2 bg-secondary rounded-lg text-primary">
                                 <CreditCard size={20} />
@@ -302,6 +357,22 @@ const SettingPage = () => {
 
                 </div>
             </div>
+
+            {/* Password Modal Overlay */}
+            {openChangePassword && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center">
+                    {/* Dimmed + Blurred Background */}
+                    <div
+                        className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+                        onClick={() => setOpenChangePassword(false)}
+                    />
+
+                    {/* Modal Content */}
+                    <div className="relative z-10 w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-200">
+                        <AdminChangePassword onClose={() => setOpenChangePassword(false)} />
+                    </div>
+                </div>
+            )}
 
             {/* Footer */}
             <div className="mt-12 flex flex-col sm:flex-row items-center justify-between gap-6 pb-8 border-t pt-8">

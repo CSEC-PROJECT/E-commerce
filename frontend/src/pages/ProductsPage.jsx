@@ -1,12 +1,91 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import Card3 from '../components/Common/Card3';
 import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
-import shopProducts from '../data/shopProducts.json';
+import { useProductStore } from '../store/productStore';
+import { useToastStore } from '../store/toastStore';
+
+/* ─── Helpers ─── */
+function formatPrice(price) {
+  if (typeof price === "number") {
+    return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  }
+  return price;
+}
+
+/* ─── Skeleton Card for loading state ─── */
+function SkeletonCard() {
+  return (
+    <div className="flex flex-col w-full rounded-xl sm:rounded-[1.5rem] animate-pulse">
+      <div className="w-full aspect-[4/5] bg-muted rounded-xl sm:rounded-[1.5rem]" />
+      <div className="flex flex-col pt-3 sm:pt-4 md:pt-6 px-0.5 sm:px-1">
+        <div className="h-4 w-16 bg-muted rounded-full mb-2" />
+        <div className="h-5 w-3/4 bg-muted rounded mt-1" />
+        <div className="h-4 w-1/3 bg-muted rounded mt-2" />
+      </div>
+    </div>
+  );
+}
 
 const ProductsPage = () => {
-  const [products] = React.useState(shopProducts);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const category = searchParams.get("category") || "";
+  const searchQuery = searchParams.get("search") || "";
+
+  const { products, totalProducts, loading, error, fetchProducts, clearError } = useProductStore();
+  const addToast = useToastStore((s) => s.addToast);
+
+  const loadProducts = useCallback(() => {
+    const params = { limit: 20 };
+    if (category) params.category = category;
+    if (searchQuery) params.search = searchQuery;
+
+    fetchProducts(params).catch((err) => {
+      addToast(
+        err.message || "Failed to load products. Please try again.",
+        "error",
+        5000
+      );
+    });
+  }, [category, searchQuery, fetchProducts, addToast]);
+
+  useEffect(() => {
+    clearError();
+    loadProducts();
+  }, [loadProducts, clearError]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      useProductStore.getState().cancelRequests();
+    };
+  }, []);
+
+  /* ── Search input handler (debounced 400ms) ── */
+  const searchTimerRef = React.useRef(null);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    clearTimeout(searchTimerRef.current);
+    searchTimerRef.current = setTimeout(() => {
+      const next = {};
+      if (category) next.category = category;
+      if (value.trim()) next.search = value.trim();
+      setSearchParams(next);
+    }, 400);
+  };
+
+  const clearCategory = () => {
+    const next = {};
+    if (searchQuery) next.search = searchQuery;
+    setSearchParams(next);
+  };
+
+  const clearSearch = () => {
+    const next = {};
+    if (category) next.category = category;
+    setSearchParams(next);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,34 +102,119 @@ const ProductsPage = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ea4b5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 </div>
                 <input
+                  id="products-search"
                   type="text"
-                  placeholder="Search curated products..."
-                  className="block w-full pl-12 pr-4 py-3.5 bg-muted rounded-xl text-[15px] font-medium text-foreground placeholder:text-muted-foreground placeholder:font-normal outline-none border-none focus:ring-0 transition-colors"
+                  defaultValue={searchQuery}
+                  onChange={handleSearchChange}
+                  placeholder="Search products..."
+                  className="block w-full pl-12 pr-10 py-3.5 bg-muted rounded-xl text-[15px] font-medium text-foreground placeholder:text-muted-foreground placeholder:font-normal outline-none border-none focus:ring-0 transition-colors"
                 />
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center text-sm text-muted-foreground shrink-0 space-x-4">
-                <span>Showing {products.length} products</span>
-                <div className="h-4 w-px bg-border"></div>
+                <span>
+                  {loading
+                    ? "Loading..."
+                    : `${totalProducts} product${totalProducts !== 1 ? "s" : ""}`}
+                </span>
+                <div className="h-4 w-px bg-border" />
                 <button className="flex items-center text-foreground font-medium hover:text-primary transition-colors">
-                  Sort by: Newest
+                  Sort: Newest
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down ml-1"><path d="m6 9 6 6 6-6" /></svg>
                 </button>
               </div>
             </div>
 
-            {/* Product Grid using Card3 */}
+            {/* Active filter chips */}
+            {(category || searchQuery) && (
+              <div className="flex flex-wrap items-center gap-2 mb-6">
+                <span className="text-xs text-muted-foreground font-medium">Active filters:</span>
+                {category && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
+                    {category}
+                    <button onClick={clearCategory} aria-label="Remove category filter" className="hover:opacity-70 transition-opacity">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </span>
+                )}
+                {searchQuery && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs font-semibold rounded-full border border-border">
+                    "{searchQuery}"
+                    <button onClick={clearSearch} aria-label="Remove search filter" className="hover:opacity-70 transition-opacity">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    </button>
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Product Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
+              {/* Loading skeletons */}
+              {loading && products.length === 0 &&
+                Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={`skel-${i}`} />)
+              }
+
+              {/* Error State */}
+              {!loading && error && products.length === 0 && (
+                <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
+                  <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+                    <svg className="w-7 h-7 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-1">Unable to load products</h3>
+                  <p className="text-sm text-muted-foreground mb-5 max-w-sm">{error}</p>
+                  <button
+                    onClick={loadProducts}
+                    className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
+
+              {/* Products */}
               {products.map((product) => (
-                <Link to={`/product/${product.id}`} key={product.id}>
+                <Link to={`/product/${product._id}`} key={product._id}>
                   <Card3
-                    image={product.image}
-                    title={product.title}
-                    price={product.price}
-                    inStock={product.inStock}
+                    image={product.coverImage}
+                    title={product.name}
+                    price={formatPrice(product.price)}
+                    inStock={product.stock > 0}
                   />
                 </Link>
               ))}
+
+              {/* Empty state */}
+              {!loading && !error && products.length === 0 && (
+                <div className="col-span-full text-center py-16">
+                  <p className="text-muted-foreground text-lg font-medium">
+                    {category
+                      ? `No products found in "${category}".`
+                      : searchQuery
+                        ? `No results for "${searchQuery}".`
+                        : "No products available yet. Check back soon!"}
+                  </p>
+                  {(category || searchQuery) && (
+                    <Link
+                      to="/products"
+                      className="inline-block mt-4 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                    >
+                      View All Products
+                    </Link>
+                  )}
+                </div>
+              )}
             </div>
 
             <Pagination />
