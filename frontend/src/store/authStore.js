@@ -77,7 +77,7 @@ export const useAuthStore = create(
           });
 
           return result;
-        } catch (_err) {
+        } catch {
           set({ accessToken: null, refreshToken: null });
           return null;
         }
@@ -104,7 +104,7 @@ export const useAuthStore = create(
             method: "POST",
             body: refreshToken ? { refreshToken } : undefined,
           });
-        } catch (_err) {
+        } catch {
           // ignore logout errors
         }
         set({ ...initialState });

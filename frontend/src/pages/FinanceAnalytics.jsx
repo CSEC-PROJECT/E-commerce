@@ -40,9 +40,9 @@ const CustomBlueBar = (props) => {
   return <rect x={x} y={y} width={width} height={height - GAP} fill={fill} />;
 };
 
-const FinanceAnalytics = () => {
+const FinanceAnalytics = ({ embedded = false }) => {
   return (
-    <div className="min-h-screen bg-background p-8 text-sm pt-20">
+    <div className={`min-h-screen bg-background p-8 text-sm ${embedded ? "pt-6" : "pt-20"}`}>
       <div className="max-w-7xl mx-auto xl:px-4">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
