@@ -10,15 +10,14 @@ import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
-import AddProduct from './pages/AddProduct'
-import ProductPreview from './pages/ProductPreview'
+
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
 import AdminUsers from './pages/AdminUsers'
-
+import FinanceAnalytics from './pages/FinanceAnalytics'
 import useThemeStore from './store/themeStore';
 
 const App = () => {
@@ -34,6 +33,7 @@ const App = () => {
       <NavBar />
       <ToastContainer />
       <Routes>
+        <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
@@ -69,8 +69,9 @@ const App = () => {
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="/admin/add-product" element={<AddProduct />} />
         <Route path="/admin/product-preview" element={<ProductPreview />} />
+        </Route>
+        <Route path="/finance" element={<FinanceAnalytics />} />
       </Routes>
-      <Footer />
     </BrowserRouter>
   )
 }
