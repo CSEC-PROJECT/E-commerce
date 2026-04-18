@@ -13,7 +13,7 @@ const getProducts = async (req, res) => {
             filter.name = { $regex: search, $options: "i" };
         }
         if (category) {
-            filter.category = category;
+            filter.category = { $regex: `^${category}$`, $options: "i" };
         }
         if (status) {
             filter.status = status;
@@ -28,12 +28,15 @@ const getProducts = async (req, res) => {
             }
         }
 
-        const products = await Product.find(filter)
-            .skip((pageNum - 1) * limitNum)
-            .limit(limitNum)
-            .sort({ createdAt: -1 });
+        const [products, total] = await Promise.all([
+            Product.find(filter)
+                .skip((pageNum - 1) * limitNum)
+                .limit(limitNum)
+                .sort({ createdAt: -1 }),
+            Product.countDocuments(filter),
+        ]);
 
-        return res.status(200).json({ products });
+        return res.status(200).json({ products, total, page: pageNum, limit: limitNum });
 
 
     }catch(error){

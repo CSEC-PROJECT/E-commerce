@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+
+// ── Shared category list – matches backend values exactly ──
+const CATEGORIES = [
+  { label: 'Footwear',    value: 'Footwear' },
+  { label: 'Accessories', value: 'Accessories' },
+  { label: 'Apparel',     value: 'Apparel' },
+  { label: 'Electronics', value: 'Electronics' },
+];
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -13,7 +21,17 @@ const NavBar = () => {
         return false;
     });
     const location = useLocation();
+    const navigate = useNavigate();
     const accessToken = useAuthStore((state) => state.accessToken);
+
+    // Detect active category from URL for navbar highlight
+    const searchParams = new URLSearchParams(location.search);
+    const activeCategory = searchParams.get('category') || '';
+    const isCategoryActive = location.pathname === '/products' && activeCategory !== '';
+
+    const handleCategoryNav = (value) => {
+        navigate(`/products?category=${encodeURIComponent(value)}`);
+    };
 
     // Dark mode toggle
     const toggleDarkMode = () => {
@@ -94,16 +112,44 @@ const NavBar = () => {
 
                                 {/* Categories Dropdown */}
                                 <div className="relative group h-[72px] flex items-center">
-                                    <button className="flex items-center px-1 text-[15px] text-muted-foreground hover:text-primary transition-colors font-semibold">
+                                    <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
+                                        isCategoryActive
+                                            ? 'text-primary border-b-[2.5px] border-primary h-full'
+                                            : 'text-muted-foreground hover:text-primary'
+                                    }`}>
                                         Categories
                                         <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
-                                    <div className="absolute top-full left-0 hidden group-hover:block w-48 bg-card border border-border rounded-lg shadow-lg py-2 z-50">
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Electronics</Link>
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Fashion</Link>
-                                        <Link to="/products" className="block px-4 py-2 text-sm text-foreground hover:bg-muted hover:text-primary transition-colors">Home & Garden</Link>
+                                    <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
+                                        <div className="px-3 py-1.5 mb-1">
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Shop by Category</span>
+                                        </div>
+                                        {CATEGORIES.map((cat) => (
+                                            <button
+                                                key={cat.value}
+                                                onClick={() => handleCategoryNav(cat.value)}
+                                                className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
+                                                    activeCategory === cat.value
+                                                        ? 'text-primary bg-primary/8 font-semibold'
+                                                        : 'text-foreground hover:bg-muted hover:text-primary'
+                                                }`}
+                                            >
+                                                {activeCategory === cat.value && (
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                                                )}
+                                                {cat.label}
+                                            </button>
+                                        ))}
+                                        <div className="border-t border-border mt-2 pt-2 px-4">
+                                            <Link
+                                                to="/products"
+                                                className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
+                                            >
+                                                View All Products →
+                                            </Link>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -283,12 +329,35 @@ const NavBar = () => {
                             </button>
 
                             <div
-                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileCategoryOpen ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}
+                                className={`overflow-hidden transition-all duration-300 ease-in-out ${isMobileCategoryOpen ? 'max-h-72 opacity-100' : 'max-h-0 opacity-0'}`}
                             >
-                                <div className="pt-1 pb-2 pl-6 pr-4 space-y-1 ml-4 border-l-2 border-muted/50 mt-1">
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Electronics</Link>
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Fashion</Link>
-                                    <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className="block px-4 py-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors rounded-md">Home & Garden</Link>
+                                <div className="pt-1 pb-2 pl-6 pr-4 space-y-0.5 ml-4 border-l-2 border-muted/50 mt-1">
+                                    {CATEGORIES.map((cat) => (
+                                        <button
+                                            key={cat.value}
+                                            onClick={() => {
+                                                handleCategoryNav(cat.value);
+                                                setIsMobileMenuOpen(false);
+                                            }}
+                                            className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
+                                                activeCategory === cat.value
+                                                    ? 'text-primary bg-primary/10 font-semibold'
+                                                    : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                                            }`}
+                                        >
+                                            {activeCategory === cat.value && (
+                                                <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
+                                            )}
+                                            {cat.label}
+                                        </button>
+                                    ))}
+                                    <Link
+                                        to="/products"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="block px-4 py-2 text-xs font-bold text-primary hover:opacity-80 transition-opacity rounded-md mt-1"
+                                    >
+                                        View All →
+                                    </Link>
                                 </div>
                             </div>
                         </div>
