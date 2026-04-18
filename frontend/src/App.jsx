@@ -6,20 +6,23 @@ import ProtectedRoute from './components/auth/ProtectedRoute'
 import AdminRoute from './components/auth/AdminRoute'
 import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
+import RequireRole from './components/auth/RequireRole'
+import ToastContainer from './components/Common/ToastContainer'
 
 // Pages
 import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
-import AddProduct from './pages/AddProduct'
-import ProductPreview from './pages/ProductPreview'
+
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
 import AdminUsers from './pages/AdminUsers'
+import FinanceAnalytics from './pages/FinanceAnalytics'
+import useThemeStore from './store/themeStore';
 
 const App = () => {
   const { initializeAuth } = useAuthStore();
@@ -27,12 +30,19 @@ const App = () => {
   useEffect(() => {
     initializeAuth();
   }, [initializeAuth]);
+  const initTheme = useThemeStore((state) => state.initTheme);
+
+  useEffect(() => {
+    initTheme();
+  }, [initTheme]);
 
   return (
+
     <BrowserRouter>
       <NavBar />
+      <ToastContainer />
       <Routes>
-        {/* Public Routes */}
+        <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
