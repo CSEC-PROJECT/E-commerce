@@ -34,7 +34,7 @@ const initializePayment = async (req, res) => {
             last_name: user.last_name || "User",
             tx_ref,
             callback_url: `https://your-api.com/api/payments/webhook`,
-            return_url: `http://localhost:3000/checkout/success/${tx_ref}`,
+            return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/transaction/success`,
             customization: {
                 title: "BaseCode Pay",
                 description: `Order ${orderId}`,

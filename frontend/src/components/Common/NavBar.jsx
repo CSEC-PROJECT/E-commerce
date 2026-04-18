@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import useCartStore from '../../store/cartStore';
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -14,6 +15,15 @@ const NavBar = () => {
     });
     const location = useLocation();
     const accessToken = useAuthStore((state) => state.accessToken);
+    const { cart, getCart } = useCartStore();
+
+    useEffect(() => {
+        if (accessToken) {
+            getCart();
+        }
+    }, [accessToken, getCart]);
+
+    const cartItemCount = cart?.items?.reduce((total, item) => total + (item.quantity || 1), 0) || 0;
 
     // Dark mode toggle
     const toggleDarkMode = () => {
@@ -143,9 +153,11 @@ const NavBar = () => {
                                     <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
+                                    {cartItemCount > 0 && (
                                     <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white border-[2.5px] border-background">
-                                        3
+                                        {cartItemCount}
                                     </span>
+                                    )}
                                 </Link>
 
                                 {/* Dark / Light Mode Toggle Button */}
@@ -319,9 +331,11 @@ const NavBar = () => {
                                 </svg>
                                 <span>Cart Items</span>
                             </div>
+                            {cartItemCount > 0 && (
                             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                                3
+                                {cartItemCount}
                             </span>
+                            )}
                         </Link>
 
                         {accessToken ? (
