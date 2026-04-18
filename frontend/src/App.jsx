@@ -2,6 +2,10 @@ import React, { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
+import ProtectedRoute from './components/auth/ProtectedRoute'
+import AdminRoute from './components/auth/AdminRoute'
+import { Toaster } from 'react-hot-toast'
+import { useAuthStore } from './store/authStore'
 import RequireRole from './components/auth/RequireRole'
 import ToastContainer from './components/Common/ToastContainer'
 
@@ -21,6 +25,11 @@ import FinanceAnalytics from './pages/FinanceAnalytics'
 import useThemeStore from './store/themeStore';
 
 const App = () => {
+  const { initializeAuth } = useAuthStore();
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
   const initTheme = useThemeStore((state) => state.initTheme);
 
   useEffect(() => {
@@ -37,41 +46,25 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route
-          path="/admin/products"
-          element={
-            <RequireRole roles={["admin"]}>
-              <AdminProducts />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="/admin/users"
-          element={
-            <RequireRole roles={["admin"]}>
-              <AdminUsers />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="/admin/addproduct"
-          element={
-            <RequireRole roles={["admin"]}>
-              <AddProduct />
-            </RequireRole>
-          }
-        />
+        <Route path="/product/:id" element={<DetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        <Route path="/product/:id" element={<DetailsPage />} />
-        <Route path="/settings" element={<SettingPage />} />
-        <Route path="/admin/products" element={<AdminProducts />} />
-        <Route path="/admin/add-product" element={<AddProduct />} />
-        <Route path="/admin/product-preview" element={<ProductPreview />} />
-        </Route>
-        <Route path="/finance" element={<FinanceAnalytics />} />
+
+        {/* Protected User Routes */}
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+
+        {/* Protected Admin Routes */}
+        <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        
+        {/* Alternate admin routes */}
+        <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
+      <Footer />
+      <Toaster position="bottom-right" reverseOrder={false} />
     </BrowserRouter>
   )
 }

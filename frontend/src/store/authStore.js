@@ -77,11 +77,25 @@ export const useAuthStore = create(
           });
 
           return result;
-        } catch (err) {
+        } catch (_err) {
           set({ accessToken: null, refreshToken: null });
           return null;
         }
       },
+
+      initializeAuth: async () => {
+        const { accessToken, refreshToken, refresh } = get();
+        if (accessToken || !refreshToken) return;
+        await refresh();
+      },
+
+      verifyEmail: async (token) => {
+        if (!token) throw new Error("Missing verification token");
+        return apiRequest(`/api/auth/verify?token=${encodeURIComponent(token)}`, {
+          method: "GET",
+        });
+      },
+
 
       logout: async () => {
         const { refreshToken } = get();
@@ -90,7 +104,7 @@ export const useAuthStore = create(
             method: "POST",
             body: refreshToken ? { refreshToken } : undefined,
           });
-        } catch (err) {
+        } catch (_err) {
           // ignore logout errors
         }
         set({ ...initialState });
