@@ -2,7 +2,15 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
-import RequireRole from './components/auth/RequireRole'
+import { Outlet } from 'react-router-dom'
+
+const MainLayout = () => (
+  <>
+    <NavBar />
+    <Outlet />
+    <Footer />
+  </>
+)
 
 // Pages
 import Home from './pages/home'
@@ -16,12 +24,13 @@ import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
 import AdminUsers from './pages/AdminUsers'
+import FinanceAnalytics from './pages/FinanceAnalytics'
 
 const App = () => {
   return (
     <BrowserRouter>
-      <NavBar />
       <Routes>
+        <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
@@ -57,8 +66,9 @@ const App = () => {
         <Route path="/admin/products" element={<AdminProducts />} />
         <Route path="/admin/add-product" element={<AddProduct />} />
         <Route path="/admin/product-preview" element={<ProductPreview />} />
+        </Route>
+        <Route path="/finance" element={<FinanceAnalytics />} />
       </Routes>
-      <Footer />
     </BrowserRouter>
   )
 }
