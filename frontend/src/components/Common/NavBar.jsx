@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
-import { useCartStore } from '../../store/cartStore';
 import toast from 'react-hot-toast';
 import useCartStore from '../../store/cartStore';
 
@@ -32,9 +31,6 @@ const NavBar = () => {
     const logout = useAuthStore((state) => state.logout);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
-    const cartCount = useCartStore((state) => state.cartCount);
-    const fetchCart = useCartStore((state) => state.fetchCart);
-    const clearCart = useCartStore((state) => state.clearCart);
 
     const isAdmin = Array.isArray(user?.role)
         ? user.role.includes('admin')
@@ -62,7 +58,6 @@ const NavBar = () => {
 
     const handleLogout = async () => {
         setUserMenuOpen(false);
-        clearCart();
         try {
             await logout();
             toast.success('Signed out');
@@ -227,7 +222,7 @@ const NavBar = () => {
                                     </svg>
                                     {cartItemCount > 0 && (
                                     <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-white border-[2.5px] border-background">
-                                        {cartItemCount > 99 ? '99+' : cartCount}
+                                        {cartItemCount}
                                     </span>
                                     )}
                                 </Link>
@@ -469,7 +464,7 @@ const NavBar = () => {
                             </div>
                             {cartItemCount > 0 && (
                             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
-                                {cartItemCount > 99 ? '99+' : cartCount}
+                                {cartItemCount}
                             </span>
                             )}
                         </Link>
