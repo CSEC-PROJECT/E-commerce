@@ -12,11 +12,9 @@ export const useProductStore = create((set, get) => ({
   error: null,
   lastFetched: null,
 
-  // In-flight request tracking for deduplication
   _latestController: null,
   _productsController: null,
 
-  // ── Actions ────────────────────────────────────────
 
   /**
    * Fetch the latest 8 products for the home page.
@@ -26,7 +24,6 @@ export const useProductStore = create((set, get) => ({
   fetchLatestProducts: async (force = false) => {
     const state = get();
 
-    // Stale-while-revalidate: return cached data if fresh
     if (
       !force &&
       state.latestProducts.length > 0 &&

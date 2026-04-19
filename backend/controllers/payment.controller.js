@@ -14,6 +14,10 @@ const initializePayment = async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
+        const nameParts = (user.name || 'Customer User').trim().split(' ');
+        const firstName = nameParts[0] || 'Customer';
+        const lastName = nameParts.slice(1).join(' ') || 'User';
+
         const tx_ref = `TX-${orderId}-${Date.now()}`;
 
         const transaction = new Transaction({
@@ -27,14 +31,15 @@ const initializePayment = async (req, res) => {
         await transaction.save();
 
         const chapaPayload = {
-            amount,
+            amount: String(amount),  
             currency: currency || 'ETB',
             email,
-            first_name: user.first_name || user.name || "Customer", // Pull from user model
-            last_name: user.last_name || "User",
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: user.phone || '0900000000',  
             tx_ref,
-            callback_url: `https://your-api.com/api/payments/webhook`,
-            return_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/transaction/success`,
+            callback_url: `${process.env.SERVER_URL || 'https://e-commerce-he4h.onrender.com'}/api/pay/webhook`,
+            return_url: `${process.env.FRONTEND_URL || 'https://e-commerce-olive-delta.vercel.app'}/transaction/success?tx_ref=${tx_ref}`,
             customization: {
                 title: "BaseCode Pay",
                 description: `Order ${orderId}`,
@@ -56,9 +61,11 @@ const initializePayment = async (req, res) => {
         res.status(200).json(response.data);
 
     } catch (error) {
-        console.error("Chapa Initialization Error:", error.response?.data || error.message);
+        console.error("Chapa Initialization Error (full):", JSON.stringify(error.response?.data, null, 2));
+        console.error("Chapa Initialization Error (message):", error.message);
         return res.status(500).json({ 
             message: "Internal Server Error", 
+            chapaError: error.response?.data || null,
             error: error.response?.data?.message || error.message 
         });
     }
@@ -79,22 +86,18 @@ const verifyPayment = async (req, res) => {
 
         const chapaData = response.data.data;
 
-        // 1. Check if payment actually succeeded at Chapa
         if (response.data.status === "success" && chapaData.status === "success") {
             
-            // 2. Find and update the transaction
             const transaction = await Transaction.findOne({ tx_ref });
             
             if (!transaction) {
                 return res.status(404).json({ message: "Transaction record not found in our DB" });
             }
 
-            // 3. Idempotency Check: Don't process if already successful
             if (transaction.status === "success") {
                 return res.status(200).json({ message: "Payment already verified", transaction });
             }
 
-            // 4. Update Transaction and Order
             transaction.status = "success";
             transaction.chapa_reference = chapaData.reference;
             await transaction.save();
@@ -105,11 +108,11 @@ const verifyPayment = async (req, res) => {
             
             return res.status(200).json({ 
                 message: "Payment verified successfully", 
+                status: 'success',
                 data: response.data 
             });
 
         } else {
-            // Update our DB to reflect the failure seen on the dashboard
             await Transaction.findOneAndUpdate({ tx_ref }, { status: "failed" });
             return res.status(400).json({ 
                 message: "Payment not successful", 

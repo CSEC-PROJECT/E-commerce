@@ -14,6 +14,8 @@ tags:
     description: Authentication endpoints
   - name: Admin Products
     description: Admin product management
+  - name: Admin Users
+    description: Admin user management
   - name: Products
     description: Public product endpoints
   - name: Admin Orders
@@ -902,6 +904,143 @@ paths:
           description: Forbidden - Not the owner or admin
         "404":
           description: Cart not found
+
+  /api/admin/users:
+    get:
+      tags: [Admin Users]
+      summary: Get All Users (Admin)
+      description: Fetch paginated list of users (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search users by name or email
+      responses:
+        "200":
+          description: Users fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      totalPages:
+                        type: integer
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/users/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID
+    get:
+      tags: [Admin Users]
+      summary: Get User by ID (Admin)
+      description: Fetch a single user by ID (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        "400":
+          description: Invalid user ID
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
+
+    put:
+      tags: [Admin Users]
+      summary: Update User (Admin)
+      description: Update user fields (Admin only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: array
+                  items:
+                    type: string
+                isVerified:
+                  type: boolean
+      responses:
+        "200":
+          description: User updated successfully
+        "400":
+          description: Invalid user ID or validation error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
+
+    delete:
+      tags: [Admin Users]
+      summary: Delete User (Admin)
+      description: Delete a user by ID (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User deleted successfully
+        "400":
+          description: Invalid user ID
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
 
     delete:
       tags: [Cart]

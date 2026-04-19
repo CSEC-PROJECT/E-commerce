@@ -1,20 +1,12 @@
 import React, { useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Card3 from '../components/Common/Card3';
+import ProductCard from '../components/ProductCard';
 import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
 import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
+import { useAuthStore } from '../store/authStore';
 
-/* ─── Helpers ─── */
-function formatPrice(price) {
-  if (typeof price === "number") {
-    return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  return price;
-}
-
-/* ─── Skeleton Card for loading state ─── */
 function SkeletonCard() {
   return (
     <div className="flex flex-col w-full rounded-xl sm:rounded-[1.5rem] animate-pulse">
@@ -55,14 +47,12 @@ const ProductsPage = () => {
     loadProducts();
   }, [loadProducts, clearError]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       useProductStore.getState().cancelRequests();
     };
   }, []);
 
-  /* ── Search input handler (debounced 400ms) ── */
   const searchTimerRef = React.useRef(null);
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -87,6 +77,8 @@ const ProductsPage = () => {
     setSearchParams(next);
   };
 
+  const user = useAuthStore((state) => state.user);
+
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -95,7 +87,6 @@ const ProductsPage = () => {
           <Sidebar />
 
           <div className="flex-1">
-            {/* Header / Search & Sort */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
               <div className="relative w-full max-w-[480px]">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -134,7 +125,6 @@ const ProductsPage = () => {
               </div>
             </div>
 
-            {/* Active filter chips */}
             {(category || searchQuery) && (
               <div className="flex flex-wrap items-center gap-2 mb-6">
                 <span className="text-xs text-muted-foreground font-medium">Active filters:</span>
@@ -185,14 +175,18 @@ const ProductsPage = () => {
 
               {/* Products */}
               {products.map((product) => (
-                <Link to={`/product/${product._id}`} key={product._id}>
-                  <Card3
-                    image={product.coverImage}
-                    title={product.name}
-                    price={formatPrice(product.price)}
-                    inStock={product.stock > 0}
-                  />
-                </Link>
+                <ProductCard
+                  key={product._id}
+                  id={product._id}
+                  image={product.coverImage}
+                  title={product.name}
+                  price={product. discountedPrice ?? product.price}
+                  status={
+                    product.stock > 0
+                      ? "IN STOCK"
+                      : "OUT OF STOCK"
+                  }
+                />
               ))}
 
               {/* Empty state */}
@@ -221,6 +215,24 @@ const ProductsPage = () => {
           </div>
 
         </div>
+        {!user && (
+          <div className="mt-20 py-16 px-6 bg-muted rounded-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">
+              Join our curated newsletter
+            </h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
+              for seasonal drops and artisan spotlights.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <Link
+                to="/signup"
+                className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

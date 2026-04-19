@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Order from "../../models/order.model.js";
+import Cart from "../../models/cart.model.js";
+import Product from "../../models/product.model.js";
 
 const createOrder = async (req,res) =>{
     const { items, totalPrice, status } = req.body;
@@ -13,13 +15,40 @@ const createOrder = async (req,res) =>{
             return res.status(400).json({ message: "Missing required fields" })
         }
 
+        // Fetch product details from the database to ensure data integrity
+        const productIds = items.map(item => item.productId);
+        const products = await Product.find({ '_id': { $in: productIds } });
+
+        const productMap = products.reduce((map, product) => {
+            map[product._id.toString()] = product;
+            return map;
+        }, {});
+
+        const orderItems = items.map(item => {
+            const product = productMap[item.productId];
+            if (!product) {
+                // This case should ideally not be hit if cart is managed properly
+                throw new Error(`Product with ID ${item.productId} not found`);
+            }
+            return {
+                productId: item.productId,
+                name: product.name,
+                price: product.price, // Or apply discount logic if needed
+                quantity: item.quantity,
+            };
+        });
+
         const newOrder = new Order({
             userId,
-            items,
+            items: orderItems,
             totalPrice,
             status
         })
         await newOrder.save();
+
+        // Clear the user's cart after creating the order
+        await Cart.findOneAndUpdate({ user: userId }, { items: [], totalPrice: 0 });
+
         return res.status(201).json({
             message:"Order created successfully",
             order:newOrder
@@ -27,7 +56,7 @@ const createOrder = async (req,res) =>{
 
     }catch(error){
         console.error("Error creating order:", error);
-        return res.status(500).json({message:"Server Error",error:error.message})
+        return res.status(500).json({ message: "Server Error", error: error.message })
     }
 }
 

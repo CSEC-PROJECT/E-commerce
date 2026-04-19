@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Hero from "../components/home/Hero";
 import CuratedCategories from "../components/home/CuratedCategories";
 import Newsletter from "../components/home/Newsletter";
-import Card2 from "../components/Common/Card2";
+import ProductCard from "../components/ProductCard";
 import { useProductStore } from "../store/productStore";
 import { useToastStore } from "../store/toastStore";
 
@@ -92,9 +92,9 @@ export default function Home() {
         <div className="container mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-14">
             <div>
-              <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">The Selection</h2>
+              <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">New Arrivals</h2>
               <p className="text-muted-foreground text-lg max-w-md font-medium leading-relaxed">
-                A handpicked collection of pieces designed for the modern individual.
+                Discover our latest arrivals, fresh from our artisans to you.
               </p>
             </div>
             <Link
@@ -119,17 +119,19 @@ export default function Home() {
             {/* Products */}
             {latestProducts.length > 0 &&
               latestProducts.map((product) => (
-                <Link to={`/product/${product._id}`} key={product._id}>
-                  <Card2
-                    image={product.coverImage}
-                    category={product.category?.toUpperCase() || "UNCATEGORIZED"}
-                    title={product.name}
-                    price={formatPrice(product.price)}
-                    rating={0}
-                    reviews={0}
-                    inStock={product.stock > 0}
-                  />
-                </Link>
+                <ProductCard
+                  key={product._id}
+                  id={product._id}
+                  image={product.coverImage}
+                  title={product.name}
+                  price={product.discountedPrice ?? product.price}
+                  status={
+                    product.stock > 0
+                      ? "IN STOCK"
+                      : "OUT OF STOCK"
+                  }
+                  rating={product.averageRating}
+                />
               ))
             }
 

@@ -46,9 +46,9 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 
                     {/* Price */}
                     <div className="flex flex-col items-end min-w-[80px]">
-                        <span className="text-lg font-bold text-foreground">${(item.unitPrice * item.quantity).toFixed(2)}</span>
+                        <span className="text-lg font-bold text-foreground">ETB {(item.unitPrice * item.quantity).toFixed(2)}</span>
                         {item.quantity > 1 && (
-                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">${item.unitPrice.toFixed(2)} / UNIT</span>
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">ETB {item.unitPrice.toFixed(2)} / UNIT</span>
                         )}
                     </div>
 

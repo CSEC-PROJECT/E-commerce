@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 import { loginSchema } from "../lib/authValidation";
@@ -8,6 +8,7 @@ import authHeroBg from "../assets/auth_hero_bg.png";
 
 export default function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login, loading } = useAuthStore();
 
@@ -38,11 +39,13 @@ export default function LoginPage() {
 
       const role = result?.data?.role || "";
       const isAdmin = Array.isArray(role) ? role.includes("admin") : role === "admin";
+      
+      const from = location.state?.from?.pathname || "/";
 
       if (isAdmin) {
         navigate("/admin/dashboard");
       } else {
-        navigate("/");
+        navigate(from, { replace: true });
       }
     } catch {
       toast.error("Invalid email or password");
