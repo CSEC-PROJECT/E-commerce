@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import ProductCard from '../components/ProductCard';
+import Card3 from '../components/Common/Card3';
 import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
 import { useProductStore } from '../store/productStore';
@@ -45,6 +45,7 @@ const ProductsPage = () => {
   } = useProductStore();
 
   const addToast       = useToastStore((s) => s.addToast);
+  const user           = useAuthStore((state) => state.user);
   const searchTimerRef = useRef(null);
 
   const loadProducts = useCallback(() => {
@@ -67,13 +68,8 @@ const ProductsPage = () => {
     loadProducts();
   }, [loadProducts, clearError]);
 
-  useEffect(() => {
-    return () => {
-      useProductStore.getState().cancelRequests();
-    };
-  }, []);
+  useEffect(() => () => cancelRequests(), [cancelRequests]);
 
-  const searchTimerRef = React.useRef(null);
   const handleSearchChange = (e) => {
     const value = e.target.value;
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
@@ -101,8 +97,6 @@ const ProductsPage = () => {
   //  else → render products normally
   const showSkeletons = loading && products.length === 0;
 
-  const user = useAuthStore((state) => state.user);
-
   return (
     <div className="min-h-screen bg-background">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -111,11 +105,10 @@ const ProductsPage = () => {
           <Sidebar />
 
           <div className="flex-1">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-              <div className="relative w-full max-w-[480px]">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ea4b5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
-                </div>
+
+            {/* ── Search bar + status ── */}
+            <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
+              <div className="relative w-full max-w-md">
                 <input
                   id="product-search"
                   type="text"
@@ -147,9 +140,9 @@ const ProductsPage = () => {
               </div>
             </div>
 
-            {(category || searchQuery) && (
-              <div className="flex flex-wrap items-center gap-2 mb-6">
-                <span className="text-xs text-muted-foreground font-medium">Active filters:</span>
+            {/* ── Active filter chips ── */}
+            {hasActiveFilters && (
+              <div className="flex flex-wrap gap-2 mb-6">
                 {category && (
                   <button
                     onClick={() => removeFilter('category')}
@@ -210,42 +203,15 @@ const ProductsPage = () => {
                     Retry
                   </button>
                 </div>
-              )}
-
-              {/* Products */}
-              {products.map((product) => (
-                <ProductCard
-                  key={product._id}
-                  id={product._id}
-                  image={product.coverImage}
-                  title={product.name}
-                  price={product. discountedPrice ?? product.price}
-                  status={
-                    product.stock > 0
-                      ? "IN STOCK"
-                      : "OUT OF STOCK"
-                  }
-                />
-              ))}
-
-              {/* Empty state */}
-              {!loading && !error && products.length === 0 && (
-                <div className="col-span-full text-center py-16">
-                  <p className="text-muted-foreground text-lg font-medium">
-                    {category
-                      ? `No products found in "${category}".`
-                      : searchQuery
-                        ? `No results for "${searchQuery}".`
-                        : "No products available yet. Check back soon!"}
-                  </p>
-                  {(category || searchQuery) && (
-                    <Link
-                      to="/products"
-                      className="inline-block mt-4 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
-                    >
-                      View All Products
-                    </Link>
-                  )}
+              ) : products.length === 0 ? (
+                <div className="col-span-full py-20 text-center">
+                  <p className="text-muted-foreground text-lg">No products match your criteria.</p>
+                  <button
+                    onClick={() => setSearchParams({})}
+                    className="text-primary font-semibold mt-2 underline"
+                  >
+                    Clear all filters
+                  </button>
                 </div>
               ) : (
                 products.map((product) => (
