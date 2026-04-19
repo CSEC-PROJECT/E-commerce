@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Sidebar from '../components/Sidebar';
@@ -7,40 +7,60 @@ import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
 import { useAuthStore } from '../store/authStore';
 
-function SkeletonCard() {
-  return (
-    <div className="flex flex-col w-full rounded-xl sm:rounded-[1.5rem] animate-pulse">
-      <div className="w-full aspect-[4/5] bg-muted rounded-xl sm:rounded-[1.5rem]" />
-      <div className="flex flex-col pt-3 sm:pt-4 md:pt-6 px-0.5 sm:px-1">
-        <div className="h-4 w-16 bg-muted rounded-full mb-2" />
-        <div className="h-5 w-3/4 bg-muted rounded mt-1" />
-        <div className="h-4 w-1/3 bg-muted rounded mt-2" />
-      </div>
+const formatPrice = (price) =>
+  typeof price === 'number'
+    ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+    : price;
+
+// Skeleton — only shown on the very first load (no cached data yet)
+const SkeletonCard = () => (
+  <div className="flex flex-col w-full animate-pulse">
+    <div className="w-full aspect-[4/5] bg-muted rounded-[1.5rem]" />
+    <div className="pt-6 space-y-2">
+      <div className="h-4 w-1/4 bg-muted rounded-full" />
+      <div className="h-5 w-3/4 bg-muted rounded" />
+      <div className="h-4 w-1/3 bg-muted rounded" />
     </div>
-  );
-}
+  </div>
+);
 
 const ProductsPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const category = searchParams.get("category") || "";
-  const searchQuery = searchParams.get("search") || "";
 
-  const { products, totalProducts, loading, error, fetchProducts, clearError } = useProductStore();
-  const addToast = useToastStore((s) => s.addToast);
+  const category    = searchParams.get('category')  || '';
+  const searchQuery = searchParams.get('search')    || '';
+  const minPrice    = searchParams.get('minPrice')  || '';
+  const maxPrice    = searchParams.get('maxPrice')  || '';
+  const page        = parseInt(searchParams.get('page') || '1', 10);
+
+  const {
+    products,
+    totalProducts,
+    loading,       // true only when grid is empty (first paint)
+    isFetching,    // true for background refreshes (data already on screen)
+    error,
+    fetchProducts,
+    clearError,
+    cancelRequests,
+  } = useProductStore();
+
+  const addToast       = useToastStore((s) => s.addToast);
+  const searchTimerRef = useRef(null);
 
   const loadProducts = useCallback(() => {
-    const params = { limit: 20 };
-    if (category) params.category = category;
-    if (searchQuery) params.search = searchQuery;
-
-    fetchProducts(params).catch((err) => {
-      addToast(
-        err.message || "Failed to load products. Please try again.",
-        "error",
-        5000
-      );
+    fetchProducts({
+      category,
+      search:   searchQuery,
+      page,
+      limit:    12,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+    }).catch((err) => {
+      if (err.name !== 'AbortError') {
+        addToast(err.message || 'Failed to load products', 'error', 5000);
+      }
     });
-  }, [category, searchQuery, fetchProducts, addToast]);
+  }, [category, searchQuery, page, minPrice, maxPrice, fetchProducts, addToast]);
 
   useEffect(() => {
     clearError();
@@ -56,26 +76,30 @@ const ProductsPage = () => {
   const searchTimerRef = React.useRef(null);
   const handleSearchChange = (e) => {
     const value = e.target.value;
-    clearTimeout(searchTimerRef.current);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
-      const next = {};
-      if (category) next.category = category;
-      if (value.trim()) next.search = value.trim();
+      const next = new URLSearchParams(searchParams);
+      if (value.trim()) next.set('search', value.trim());
+      else next.delete('search');
+      next.set('page', '1');
       setSearchParams(next);
     }, 400);
   };
 
-  const clearCategory = () => {
-    const next = {};
-    if (searchQuery) next.search = searchQuery;
+  const removeFilter = (key) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete(key);
+    next.set('page', '1');
     setSearchParams(next);
   };
 
-  const clearSearch = () => {
-    const next = {};
-    if (category) next.category = category;
-    setSearchParams(next);
-  };
+  const hasActiveFilters = category || searchQuery || minPrice || maxPrice;
+
+  // Grid content decision:
+  //  loading=true  → show skeletons (no data at all)
+  //  isFetching=true + data exists → dim the existing grid (keep-previous-data)
+  //  else → render products normally
+  const showSkeletons = loading && products.length === 0;
 
   const user = useAuthStore((state) => state.user);
 
@@ -93,35 +117,33 @@ const ProductsPage = () => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ea4b5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
                 </div>
                 <input
-                  id="products-search"
+                  id="product-search"
                   type="text"
                   defaultValue={searchQuery}
                   onChange={handleSearchChange}
                   placeholder="Search products..."
-                  className="block w-full pl-12 pr-10 py-3.5 bg-muted rounded-xl text-[15px] font-medium text-foreground placeholder:text-muted-foreground placeholder:font-normal outline-none border-none focus:ring-0 transition-colors"
+                  className="w-full pl-12 pr-4 py-3.5 bg-muted rounded-xl outline-none focus:ring-2 focus:ring-primary/10 transition-all"
                 />
-                {searchQuery && (
-                  <button
-                    onClick={clearSearch}
-                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                    aria-label="Clear search"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                  </button>
-                )}
+                <div className="absolute left-4 top-4 text-muted-foreground">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </div>
               </div>
 
-              <div className="flex items-center text-sm text-muted-foreground shrink-0 space-x-4">
-                <span>
-                  {loading
-                    ? "Loading..."
-                    : `${totalProducts} product${totalProducts !== 1 ? "s" : ""}`}
-                </span>
-                <div className="h-4 w-px bg-border" />
-                <button className="flex items-center text-foreground font-medium hover:text-primary transition-colors">
-                  Sort: Newest
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down ml-1"><path d="m6 9 6 6 6-6" /></svg>
-                </button>
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground whitespace-nowrap">
+                {/* Subtle spinner next to count while refreshing in background */}
+                {isFetching && !loading && (
+                  <svg className="animate-spin w-4 h-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  </svg>
+                )}
+                {loading
+                  ? 'Loading…'
+                  : `${totalProducts} product${totalProducts !== 1 ? 's' : ''} found`}
               </div>
             </div>
 
@@ -129,46 +151,63 @@ const ProductsPage = () => {
               <div className="flex flex-wrap items-center gap-2 mb-6">
                 <span className="text-xs text-muted-foreground font-medium">Active filters:</span>
                 {category && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-xs font-semibold rounded-full">
-                    {category}
-                    <button onClick={clearCategory} aria-label="Remove category filter" className="hover:opacity-70 transition-opacity">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                  </span>
+                  <button
+                    onClick={() => removeFilter('category')}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full hover:bg-primary/20 transition-colors"
+                  >
+                    {category} <span className="text-sm">×</span>
+                  </button>
                 )}
                 {searchQuery && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs font-semibold rounded-full border border-border">
-                    "{searchQuery}"
-                    <button onClick={clearSearch} aria-label="Remove search filter" className="hover:opacity-70 transition-opacity">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-                    </button>
-                  </span>
+                  <button
+                    onClick={() => removeFilter('search')}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs font-bold rounded-full hover:bg-accent transition-colors"
+                  >
+                    "{searchQuery}" <span className="text-sm">×</span>
+                  </button>
                 )}
+                {(minPrice || maxPrice) && (
+                  <button
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete('minPrice');
+                      next.delete('maxPrice');
+                      next.set('page', '1');
+                      setSearchParams(next);
+                    }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs font-bold rounded-full hover:bg-accent transition-colors"
+                  >
+                    {minPrice ? `$${Number(minPrice).toLocaleString()}` : '$0'} – {maxPrice ? `$${Number(maxPrice).toLocaleString()}` : '$2,500+'} <span className="text-sm">×</span>
+                  </button>
+                )}
+                <button
+                  onClick={() => setSearchParams({})}
+                  className="inline-flex items-center gap-1.5 px-3 py-1 text-muted-foreground text-xs font-semibold rounded-full hover:text-foreground transition-colors"
+                >
+                  Clear all
+                </button>
               </div>
             )}
 
-            {/* Product Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10">
-              {/* Loading skeletons */}
-              {loading && products.length === 0 &&
-                Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={`skel-${i}`} />)
-              }
-
-              {/* Error State */}
-              {!loading && error && products.length === 0 && (
-                <div className="col-span-full flex flex-col items-center justify-center py-16 text-center">
-                  <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
-                    <svg className="w-7 h-7 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-                    </svg>
+            {/* ── Product grid ── */}
+            <div
+              className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10 transition-opacity duration-200"
+              style={{ opacity: isFetching && !loading ? 0.5 : 1 }}
+            >
+              {showSkeletons ? (
+                Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+              ) : error ? (
+                <div className="col-span-full py-20 text-center">
+                  <div className="bg-destructive/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-destructive font-bold">!</span>
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-1">Unable to load products</h3>
-                  <p className="text-sm text-muted-foreground mb-5 max-w-sm">{error}</p>
+                  <h3 className="text-lg font-semibold">Something went wrong</h3>
+                  <p className="text-muted-foreground mb-6">{error}</p>
                   <button
                     onClick={loadProducts}
-                    className="px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 transition-colors"
+                    className="bg-primary text-primary-foreground px-8 py-2.5 rounded-xl font-medium hover:bg-primary/90 transition-colors"
                   >
-                    Try Again
+                    Retry
                   </button>
                 </div>
               )}
@@ -208,12 +247,31 @@ const ProductsPage = () => {
                     </Link>
                   )}
                 </div>
+              ) : (
+                products.map((product) => (
+                  <Link to={`/product/${product._id}`} key={product._id} className="group">
+                    <Card3
+                      image={product.coverImage}
+                      title={product.name}
+                      price={formatPrice(product.price)}
+                      inStock={product.stock > 0}
+                    />
+                  </Link>
+                ))
               )}
             </div>
 
-            <Pagination />
+            {/* ── Pagination ── */}
+            {!loading && products.length > 0 && (
+              <div className="mt-16 border-t border-border pt-8">
+                <Pagination
+                  total={totalProducts}
+                  current={page}
+                  pageSize={12}
+                />
+              </div>
+            )}
           </div>
-
         </div>
         {!user && (
           <div className="mt-20 py-16 px-6 bg-muted rounded-2xl text-center">
