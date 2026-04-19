@@ -29,11 +29,11 @@ import TransactionStatusPage from './pages/TransactionStatusPage'
 
 function AppRoutes() {
   const location = useLocation()
-  const hideMainChrome = location.pathname.startsWith('/admin')
+  const isHideFooter = location.pathname.startsWith('/admin')
 
   return (
     <>
-      {!hideMainChrome && <NavBar />}
+      <NavBar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
@@ -57,7 +57,7 @@ function AppRoutes() {
         <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
-      {!hideMainChrome && <Footer />}
+      {!isHideFooter && <Footer />}
     </>
   )
 }
