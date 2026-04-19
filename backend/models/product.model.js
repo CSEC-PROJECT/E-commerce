@@ -15,6 +15,12 @@ const productSchema = new mongoose.Schema({
         type:Number,
         required: true,
     },
+    discount: {
+        type: Number,
+        min: 0,
+        max: 100,
+        default: 0,
+    },
     status:{
         type:String,
         enum:["used","slightly used","new"],

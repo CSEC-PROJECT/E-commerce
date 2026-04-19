@@ -26,18 +26,9 @@ export const useProductStore = create((set, get) => ({
   error: null,
   lastFetched: null,     // for latestProducts cache
 
-  // Per-query result cache: { [cacheKey]: { products, total, ts } }
-  _cache: {},
-
-  // In-flight controllers
   _latestController: null,
   _productsController: null,
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  _isCacheFresh: (key) => {
-    const entry = get()._cache[key];
-    return entry && Date.now() - entry.ts < CACHE_TTL;
-  },
 
   // ── fetchProducts ──────────────────────────────────────────────────────────
   /**
@@ -50,11 +41,18 @@ export const useProductStore = create((set, get) => ({
     const state = get();
     const key   = makeCacheKey(params);
 
-    // ── 1. Cache hit → instant return ────────────────────────────────────────
-    if (state._isCacheFresh(key)) {
-      const { products, total } = state._cache[key];
-      set({ products, totalProducts: total, loading: false, isFetching: false, error: null });
-      return products;
+    if (
+      !force &&
+      state.latestProducts.length > 0 &&
+      state.lastFetched &&
+      Date.now() - state.lastFetched < CACHE_DURATION
+    ) {
+      return state.latestProducts;
+    }
+
+    // Deduplication: skip if already loading
+    if (state.loading && state._latestController) {
+      return state.latestProducts;
     }
 
     // ── 2. Cancel any previous in-flight request ──────────────────────────────
