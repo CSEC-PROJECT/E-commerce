@@ -75,11 +75,11 @@ const App = () => {
   }, [initTheme])
 
   return (
-    <BrowserRouter>
+    <>
       <ToastContainer />
       <AppRoutes />
       <Toaster position="bottom-right" reverseOrder={false} />
-    </BrowserRouter>
+    </>
   )
 }
 

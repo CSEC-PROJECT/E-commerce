@@ -33,7 +33,7 @@ export default function LoginPage() {
     }
 
     try {
-      const result = await login({ email, password });
+      const result = await login({ email: email.trim(), password: password.trim() });
       toast.success("Welcome back!");
 
       const role = result?.data?.role || "";
@@ -44,8 +44,8 @@ export default function LoginPage() {
       } else {
         navigate("/");
       }
-    } catch {
-      toast.error("Invalid email or password");
+    } catch (error) {
+      toast.error(error.message || "Invalid email or password");
     }
   };
 
