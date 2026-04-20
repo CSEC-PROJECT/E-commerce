@@ -55,6 +55,7 @@ function AppRoutes() {
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/edit-product/:id" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
       {!hideMainChrome && <Footer />}
