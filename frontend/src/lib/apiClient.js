@@ -71,4 +71,3 @@ export const productsApi = {
     return apiRequest(`/api/admin/products/${id}`, { method: 'DELETE' });
   }
 };
-
