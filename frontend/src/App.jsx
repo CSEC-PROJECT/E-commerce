@@ -36,6 +36,7 @@ function AppRoutes() {
     <>
       {!hideMainChrome && <NavBar />}
       <Routes>
+        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
@@ -43,12 +44,14 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
+        {/* Protected user routes */}
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
         <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
 
+        {/* Admin routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
