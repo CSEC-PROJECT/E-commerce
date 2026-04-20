@@ -39,7 +39,12 @@ export async function apiRequest(path, options = {}) {
   const data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
-    const message = data?.message || "Request failed";
+    // Surface the most specific error message available
+    const message =
+      data?.chapaError?.message ||
+      data?.error ||
+      data?.message ||
+      "Request failed";
     throw new Error(message);
   }
 

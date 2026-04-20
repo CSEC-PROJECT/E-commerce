@@ -26,18 +26,9 @@ export const useProductStore = create((set, get) => ({
   error: null,
   lastFetched: null,     // for latestProducts cache
 
-  // Per-query result cache: { [cacheKey]: { products, total, ts } }
-  _cache: {},
-
-  // In-flight controllers
   _latestController: null,
   _productsController: null,
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  _isCacheFresh: (key) => {
-    const entry = get()._cache[key];
-    return entry && Date.now() - entry.ts < CACHE_TTL;
-  },
 
   // ── fetchProducts ──────────────────────────────────────────────────────────
   /**
@@ -50,11 +41,18 @@ export const useProductStore = create((set, get) => ({
     const state = get();
     const key   = makeCacheKey(params);
 
-    // ── 1. Cache hit → instant return ────────────────────────────────────────
-    if (state._isCacheFresh(key)) {
-      const { products, total } = state._cache[key];
-      set({ products, totalProducts: total, loading: false, isFetching: false, error: null });
-      return products;
+    if (
+      !force &&
+      state.latestProducts.length > 0 &&
+      state.lastFetched &&
+      Date.now() - state.lastFetched < CACHE_DURATION
+    ) {
+      return state.latestProducts;
+    }
+
+    // Deduplication: skip if already loading
+    if (state.loading && state._latestController) {
+      return state.latestProducts;
     }
 
     // ── 2. Cancel any previous in-flight request ──────────────────────────────
@@ -177,6 +175,32 @@ export const useProductStore = create((set, get) => ({
 
   // ── Utilities ──────────────────────────────────────────────────────────────
   clearError: () => set({ error: null }),
+
+  createProduct: async (formData) => {
+    set({ loading: true, error: null });
+    try {
+      const token = localStorage.getItem("auth-storage") ? JSON.parse(localStorage.getItem("auth-storage"))?.state?.accessToken : null;
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com";
+      const response = await fetch(`${BASE_URL}/api/admin/products`, {
+        method: 'POST',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: formData // FormData sets Content-Type automatically
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create product');
+      }
+      // Assuming we invalidate cache on successful creation
+      get().invalidateCache();
+      set({ loading: false, error: null });
+      return data;
+    } catch (err) {
+      set({ loading: false, error: err.message || "Failed to create product" });
+      throw err;
+    }
+  },
 
   /** Invalidate the entire products cache (useful after create/update/delete) */
   invalidateCache: () => set({ _cache: {} }),

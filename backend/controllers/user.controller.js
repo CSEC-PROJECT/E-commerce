@@ -27,7 +27,7 @@ const sendVerificationEmail = async (email, token) => {
         }
     });
 
-    const serverUrl = process.env.SERVER_URL || `http://localhost:${process.env.PORT || 3000}`;
+    const serverUrl = process.env.SERVER_URL || `https://e-commerce-he4h.onrender.com`;
     const verificationLink = `${serverUrl}/api/auth/verify?token=${token}`;
 
     const mailOptions = {

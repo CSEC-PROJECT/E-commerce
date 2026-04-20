@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { apiRequest } from '../lib/apiClient';
 import Card4 from '../components/Common/Card4';
-import relatedProducts from '../data/relatedProducts.json';
 import useCartStore from '../store/cartStore';
+import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
 const TechnicalDetail = ({ iconPath, label, value }) => (
   <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg border border-border transition-colors">
@@ -31,33 +32,72 @@ const StarRating = ({ rating = 5, size = "sm" }) => (
 
 
 // 3. Product Detail Section
-const ProductDetail = () => {
+const ProductDetail = ({ onCategoryLoad }) => {
   const [quantity, setQuantity] = useState(1);
   const { id } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const addToCart = useCartStore(state => state.addToCart);
+  const user = useAuthStore(state => state.user);
+  
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeImage, setActiveImage] = useState("");
 
-  const productGallery = [
-    "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/3587478/pexels-photo-3587478.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/1649771/pexels-photo-1649771.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/6373305/pexels-photo-6373305.jpeg?auto=compress&cs=tinysrgb&w=400",
-    "https://images.pexels.com/photos/3945667/pexels-photo-3945667.jpeg?auto=compress&cs=tinysrgb&w=400"
-  ];
-
-  const [activeImage, setActiveImage] = useState(productGallery[0]);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const data = await apiRequest(`/api/products/${id}`);
+        setProduct(data.product);
+        if (onCategoryLoad && data.product.category) {
+          onCategoryLoad(data.product.category);
+        }
+        setActiveImage(data.product.coverImage || "https://images.pexels.com/photos/3394650/pexels-photo-3394650.jpeg?auto=compress&cs=tinysrgb&w=800");
+      } catch (err) {
+        console.error(err);
+        setError("Failed to load product details.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    if (id) fetchProduct();
+  }, [id]);
 
   const handleAddToCart = async () => {
+      if (!user) {
+          navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+          return;
+      }
+      if (!product) return;
       try {
           await addToCart({
-              product: id || "65dcd1e1e1e1e1e1e1e1e1e1", // Default to dummy ObjectId if no ID in URL
+              product: product._id,
               quantity: quantity,
-              price: 240.00
+              price: product.price
           });
           toast.success("Added to cart successfully");
+          
       } catch (error) {
           toast.error("Failed to add to cart");
       }
   };
+
+  if (loading) {
+    return <div className="max-w-7xl mx-auto p-12 text-center py-20 text-muted-foreground animate-pulse">Loading Premium Details...</div>;
+  }
+
+  if (error || !product) {
+    return <div className="max-w-7xl mx-auto p-12 text-center py-20 text-destructive">{error || "Product not found."}</div>;
+  }
+
+  const productGallery = [
+    product.coverImage,
+    ...(product.images || [])
+  ].filter(Boolean);
+
+
 
   return (
     <div className="max-w-7xl mx-auto p-6 lg:p-12 font-sans text-foreground">
@@ -69,7 +109,7 @@ const ProductDetail = () => {
           <div className="aspect-[4/5] w-full bg-muted rounded-3xl overflow-hidden relative border border-border">
             <img
               src={activeImage}
-              alt="Premium Electronics main view"
+              alt={product.name}
               className="w-full h-full object-cover transition-opacity duration-300"
               onError={(e) => { e.target.src = "https://via.placeholder.com/800x1000?text=Image+Not+Found"; }}
             />
@@ -98,39 +138,44 @@ const ProductDetail = () => {
         <div className="flex flex-col">
           <div className="flex items-center gap-3 mb-4">
             <span className="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
-              New Arrival
+              {product.category || "New Arrival"}
             </span>
-            <span className="text-sm font-medium flex items-center gap-1">★ 4.9 <span className="text-muted-foreground font-normal">(88 reviews)</span></span>
+            <span className="text-sm font-medium flex items-center gap-1">★ {product.rating || "4.9"} <span className="text-muted-foreground font-normal">({product.reviews || "88"} reviews)</span></span>
           </div>
 
-          <h1 className="text-5xl font-black tracking-tight mb-6 leading-[0.95] text-foreground">
-            Lumina Sculptural<br />Object
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-[0.95] text-foreground uppercase">
+            {product.name}
           </h1>
 
           <div className="flex items-center gap-4 mb-8">
-            <span className="text-4xl font-bold text-primary">$240.00</span>
-            <span className="text-xl text-muted-foreground line-through font-medium">$310.00</span>
-            <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-green-600 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              In Stock
-            </span>
+            <span className="text-4xl font-bold text-primary">ETB {product.price?.toFixed(2)}</span>
+            <span className="text-xl text-muted-foreground line-through font-medium">ETB {(product.price * 1.25).toFixed(2)}</span>
+            {product.stock > 0 ? (
+                <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                  In Stock ({product.stock})
+                </span>
+            ) : (
+                <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-destructive bg-destructive/10 px-3 py-1 rounded-full border border-destructive/20">
+                  Out of Stock
+                </span>
+            )}
           </div>
 
           <section className="mb-10">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4 text-muted-foreground">The Narrative</h3>
             <p className="text-muted-foreground leading-relaxed text-base italic">
-              A masterpiece of industrial poetry. The Lumina Sculptural Object is meticulously crafted from recycled aeronautical-grade aluminum,
-              hand-polished to a satin finish that catches ambient light like a still pool of water.
+              {product.description || "A masterpiece of modern design and craftsmanship, crafted strictly from high-grade materials to deliver an exceptional experience tailored for the discerning eye."}
             </p>
           </section>
 
           <section className="mb-10">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4 text-muted-foreground">Technical Details</h3>
             <div className="grid grid-cols-2 gap-3">
-              <TechnicalDetail label="Material" value="Brushed Aluminum" iconPath="/Icons/stacks.svg" />
-              <TechnicalDetail label="Dimensions" value="12 × 12 × 18 cm" iconPath="/Icons/square_foot.svg" />
-              <TechnicalDetail label="Weight" value="1.2 kg" iconPath="/Icons/weight.svg" />
-              <TechnicalDetail label="Origin" value="Milan, Italy" iconPath="/Icons/history.svg" />
+              <TechnicalDetail label="Material" value={product.material || "Premium Hand-Finished"} iconPath="/Icons/stacks.svg" />
+              <TechnicalDetail label="Type" value={product.category || "General"} iconPath="/Icons/square_foot.svg" />
+              <TechnicalDetail label="Stock Status" value={product.stock > 0 ? "Available" : "Sold Out"} iconPath="/Icons/weight.svg" />
+              <TechnicalDetail label="Origin" value="Global Sourced" iconPath="/Icons/history.svg" />
             </div>
           </section>
 
@@ -158,8 +203,8 @@ const ProductDetail = () => {
                 </div>
               </div>
 
-              <button type="button" onClick={handleAddToCart} className="flex-1 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-3 hover:brightness-110 transition-all uppercase tracking-widest text-xs h-[56px]">
-                Add to Cart
+              <button type="button" onClick={handleAddToCart} disabled={product.stock < 1} className="flex-1 bg-primary text-primary-foreground font-bold rounded-xl flex items-center justify-center gap-3 hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-widest text-xs h-[56px]">
+                {product.stock < 1 ? "Out of Stock" : "Add to Cart"}
               </button>
 
               <button type="button" className="p-4 border border-border rounded-xl hover:bg-muted transition-colors text-foreground h-[56px] w-[56px] flex items-center justify-center" aria-label="Add to wishlist">
@@ -262,8 +307,24 @@ const ReviewsSection = () => {
 };
 
 
-// 6. Related Products Section using Card4 from JSON
-const RelatedProductsSection = () => {
+const RelatedProductsSection = ({ category }) => {
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchRelated = async () => {
+      try {
+        const query = category ? `?category=${category}&limit=4` : `?limit=4`;
+        const data = await apiRequest(`/api/products${query}`);
+        if(data && data.products) setProducts(data.products.slice(0, 4));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchRelated();
+  }, [category]);
+
+  if (products.length === 0) return null;
+
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 font-sans">
       <div className="flex justify-between items-end mb-10">
@@ -276,16 +337,17 @@ const RelatedProductsSection = () => {
         </Link>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-        {relatedProducts.map((product) => (
-          <Link to={`/product/${product.id}`} key={product.id}>
+        {products.map((product) => (
+          <Link to={`/product/${product._id}`} key={product._id}>
             <Card4
-              image={product.image}
+              image={product.coverImage}
               category={product.category}
-              title={product.title}
+              title={product.name}
               price={product.price}
-              rating={product.rating}
-              reviews={product.reviews}
-              inStock={product.inStock}
+              rating={product.rating || 5}
+              reviews={product.reviews || 0}
+              inStock={product.stock > 0}
+              id={product._id}
             />
           </Link>
         ))}
@@ -295,16 +357,18 @@ const RelatedProductsSection = () => {
 };
 
 // 7. Final Export Page
-const DetailsPage = () => (
+const DetailsPage = () => {
+  const [category, setCategory] = useState("");
+  return (
   <main className="bg-background min-h-screen text-foreground selection:bg-primary selection:text-primary-foreground">
-    <ProductDetail />
+    <ProductDetail onCategoryLoad={setCategory} />
     <div className="border-t border-border">
       <ReviewsSection />
     </div>
     <div className="border-t border-border bg-muted/20">
-      <RelatedProductsSection />
+      <RelatedProductsSection category={category} />
     </div>
   </main>
-);
+)};
 
 export default DetailsPage;

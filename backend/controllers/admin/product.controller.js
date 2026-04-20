@@ -6,7 +6,7 @@ const createProduct = async(req,res) =>{
     console.log("Body:", req.body);
     console.log("Files:", req.files);
 
-    const { name, description, price, category, stock, status, madeIn, material } = req.body;
+    const { name, description, price, discount, category, stock, status, madeIn, material } = req.body;
     const coverImage = req.body.coverImage || (req.files && req.files.coverImage && req.files.coverImage[0] && req.files.coverImage[0].path);
     const detailImages = [];
     if (req.files && req.files.detailImages) {
@@ -28,13 +28,20 @@ const createProduct = async(req,res) =>{
         if (Number(stock) < 0) {
             return res.status(400).json({ message: "Invalid stock value" });
         }
+        if (discount != null) {
+            const discountNum = Number(discount);
+            if (Number.isNaN(discountNum) || discountNum < 0 || discountNum > 100) {
+                return res.status(400).json({ message: "Invalid discount value. It must be between 0 and 100" });
+            }
+        }
 
         const newProduct = new Product({
             name,
             description,
-            price,
+            price: Number(price),
+            discount: discount == null ? 0 : Number(discount),
             category,
-            stock,
+            stock: Number(stock),
             status,
             madeIn,
             material,
@@ -72,6 +79,27 @@ const updateProduct = async(req,res) =>{
         }
         if (req.files && req.files.detailImages && req.files.detailImages.length > 0) {
             updateData.detailImages = req.files.detailImages.map(f => f.path).slice(0, 3);
+        }
+        if (Object.prototype.hasOwnProperty.call(updateData, "discount")) {
+            const discountNum = Number(updateData.discount);
+            if (Number.isNaN(discountNum) || discountNum < 0 || discountNum > 100) {
+                return res.status(400).json({ message: "Invalid discount value. It must be between 0 and 100" });
+            }
+            updateData.discount = discountNum;
+        }
+        if (Object.prototype.hasOwnProperty.call(updateData, "price")) {
+            const priceNum = Number(updateData.price);
+            if (Number.isNaN(priceNum) || priceNum < 0) {
+                return res.status(400).json({ message: "Invalid price value" });
+            }
+            updateData.price = priceNum;
+        }
+        if (Object.prototype.hasOwnProperty.call(updateData, "stock")) {
+            const stockNum = Number(updateData.stock);
+            if (Number.isNaN(stockNum) || stockNum < 0) {
+                return res.status(400).json({ message: "Invalid stock value" });
+            }
+            updateData.stock = stockNum;
         }
 
         const UpdateProduct = await Product.findByIdAndUpdate(

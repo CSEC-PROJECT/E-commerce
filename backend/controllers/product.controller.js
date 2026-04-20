@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 import Product from "../models/product.model.js";
 
+const withDiscountedPrice = (productDoc) => {
+    const product = productDoc.toObject ? productDoc.toObject() : productDoc;
+    const price = Number(product.price) || 0;
+    const discount = Number(product.discount) || 0;
+    const discountedPrice = Number((price - (price * discount) / 100).toFixed(2));
+    return { ...product, discountedPrice };
+};
+
 const getProducts = async (req, res) => {
     try{
         const { search, category, minPrice, maxPrice, status, page = 1, limit = 10 } = req.query;
@@ -36,7 +44,9 @@ const getProducts = async (req, res) => {
             Product.countDocuments(filter),
         ]);
 
-        return res.status(200).json({ products, total, page: pageNum, limit: limitNum });
+        const productsWithDiscount = products.map(withDiscountedPrice);
+
+        return res.status(200).json({ products: productsWithDiscount, total, page: pageNum, limit: limitNum });
 
 
     }catch(error){
@@ -55,7 +65,7 @@ const getProductById = async (req, res) => {
         if (!product) {
             return res.status(404).json({ message: "Product not found" });
         }
-        return res.status(200).json({ product });
+        return res.status(200).json({ product: withDiscountedPrice(product) });
 
     } catch (error) {
         console.error("Error fetching product:", error);

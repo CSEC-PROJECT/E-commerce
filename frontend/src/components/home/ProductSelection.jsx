@@ -1,17 +1,57 @@
+import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Star } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import Product1 from "../../assets/ImagesForHome/Product1.png";
-import Product2 from "../../assets/ImagesForHome/Product2.png";
-import Product3 from "../../assets/ImagesForHome/Product3.png";
-import Product4 from "../../assets/ImagesForHome/Product4.png";
+import { apiRequest } from "../../lib/apiClient";
+import useCartStore from "../../store/cartStore";
+import { useAuthStore } from "../../store/authStore";
+import toast from "react-hot-toast";
 
 export default function ProductSelection() {
-  const products = [
-    { id: 1, category: "Outerwear", name: "Arctic Winter Coat", price: "$420.00", rating: 4.8, reviews: 142, inStock: true, image: Product1 },
-    { id: 2, category: "Audio", name: "Studio Headphones", price: "$289.00", rating: 4.9, reviews: 84, inStock: true, image: Product2 },
-    { id: 3, category: "Tailoring", name: "Midnight Blazer", price: "$550.00", rating: 4.7, reviews: 56, inStock: false, image: Product3 },
-    { id: 4, category: "Footwear", name: "Classic High-Top", price: "$120.00", rating: 4.5, reviews: 112, inStock: true, image: Product4 }
-  ];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const addToCart = useCartStore(state => state.addToCart);
+  const user = useAuthStore(state => state.user);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+      const fetchProducts = async () => {
+          try {
+              const res = await apiRequest('/api/products?limit=4');
+              if (res && res.products) {
+                  setProducts(res.products);
+              }
+          } catch (e) {
+              console.error("Failed to load featured products", e);
+          } finally {
+              setLoading(false);
+          }
+      };
+      fetchProducts();
+  }, []);
+
+  const handleAddToCart = async (e, product) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (!user) {
+          navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+          return;
+      }
+
+      try {
+          await addToCart({
+              product: product._id,
+              quantity: 1,
+              price: product.price
+          });
+          toast.success("Added to cart successfully");
+          navigate('/cart');
+      } catch (err) {
+          toast.error("Failed to add to cart");
+      }
+  };
 
   return (
     <section className="bg-[#f2f4fc] py-28 px-4 md:px-8">
@@ -24,40 +64,47 @@ export default function ProductSelection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col group border border-gray-100/50">
-              <div className="w-full h-72 rounded-[1.5rem] mb-5 relative overflow-hidden flex items-center justify-center">
-                <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </div>
-
-              <div className="flex flex-col flex-grow px-2">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[10px] text-[#5c53e5] font-extrabold uppercase tracking-widest bg-[#5c53e5]/10 px-2.5 py-1 rounded-md">{product.category}</span>
-                  <span className="text-lg text-[#5c53e5] font-extrabold">{product.price}</span>
-                </div>
-                <h3 className="font-extrabold text-gray-900 text-xl mb-3 tracking-tight">{product.name}</h3>
-                
-                <div className="flex justify-between items-center mb-6 mt-auto">
-                  <div className="flex items-center gap-1.5">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-extrabold text-gray-700">{product.rating}</span>
-                    <span className="text-sm text-gray-400 font-medium">({product.reviews})</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`w-2 h-2 rounded-full ${product.inStock ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                    <span className={`text-[11px] uppercase tracking-wider font-extrabold ${product.inStock ? 'text-green-600' : 'text-red-600'}`}>
-                      {product.inStock ? 'In Stock' : 'Low Stock'}
-                    </span>
-                  </div>
+          {loading ? (
+             <div className="col-span-full py-16 text-center text-muted-foreground animate-pulse">Loading curated selections...</div>
+          ) : (
+            products.map((product) => (
+             <Link to={`/product/${product._id}`} key={product._id} className="bg-white rounded-3xl p-4 shadow-sm hover:shadow-xl transition-shadow duration-300 flex flex-col group border border-gray-100/50 cursor-pointer">
+                <div className="w-full h-72 rounded-[1.5rem] mb-5 relative overflow-hidden flex items-center justify-center">
+                  <img src={product.coverImage || "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop&q=60"} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
 
-                <Button className="w-full bg-[#5c53e5] hover:bg-[#4840b8] text-white flex items-center justify-center gap-2 py-6 rounded-xl transition-transform duration-200 active:scale-95 text-base font-extrabold shadow-md shadow-[#5c53e5]/20">
-                  <ShoppingCart className="w-5 h-5" /> Add to Cart
-                </Button>
-              </div>
-            </div>
-          ))}
+                <div className="flex flex-col flex-grow px-2">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-[10px] text-[#5c53e5] font-extrabold uppercase tracking-widest bg-[#5c53e5]/10 px-2.5 py-1 rounded-md">{product.category || "Curation"}</span>
+                    <span className="text-lg text-[#5c53e5] font-extrabold">ETB {parseFloat(product.price).toFixed(2)}</span>
+                  </div>
+                  <h3 className="font-extrabold text-gray-900 text-xl mb-3 tracking-tight">{product.name}</h3>
+                  
+                  <div className="flex justify-between items-center mb-6 mt-auto">
+                    <div className="flex items-center gap-1.5">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-extrabold text-gray-700">{product.rating || 5.0}</span>
+                      <span className="text-sm text-gray-400 font-medium">({product.reviews || 0})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                      <span className={`text-[11px] uppercase tracking-wider font-extrabold ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {product.stock > 0 ? 'In Stock' : 'Low Stock'}
+                      </span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    disabled={product.stock < 1}
+                    onClick={(e) => handleAddToCart(e, product)}
+                    className="w-full bg-[#5c53e5] hover:bg-[#4840b8] text-white flex items-center justify-center gap-2 py-6 rounded-xl transition-transform duration-200 active:scale-95 text-base font-extrabold shadow-md shadow-[#5c53e5]/20 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <ShoppingCart className="w-5 h-5" /> {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                  </Button>
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </section>
