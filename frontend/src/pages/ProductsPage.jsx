@@ -5,6 +5,7 @@ import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
 import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
+import { useAuthStore } from '../store/authStore';
 
 const formatPrice = (price) =>
   typeof price === 'number'
@@ -44,6 +45,7 @@ const ProductsPage = () => {
   } = useProductStore();
 
   const addToast       = useToastStore((s) => s.addToast);
+  const user           = useAuthStore((state) => state.user);
   const searchTimerRef = useRef(null);
 
   const loadProducts = useCallback(() => {
@@ -237,6 +239,24 @@ const ProductsPage = () => {
             )}
           </div>
         </div>
+        {!user && (
+          <div className="mt-20 py-16 px-6 bg-muted rounded-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground">
+              Join our curated newsletter
+            </h2>
+            <p className="mt-3 text-muted-foreground max-w-2xl mx-auto">
+              for seasonal drops and artisan spotlights.
+            </p>
+            <div className="mt-6 flex justify-center">
+              <Link
+                to="/signup"
+                className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Sign up
+              </Link>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

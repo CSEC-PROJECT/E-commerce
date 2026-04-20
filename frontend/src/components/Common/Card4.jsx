@@ -12,7 +12,6 @@ const Card4 = ({
     return (
         <div className="group flex flex-col w-full bg-card rounded-xl sm:rounded-2xl md:rounded-[2rem] p-3 sm:p-4 shadow-sm hover:shadow-lg transition-all duration-300 ease-in-out cursor-pointer hover:-translate-y-1 border border-border/50">
 
-            {/* Image Section */}
             <div className="w-full aspect-square bg-muted rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden mb-4 sm:mb-6 relative">
                 <img
                     src={image}
@@ -22,9 +21,7 @@ const Card4 = ({
                 />
             </div>
 
-            {/* Content Section */}
             <div className="flex flex-col px-1 sm:px-2 mb-1">
-                {/* Top Row: Category & Price */}
                 <div className="flex justify-between items-start mb-1">
                     <span className="text-[9px] sm:text-[11px] md:text-xs font-bold text-primary uppercase tracking-wide sm:tracking-[0.15em] mt-1 sm:mt-2">
                         {category}
@@ -34,12 +31,10 @@ const Card4 = ({
                     </span>
                 </div>
 
-                {/* Product Title */}
                 <h3 className="text-base sm:text-lg md:text-[22px] font-bold text-foreground tracking-tight line-clamp-2 leading-tight mb-3 sm:mb-6">
                     {title}
                 </h3>
 
-                {/* Meta Row */}
                 <div className="flex items-center justify-between pb-1 mt-auto">
                     <div className="flex items-center gap-1 sm:gap-1.5">
                         <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400 fill-yellow-400" fill="currentColor" viewBox="0 0 20 20">

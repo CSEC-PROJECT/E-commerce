@@ -14,6 +14,8 @@ tags:
     description: Authentication endpoints
   - name: Admin Products
     description: Admin product management
+  - name: Admin Users
+    description: Admin user management
   - name: Products
     description: Public product endpoints
   - name: Admin Orders
@@ -22,6 +24,12 @@ tags:
     description: User order management
   - name: Cart
     description: User shopping cart management
+  - name: Admin Dashboard
+    description: Admin dashboard endpoints
+  - name: Admin Finance
+    description: Admin finance endpoints
+  - name: Payment
+    description: Payment processing endpoints
 
 components:
   securitySchemes:
@@ -453,6 +461,211 @@ paths:
         "403":
           description: Forbidden (Admin only)
 
+  /api/admin/dashboard/stats:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get Dashboard Stats
+      description: Retrieve key statistics for the admin dashboard.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved dashboard stats.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                  totalProducts:
+                    type: integer
+                  totalOrders:
+                    type: integer
+                  totalRevenue:
+                    type: number
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/dashboard/sales-performance:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get Weekly Sales Performance
+      description: Retrieve sales performance data for the last week.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved weekly sales performance.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    day:
+                      type: string
+                    sales:
+                      type: number
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/dashboard/recent-transactions:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get Recent Transactions
+      description: Retrieve a list of recent transactions.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved recent transactions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/dashboard/best-selling:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get Best-Selling Products
+      description: Retrieve a list of the best-selling products.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved best-selling products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    productId:
+                      type: string
+                    name:
+                      type: string
+                    totalSold:
+                      type: integer
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/finance/overview:
+    get:
+      tags: [Admin Finance]
+      summary: Get Financial Overview
+      description: Retrieve a financial overview including total revenue, refunds, and net income.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved financial overview.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalRevenue:
+                    type: number
+                  totalRefunds:
+                    type: number
+                  netIncome:
+                    type: number
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/finance/revenue-over-time:
+    get:
+      tags: [Admin Finance]
+      summary: Get Revenue Over Time
+      description: Retrieve revenue data over a specified period.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved revenue data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                      format: date
+                    revenue:
+                      type: number
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/finance/orders-vs-refunds:
+    get:
+      tags: [Admin Finance]
+      summary: Get Orders vs. Refunds
+      description: Compare the number of orders and refunds over time.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved orders vs. refunds data.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    month:
+                      type: string
+                    orders:
+                      type: integer
+                    refunds:
+                      type: integer
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/finance/transactions:
+    get:
+      tags: [Admin Finance]
+      summary: Get All Financial Transactions
+      description: Retrieve a list of all financial transactions.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved all transactions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
   /api/admin/products/{id}:
     put:
       tags: [Admin Products]
@@ -784,6 +997,118 @@ paths:
         "500":
           description: Server error
 
+  /api/payment:
+    post:
+      tags: [Payment]
+      summary: Initialize Payment
+      description: Initialize a payment transaction for an order.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+              properties:
+                orderId:
+                  type: string
+                  description: The ID of the order to pay for.
+      responses:
+        "200":
+          description: Payment initialized successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      authorization_url:
+                        type: string
+                      access_code:
+                        type: string
+                      reference:
+                        type: string
+        "401":
+          description: Unauthorized
+        "404":
+          description: Order not found
+        "500":
+          description: Server error
+
+  /api/payment/verify/{tx_ref}:
+    get:
+      tags: [Payment]
+      summary: Verify Payment
+      description: Verify the status of a payment transaction.
+      parameters:
+        - in: path
+          name: tx_ref
+          required: true
+          schema:
+            type: string
+          description: The transaction reference.
+      responses:
+        "302":
+          description: Redirects to a success or failure page.
+        "400":
+          description: Invalid transaction reference.
+        "500":
+          description: Server error
+
+  /api/payment/webhook:
+    post:
+      tags: [Payment]
+      summary: Payment Webhook
+      description: Handles webhook notifications from the payment gateway.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The webhook payload from the payment provider.
+      responses:
+        "200":
+          description: Webhook received successfully.
+
+  /api/paycheck/success/{tx_ref}:
+    get:
+      tags: [Payment]
+      summary: Payment Success
+      description: Display a success message to the user after a successful payment.
+      parameters:
+        - in: path
+          name: tx_ref
+          required: true
+          schema:
+            type: string
+          description: The transaction reference.
+      responses:
+        "200":
+          description: Success message.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  transaction:
+                    type: object
+        "404":
+          description: Transaction not found.
+        "500":
+          description: Server error
+
   /api/user/orders/{id}:
     get:
       tags: [Orders]
@@ -902,6 +1227,143 @@ paths:
           description: Forbidden - Not the owner or admin
         "404":
           description: Cart not found
+
+  /api/admin/users:
+    get:
+      tags: [Admin Users]
+      summary: Get All Users (Admin)
+      description: Fetch paginated list of users (Admin only).
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Search users by name or email
+      responses:
+        "200":
+          description: Users fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      totalPages:
+                        type: integer
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+
+  /api/admin/users/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+        description: User ID
+    get:
+      tags: [Admin Users]
+      summary: Get User by ID (Admin)
+      description: Fetch a single user by ID (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User fetched successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+        "400":
+          description: Invalid user ID
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
+
+    put:
+      tags: [Admin Users]
+      summary: Update User (Admin)
+      description: Update user fields (Admin only).
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                role:
+                  type: array
+                  items:
+                    type: string
+                isVerified:
+                  type: boolean
+      responses:
+        "200":
+          description: User updated successfully
+        "400":
+          description: Invalid user ID or validation error
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
+
+    delete:
+      tags: [Admin Users]
+      summary: Delete User (Admin)
+      description: Delete a user by ID (Admin only).
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User deleted successfully
+        "400":
+          description: Invalid user ID
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden (Admin only)
+        "404":
+          description: User not found
 
     delete:
       tags: [Cart]

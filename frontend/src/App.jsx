@@ -24,12 +24,13 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminSettings from './pages/AdminSettings'
 import AdminEarnings from './pages/AdminEarnings'
 import AddProduct from './pages/AddProduct'
+import MyProducts from './pages/MyProducts'
 import ProductPreview from './pages/ProductPreviewPage'
 import TransactionStatusPage from './pages/TransactionStatusPage'
 
 function AppRoutes() {
   const location = useLocation()
-  const hideMainChrome = location.pathname.startsWith('/admin')
+  const hideMainChrome = location.pathname.startsWith('/admin') || location.pathname === '/my-products'
 
   return (
     <>
@@ -44,6 +45,7 @@ function AppRoutes() {
 
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+        <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
         <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
 
@@ -77,7 +79,9 @@ const App = () => {
   return (
     <>
       <ToastContainer />
-      <AppRoutes />
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
       <Toaster position="bottom-right" reverseOrder={false} />
     </>
   )

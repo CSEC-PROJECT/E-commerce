@@ -1,4 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
+import useCartStore from '../../store/cartStore';
+import { useAuthStore } from '../../store/authStore';
+import toast from 'react-hot-toast';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Card2 = ({
     image = "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&auto=format&fit=crop&q=60",
@@ -7,12 +11,48 @@ const Card2 = ({
     price = "$180.00",
     rating = 4.8,
     reviews = 124,
-    inStock = true
+    inStock = true,
+    id
 }) => {
+    const addToCart = useCartStore(state => state.addToCart);
+    const user = useAuthStore(state => state.user);
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [loading, setLoading] = useState(false);
+
+    const handleAddToCart = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        if (!user) {
+            navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+            return;
+        }
+
+        if (!id) {
+            toast.error("Product ID missing");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const numericPrice = typeof price === 'string' ? parseFloat(price.replace(/[^0-9.]/g, '')) : parseFloat(price);
+            await addToCart({
+                product: id,
+                quantity: 1,
+                price: numericPrice || 0
+            });
+            toast.success("Added to cart successfully");
+            navigate('/cart');
+        } catch (error) {
+            toast.error("Failed to add to cart");
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
         <div className="group flex flex-col w-full bg-card rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-md hover:border-border border border-transparent transition-all duration-300 ease-in-out cursor-pointer hover:-translate-y-1">
 
-            {/* Image Section */}
             <div className="w-full aspect-[4/5] bg-muted rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4 relative">
                 <img
                     src={image}
@@ -60,18 +100,17 @@ const Card2 = ({
 
             {/* Add to Cart Button */}
             <button
-                className="w-full h-11 sm:h-[52px] bg-primary text-white rounded-lg sm:rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    console.log("Added to cart");
-                }}
+                disabled={!inStock || loading}
+                className="w-full h-11 sm:h-[52px] bg-primary text-white rounded-lg sm:rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                onClick={handleAddToCart}
                 aria-label="Add to Cart"
             >
                 <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
-                <span className="text-sm sm:text-base font-semibold tracking-wide">Add to Cart</span>
+                <span className="text-sm sm:text-base font-semibold tracking-wide">
+                    {loading ? "Adding..." : (inStock ? "Add to Cart" : "Out of Stock")}
+                </span>
             </button>
         </div>
     );

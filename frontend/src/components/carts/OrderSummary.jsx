@@ -4,7 +4,7 @@ import { apiRequest } from '../../lib/apiClient';
 import toast from 'react-hot-toast';
 
 const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
-    const { user } = useAuthStore();
+    const { user, accessToken } = useAuthStore();
     const [loading, setLoading] = useState(false);
 
     const handleCheckout = async () => {
@@ -21,7 +21,8 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
         try {
             const orderPayload = {
                 items: cartItems.map(item => ({
-                    product: item.product?._id || item.product,
+                    productId: item.product?._id || item.product,
+                    name: item.product?.name,
                     quantity: item.quantity,
                     price: item.price
                 })),
@@ -32,7 +33,8 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
             // 1. Create Order
             const orderResponse = await apiRequest('/api/user/orders', {
                 method: 'POST',
-                body: orderPayload
+                body: orderPayload,
+                token: accessToken
             });
 
             const orderId = orderResponse?.order?._id;
@@ -50,7 +52,8 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
 
             const payResponse = await apiRequest('/api/pay', {
                 method: 'POST',
-                body: payPayload
+                body: payPayload,
+                token: accessToken
             });
 
             if (payResponse?.data?.checkout_url) {
@@ -75,7 +78,7 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
             <div className="flex flex-col gap-4 text-sm mb-6 pb-6 border-b border-border/60">
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground font-medium">Subtotal</span>
-                    <span className="font-bold text-foreground">${subtotal.toFixed(2)}</span>
+                    <span className="font-bold text-foreground">ETB {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground font-medium">Shipping</span>
@@ -83,7 +86,7 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-muted-foreground font-medium">Estimated Tax</span>
-                    <span className="font-bold text-foreground">${tax.toFixed(2)}</span>
+                    <span className="font-bold text-foreground">ETB {tax.toFixed(2)}</span>
                 </div>
             </div>
 
@@ -106,8 +109,8 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
             <div className="flex justify-between items-end mb-8 pt-4">
                 <span className="text-lg font-bold text-foreground">Total</span>
                 <div className="flex flex-col items-end">
-                    <span className="text-3xl font-extrabold text-primary leading-none">${total.toFixed(2)}</span>
-                    <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground mt-1">USD INCLUDES VAT</span>
+                    <span className="text-3xl font-extrabold text-primary leading-none">ETB {total.toFixed(2)}</span>
+                    <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground mt-1">ETB INCLUDES TAX</span>
                 </div>
             </div>
 

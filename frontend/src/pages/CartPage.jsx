@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import Card2 from '../components/Common/Card2';
 import CartItem from '../components/carts/CartItem';
 import OrderSummary from '../components/carts/OrderSummary';
-import homeProducts from '../data/homeProducts.json';
 import useCartStore from '../store/cartStore';
 import { apiRequest } from '../lib/apiClient';
 
@@ -39,12 +38,11 @@ const CartPage = () => {
                         inStock: p.stock > 0
                     })));
                 } else {
-                    // Fallback to front-end data
-                    setSuggestions(homeProducts.slice(1, 5));
+                    setSuggestions([]);
                 }
             } catch (error) {
                 console.error("Failed to fetch suggestions", error);
-                setSuggestions(homeProducts.slice(1, 5));
+                setSuggestions([]);
             }
         };
         fetchSuggestions();
@@ -138,6 +136,7 @@ const CartPage = () => {
                         {suggestions.map((product) => (
                             <Link to={`/product/${product.id}`} key={product.id}>
                                 <Card2
+                                    id={product.id}
                                     image={product.image}
                                     category={product.category}
                                     title={product.title}

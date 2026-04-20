@@ -1,3 +1,5 @@
+import { useAuthStore } from "../store/authStore";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com";
 
 const defaultHeaders = {
@@ -9,36 +11,19 @@ const buildUrl = (path) => {
   return `${API_BASE_URL}${normalizedPath}`;
 };
 
-import { useAuthStore } from "../store/authStore";
-
 export async function apiRequest(path, options = {}) {
-  const { method = "GET", headers = {}, body, signal } = options;
-
-  let token = options.token;
-  if (!token) {
-    try {
-      token = useAuthStore.getState().accessToken || localStorage.getItem("token") || localStorage.getItem("accessToken");
-    } catch (e) {
-      // Fallback if useAuthStore fails
-      token = localStorage.getItem("token") || localStorage.getItem("accessToken");
-    }
-  }
+  const { method = "GET", headers = {}, body, token, signal } = options;
 
   const mergedHeaders = {
     ...defaultHeaders,
     ...headers,
-    ...(token && { Authorization: `Bearer ${token}` }), 
   };
 
-  const isAuthRequest = path.includes("/api/auth/login");
+  const stateToken = useAuthStore.getState().accessToken;
+  const finalToken = token || stateToken;
 
-  if (isAuthRequest) {
-    console.log("[DEBUG] Login Request Info:", { 
-      url: buildUrl(path),
-      method, 
-      headers: mergedHeaders, 
-      body 
-    });
+  if (finalToken) {
+    mergedHeaders.Authorization = `Bearer ${finalToken}`;
   }
 
   const response = await fetch(buildUrl(path), {
@@ -53,17 +38,36 @@ export async function apiRequest(path, options = {}) {
   const isJson = contentType.includes("application/json");
   const data = isJson ? await response.json().catch(() => null) : null;
 
-  if (isAuthRequest) {
-    console.log("[DEBUG] Login Response Info:", { status: response.status, data });
-  }
-
   if (!response.ok) {
-    const message = data?.message || data?.error || `Request failed with status ${response.status}`;
-    if (isAuthRequest) {
-      console.error("[DEBUG] Login Request Error:", message);
-    }
+    // Surface the most specific error message available
+    const message =
+      data?.chapaError?.message ||
+      data?.error ||
+      data?.message ||
+      "Request failed";
     throw new Error(message);
   }
 
   return data;
 }
+
+export const productsApi = {
+  getProducts: async ({ search, category, status, minPrice, maxPrice, page, limit }) => {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    if (status) params.append('status', status);
+    if (minPrice) params.append('minPrice', minPrice);
+    if (maxPrice) params.append('maxPrice', maxPrice);
+    if (page) params.append('page', page);
+    if (limit) params.append('limit', limit);
+
+    const queryString = params.toString();
+    const endpoint = queryString ? `/api/products?${queryString}` : '/api/products';
+    return apiRequest(endpoint);
+  },
+
+  deleteProduct: async (id) => {
+    return apiRequest(`/api/admin/products/${id}`, { method: 'DELETE' });
+  }
+};

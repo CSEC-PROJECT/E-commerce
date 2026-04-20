@@ -1,52 +1,266 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { apiRequest } from '../lib/apiClient';
+import { useAuthStore } from '../store/authStore';
+import useCartStore from '../store/cartStore';
 
-const TransactionStatusPage = ({ success }) => {
+// Animated checkmark circle
+const SuccessIcon = () => (
+    <div className="relative mx-auto mb-8" style={{ width: 96, height: 96 }}>
+        <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping" style={{ animationDuration: '2s' }} />
+        <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/30">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+        </div>
+    </div>
+);
+
+// Failed X icon
+const FailedIcon = () => (
+    <div className="relative mx-auto mb-8" style={{ width: 96, height: 96 }}>
+        <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/30">
+            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </div>
+    </div>
+);
+
+// Spinner while loading
+const Spinner = () => (
+    <div className="relative mx-auto mb-8" style={{ width: 96, height: 96 }}>
+        <div className="w-24 h-24 rounded-full border-4 border-border border-t-primary animate-spin" />
+    </div>
+);
+
+const TransactionStatusPage = () => {
+    const [searchParams] = useSearchParams();
+    const { accessToken } = useAuthStore();
+    const clearCart = useCartStore((s) => s.clearCart);
+
+    const [status, setStatus] = useState('loading');
+    const [txRef, setTxRef] = useState('');
+    const [details, setDetails] = useState(null);
+    const [errorMsg, setErrorMsg] = useState('');
+
+    useEffect(() => {
+        // Chapa appends tx_ref and status to the return_url as query params
+        const tx = searchParams.get('tx_ref') || searchParams.get('trx_ref');
+        const chapaStatus = searchParams.get('status');
+
+        if (!tx) {
+            // No tx_ref at all — show generic error
+            setStatus('error');
+            setErrorMsg('Transaction reference not found. Please contact support.');
+            return;
+        }
+
+        setTxRef(tx);
+
+        // If Chapa already signals a failed status in the URL, don't bother verifying
+        if (chapaStatus && chapaStatus !== 'success') {
+            setStatus('failed');
+            return;
+        }
+
+        // Verify with our backend
+        const verify = async () => {
+            try {
+                const data = await apiRequest(`/api/pay/verify/${tx}`, {
+                    method: 'GET',
+                    token: accessToken,
+                });
+
+                if (data?.status === 'success' || data?.message === 'Payment verified successfully' || data?.message === 'Payment already verified') {
+                    setDetails(data?.data);
+                    setStatus('success');
+                    // Cart is paid — clear it
+                    clearCart();
+                } else {
+                    setStatus('failed');
+                }
+            } catch (err) {
+                console.error('Verification error:', err);
+                // If backend says not successful
+                if (err.message?.toLowerCase().includes('not successful')) {
+                    setStatus('failed');
+                } else {
+                    setStatus('error');
+                    setErrorMsg(err.message || 'Verification failed. Please contact support.');
+                }
+            }
+        };
+
+        verify();
+    }, [searchParams, accessToken]);
+
+    const renderContent = () => {
+        switch (status) {
+            case 'loading':
+                return (
+                    <>
+                        <Spinner />
+                        <h1 className="text-2xl md:text-3xl font-black text-foreground mb-3 tracking-tight">
+                            Verifying Payment...
+                        </h1>
+                        <p className="text-muted-foreground text-base mb-8 max-w-xs mx-auto">
+                            Please wait while we confirm your transaction with Chapa.
+                        </p>
+                    </>
+                );
+
+            case 'success':
+                return (
+                    <>
+                        <SuccessIcon />
+                        <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                            Payment Confirmed
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">
+                            Thank You! 🎉
+                        </h1>
+                        <p className="text-muted-foreground text-base mb-6 max-w-xs mx-auto leading-relaxed">
+                            Your payment was successful. Your order is now being processed and you'll receive a confirmation email shortly.
+                        </p>
+
+                        {/* Transaction reference badge */}
+                        {txRef && (
+                            <div className="bg-muted/60 rounded-xl p-4 mb-4 text-left border border-border/50">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                    Transaction Reference
+                                </p>
+                                <p className="font-mono text-sm text-foreground break-all">{txRef}</p>
+                            </div>
+                        )}
+
+                        {/* Amount paid */}
+                        {details?.amount && (
+                            <div className="flex items-center justify-center gap-2 bg-emerald-500/10 rounded-xl p-4 mb-6 border border-emerald-500/20">
+                                <span className="text-muted-foreground text-sm font-medium">Amount Paid</span>
+                                <span className="text-xl font-black text-emerald-500">
+                                    {details.currency || 'ETB'} {Number(details.amount).toLocaleString()}
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Link
+                                to="/products"
+                                className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card"
+                            >
+                                Continue Shopping
+                            </Link>
+                            <Link
+                                to="/"
+                                className="bg-muted text-foreground px-8 py-3 rounded-xl font-bold hover:bg-muted/80 transition-all"
+                            >
+                                Go to Homepage
+                            </Link>
+                        </div>
+                    </>
+                );
+
+            case 'failed':
+                return (
+                    <>
+                        <FailedIcon />
+                        <div className="inline-flex items-center gap-2 bg-red-500/10 text-red-600 dark:text-red-400 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                            Payment Failed
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">
+                            Transaction Failed
+                        </h1>
+                        <p className="text-muted-foreground text-base mb-6 max-w-xs mx-auto leading-relaxed">
+                            Unfortunately we couldn't process your payment. Please try again or use a different payment method.
+                        </p>
+
+                        {txRef && (
+                            <div className="bg-muted/60 rounded-xl p-4 mb-8 text-left border border-border/50">
+                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                    Transaction Reference
+                                </p>
+                                <p className="font-mono text-sm text-foreground break-all">{txRef}</p>
+                            </div>
+                        )}
+
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Link
+                                to="/cart"
+                                className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-card"
+                            >
+                                Return to Cart
+                            </Link>
+                            <Link
+                                to="/"
+                                className="bg-muted text-foreground px-8 py-3 rounded-xl font-bold hover:bg-muted/80 transition-all"
+                            >
+                                Go to Homepage
+                            </Link>
+                        </div>
+                    </>
+                );
+
+            case 'error':
+            default:
+                return (
+                    <>
+                        <div className="relative mx-auto mb-8 w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg shadow-amber-500/30">
+                            <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                            </svg>
+                        </div>
+                        <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">
+                            Something Went Wrong
+                        </h1>
+                        <p className="text-muted-foreground text-base mb-6 max-w-xs mx-auto leading-relaxed">
+                            {errorMsg || 'We could not verify your payment. If money was deducted, please contact our support team.'}
+                        </p>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <Link
+                                to="/cart"
+                                className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg hover:-translate-y-0.5 transition-all"
+                            >
+                                Return to Cart
+                            </Link>
+                            <Link
+                                to="/"
+                                className="bg-muted text-foreground px-8 py-3 rounded-xl font-bold hover:bg-muted/80 transition-all"
+                            >
+                                Go to Homepage
+                            </Link>
+                        </div>
+                    </>
+                );
+        }
+    };
+
     return (
-        <div className="font-sans antialiased bg-background text-foreground min-h-screen flex items-center justify-center">
-            <div className="container mx-auto max-w-md px-4 py-10 text-center">
-                <div className="bg-card rounded-2xl shadow-xl border border-border/50 p-8 sm:p-12">
-                    {success ? (
-                        <>
-                            <div className="w-20 h-20 mx-auto bg-emerald-100 dark:bg-emerald-900/50 rounded-full flex items-center justify-center mb-6 border-4 border-emerald-200 dark:border-emerald-800">
-                                <svg className="w-10 h-10 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                </svg>
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">Payment Successful!</h1>
-                            <p className="text-muted-foreground text-base mb-8">
-                                Thank you for your purchase. Your order is being processed and you will receive a confirmation email shortly.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <Link to="/user/orders" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-                                    View My Orders
-                                </Link>
-                                <Link to="/products" className="bg-muted text-foreground px-8 py-3 rounded-xl font-bold hover:bg-muted/80 transition-all">
-                                    Continue Shopping
-                                </Link>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="w-20 h-20 mx-auto bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center mb-6 border-4 border-red-200 dark:border-red-800">
-                                <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </div>
-                            <h1 className="text-3xl md:text-4xl font-black text-foreground mb-3 tracking-tight">Transaction Failed</h1>
-                            <p className="text-muted-foreground text-base mb-8">
-                                Unfortunately, we were unable to process your payment. Please check your payment details and try again.
-                            </p>
-                            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                                <Link to="/cart" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
-                                    Return to Cart
-                                </Link>
-                                <Link to="/" className="bg-muted text-foreground px-8 py-3 rounded-xl font-bold hover:bg-muted/80 transition-all">
-                                    Go to Homepage
-                                </Link>
-                            </div>
-                        </>
-                    )}
+        <div className="font-sans antialiased bg-background text-foreground min-h-screen flex items-center justify-center px-4">
+            {/* Subtle background glow */}
+            <div className="fixed inset-0 pointer-events-none overflow-hidden">
+                <div
+                    className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-20 transition-colors duration-1000 ${
+                        status === 'success' ? 'bg-emerald-500' :
+                        status === 'failed' ? 'bg-red-500' :
+                        status === 'loading' ? 'bg-primary' : 'bg-amber-500'
+                    }`}
+                />
+            </div>
+
+            <div className="relative z-10 w-full max-w-md py-10">
+                <div className="bg-card rounded-3xl shadow-2xl border border-border/50 p-8 sm:p-12 text-center">
+                    {renderContent()}
+
+                    {/* Support footer */}
+                    <p className="mt-8 text-[11px] text-muted-foreground">
+                        Need help?{' '}
+                        <a href="mailto:support@basecode.com" className="text-primary font-semibold hover:underline">
+                            Contact Support
+                        </a>
+                    </p>
                 </div>
             </div>
         </div>
