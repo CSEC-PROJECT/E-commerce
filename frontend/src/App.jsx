@@ -1,32 +1,40 @@
-import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
+import React, { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import AdminRoute from './components/auth/AdminRoute'
+import { Toaster } from 'react-hot-toast'
+import { useAuthStore } from './store/authStore'
+import ToastContainer from './components/Common/ToastContainer'
+import useThemeStore from './store/themeStore'
 
 // Pages
 import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
-import TransactionStatusPage from './pages/TransactionStatusPage'
 import LoginPage from './pages/LoginPage'
 import SignupPage from './pages/SignupPage'
 import DetailsPage from './pages/detailsPage'
 import SettingPage from './pages/SettingPage'
 import AdminProducts from './pages/AdminProducts'
 import AdminUsers from './pages/AdminUsers'
-import AddProduct from './pages/AddProduct'
 import AdminDashboard from './pages/AdminDashboard'
 import AdminSettings from './pages/AdminSettings'
 import AdminEarnings from './pages/AdminEarnings'
-import ProductPreview from './pages/ProductPreview'
+import AddProduct from './pages/AddProduct'
+import MyProducts from './pages/MyProducts'
+import ProductPreview from './pages/ProductPreviewPage'
+import TransactionStatusPage from './pages/TransactionStatusPage'
 
-const App = () => {
+function AppRoutes() {
+  const location = useLocation()
+  const hideMainChrome = location.pathname.startsWith('/admin') || location.pathname === '/my-products'
+
   return (
-    <BrowserRouter>
-      <NavBar />
+    <>
+      {!hideMainChrome && <NavBar />}
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<Home />} />
@@ -39,6 +47,7 @@ const App = () => {
         {/* Protected user routes */}
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+        <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
         <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
 
@@ -51,11 +60,33 @@ const App = () => {
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
-        <Route path="/admin/edit-product/:id" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
-      <Footer />
-    </BrowserRouter>
+      {!hideMainChrome && <Footer />}
+    </>
+  )
+}
+
+const App = () => {
+  const { initializeAuth } = useAuthStore()
+  const initTheme = useThemeStore((state) => state.initTheme)
+
+  useEffect(() => {
+    initializeAuth()
+  }, [initializeAuth])
+
+  useEffect(() => {
+    initTheme()
+  }, [initTheme])
+
+  return (
+    <>
+      <ToastContainer />
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+      <Toaster position="bottom-right" reverseOrder={false} />
+    </>
   )
 }
 

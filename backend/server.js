@@ -13,6 +13,8 @@ import orderUserRoutes from "./routes/user/order.route.js";
 import cartUserRoutes from "./routes/user/cart.route.js";
 import paymentRoutes from "./routes/payment.route.js"
 import successMessage from './routes/payCheck.route.js';
+import dashboardAdminRoutes from "./routes/admin/dashboard.route.js";
+import financeAdminRoutes from "./routes/admin/finance.route.js";
 
 
 import swaggerUi from "swagger-ui-express";
@@ -66,6 +68,8 @@ app.use("/api/user/orders", orderUserRoutes);
 app.use("/api/user/cart", cartUserRoutes);
 app.use("/api/pay",paymentRoutes)
 app.use("/checkout",successMessage)
+app.use("/api/admin/dashboard", dashboardAdminRoutes);
+app.use("/api/admin/finance", financeAdminRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

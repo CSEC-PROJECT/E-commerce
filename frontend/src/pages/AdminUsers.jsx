@@ -1,42 +1,89 @@
-import React, { useState } from 'react';
-import { DownloadCloud, Users as UsersIcon, UserPlus, MousePointerClick } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { DownloadCloud, Users as UsersIcon, UserPlus, MousePointerClick, Search } from 'lucide-react';
 import Sidebar from '../components/Common/Sidebar';
 import AdminHeader from '../components/Admin/AdminHeader';
 import StatCard from '../components/Admin/StatCard';
 import UsersTable from '../components/Admin/UsersTable';
-
-const INITIAL_USERS_DATA = [
-  { id: 'USR-8821', name: 'Julian Barnes', email: 'j.barnes@outlook.com', phone: '+1 (555) 012-3344', orders: 42, spend: '$3,120.00', status: 'VIP' },
-  { id: 'USR-8794', name: 'Sarah Jenkins', email: 'sarah.j@tech-atelier.io', phone: '+1 (555) 890-1122', orders: 18, spend: '$1,450.50', status: 'ACTIVE' },
-  { id: 'USR-8755', name: 'Robert Miller', email: 'r.miller.99@gmail.com', phone: '+1 (555) 443-5566', orders: 0, spend: '$0.00', status: 'INACTIVE' },
-  { id: 'USR-8742', name: 'Emily Chen', email: 'emily.chen@design.co', phone: '+1 (555) 776-8899', orders: 104, spend: '$12,400.00', status: 'VIP' },
-  { id: 'USR-8730', name: 'Michael Chang', email: 'm.chang88@yahoo.com', phone: '+1 (555) 234-5678', orders: 5, spend: '$345.00', status: 'ACTIVE' },
-];
+import ConfirmModal from '../components/Admin/ConfirmModal';
+import { useUserStore } from '../store/userStore';
+import toast from 'react-hot-toast';
 
 const AdminUsers = () => {
+  const { users, fetchUsers, deleteUser, totalUsers, totalPages, loading, error } = useUserStore();
   const [currentPage, setCurrentPage] = useState(1);
-  const [users, setUsers] = useState(INITIAL_USERS_DATA);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
-  const handleDeleteUser = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      setUsers(prev => prev.filter(user => user.id !== id));
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setCurrentPage(1); // Reset to page 1 on new search
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    fetchUsers({ page: currentPage, limit: 10, search: debouncedSearch });
+  }, [currentPage, debouncedSearch, fetchUsers]);
+
+  const handleDeleteClick = (id) => {
+    setUserToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (userToDelete) {
+      const success = await deleteUser(userToDelete);
+      if (success) {
+        setIsDeleteModalOpen(false);
+        setUserToDelete(null);
+      }
     }
   };
 
   const handleBanUser = (id) => {
-    setUsers(prev => prev.map(user => 
-      user.id === id 
-        ? { ...user, status: user.status === 'INACTIVE' ? 'ACTIVE' : 'INACTIVE' } 
-        : user
-    ));
+    toast("Ban user logic not implemented in backend.", { icon: 'ℹ️' });
   };
 
   const handleExport = () => {
-    alert("Downloading report...");
+    if (!users || users.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    const headers = ["Customer ID", "Name", "Email", "Verified", "Role"];
+    const csvRows = [];
+    csvRows.push(headers.join(","));
+
+    users.forEach(u => {
+      const row = [
+        `USR-${u._id?.substring(u._id.length - 4)}`,
+        `"${u.name}"`,
+        `"${u.email}"`,
+        u.isVerified ? "Yes" : "No",
+        Array.isArray(u.role) ? u.role.join(" ") : (u.role || "user")
+      ];
+      csvRows.push(row.join(","));
+    });
+
+    const csvData = csvRows.join("\n");
+    const blob = new Blob([csvData], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.setAttribute("hidden", "");
+    a.setAttribute("href", url);
+    a.setAttribute("download", "admin_users_report.csv");
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#FAFAFC] text-gray-800 font-sans">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 p-6 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
         <AdminHeader 
@@ -45,55 +92,87 @@ const AdminUsers = () => {
         >
           <button 
             onClick={handleExport}
-            className="cursor-pointer flex items-center gap-2 bg-[#EEEDFE] text-[#5542F6] px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-[#E4E2FD] active:scale-95 transition-all shadow-sm"
+            className="cursor-pointer flex items-center gap-2 bg-[#EEEDFE] text-[#5542F6] px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-[#E4E2FD] active:scale-95 transition-all shadow-sm shrink-0"
           >
             <DownloadCloud size={18} />
             Export Report
           </button>
         </AdminHeader>
 
+        {/* Search Bar - Custom Addition */}
+        <div className="mt-8 mb-4">
+          <div className="relative max-w-md w-full">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
+              <Search className="w-5 h-5" />
+            </div>
+            <input
+              type="text"
+              className="flex h-11 w-full rounded-xl border border-input bg-card pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary h-12 transition-all shadow-sm"
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-4">
           <StatCard 
             title="Total Users" 
-            value="12,840" 
-            change="+12.5%" 
+            value={totalUsers || "0"} 
+            change="" 
             trendingInfo="vs last month" 
             icon={UserPlus} 
-            iconBg="bg-indigo-50" 
-            iconColor="text-[#5542F6]" 
+            iconBg="bg-indigo-50 dark:bg-indigo-500/10" 
+            iconColor="text-[#5542F6] dark:text-indigo-400" 
           />
           <StatCard 
             title="New Users" 
-            value="1,204" 
+            value="--" 
             change="" 
             trendingInfo="ACTIVE NOW" 
             icon={UsersIcon} 
-            iconBg="bg-green-50" 
-            iconColor="text-green-500" 
+            iconBg="bg-green-50 dark:bg-green-500/10" 
+            iconColor="text-green-500 dark:text-green-400" 
           />
           <StatCard 
             title="Total Visits" 
-            value="84.2k" 
+            value="--" 
             change="" 
             trendingInfo="Daily average" 
             icon={MousePointerClick} 
-            iconBg="bg-gray-100" 
-            iconColor="text-gray-400" 
+            iconBg="bg-gray-100 dark:bg-gray-500/10" 
+            iconColor="text-gray-400 dark:text-gray-400" 
           />
         </div>
 
         {/* Users Table Component */}
-        <UsersTable 
-           users={users} 
-           currentPage={currentPage}
-           setCurrentPage={setCurrentPage}
-           totalPages={120}
-           totalUsers="1,204"
-           onDelete={handleDeleteUser}
-           onBan={handleBanUser}
-        />
+        <div className="relative">
+          {loading && (
+            <div className="absolute inset-0 z-10 bg-background/50 backdrop-blur-[1px] flex items-center justify-center rounded-[20px]">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          )}
+          <UsersTable 
+             users={users} 
+             currentPage={currentPage}
+             setCurrentPage={setCurrentPage}
+             totalPages={totalPages}
+             totalUsers={totalUsers}
+             onDelete={handleDeleteClick}
+             onBan={handleBanUser}
+          />
+        </div>
 
+        <ConfirmModal 
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={confirmDelete}
+          title="Delete User"
+          message="Are you sure you want to permanently delete this user? This action cannot be undone."
+          confirmText="Yes, Delete User"
+          isLoading={loading}
+        />
       </main>
     </div>
   );
