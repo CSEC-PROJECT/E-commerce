@@ -56,8 +56,21 @@ const App = () => {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
         <Route path="/settings" element={<SettingPage />} />
-        <Route path="/transaction/success" element={<TransactionStatusPage />} />
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
+        <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
+        <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
 
+        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
+        <Route path="/admin/earnings" element={<AdminRoute><AdminEarnings /></AdminRoute>} />
+        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+        <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
+        <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/edit-product/:id" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
       <Footer />
     </BrowserRouter>
