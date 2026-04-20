@@ -7,6 +7,7 @@ import ProductCard from "../components/ProductCard";
 import { useProductStore } from "../store/productStore";
 import { useToastStore } from "../store/toastStore";
 
+
 /* ─── Skeleton Card (pulse placeholder while loading) ─── */
 function SkeletonCard() {
   return (
