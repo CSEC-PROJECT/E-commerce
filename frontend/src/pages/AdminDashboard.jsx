@@ -65,8 +65,8 @@ const AdminDashboard = () => {
     if (!status) return "text-gray-500";
     const s = status.toLowerCase();
     if (s === 'paid' || s === 'delivered' || s === 'shipped') return "text-success";
-    if (s === 'pending') return "text-[#FFB800]";
-    if (s === 'cancelled' || s === 'failed') return "text-[#EB5757]";
+    if (s === 'pending') return "text-warning";
+    if (s === 'cancelled' || s === 'failed') return "text-error";
     return "text-gray-500";
   };
 
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-[#FDFDFF] dark:bg-background dark:text-primary font-sans">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans">
       <Sidebar />
       <main className="flex-1 p-4 md:p-10 overflow-y-auto space-y-6 md:space-y-10 pb-24 lg:pb-10">
 
@@ -133,8 +133,8 @@ const AdminDashboard = () => {
                 <h3 className="text-xl font-bold tracking-tight  dark:text-primary">Weekly Sales Performance</h3>
                 <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">Revenue analysis for the past 7 days</p>
               </div>
-              <div className="flex bg-[#F4F5F7] dark:bg-muted p-1.5 rounded-2xl w-full sm:w-auto">
-                <span className="flex-1 sm:flex-none px-6 py-2 bg-card shadow-sm rounded-xl text-xs font-bold text-[#5542F6] cursor-default">This week</span>
+              <div className="flex bg-muted dark:bg-muted p-1.5 rounded-2xl w-full sm:w-auto">
+                <span className="flex-1 sm:flex-none px-6 py-2 bg-card shadow-sm rounded-xl text-xs font-bold text-primary cursor-default">This week</span>
               </div>
             </div>
 
@@ -169,7 +169,7 @@ const AdminDashboard = () => {
             <div className="flex flex-wrap justify-between gap-4 mt-8 pt-6 border-t border-border">
               <MiniInfo label="NEW CUSTOMERS" value={stats?.newCustomers || 0} />
               <MiniInfo label="ACTIVE PRODUCTS" value={stats?.activeProducts || 0} />
-              <MiniInfo label="GROSS REVENUE" value={formatCurrency(stats?.grossRevenue)} color="text-[#5542F6]" />
+              <MiniInfo label="GROSS REVENUE" value={formatCurrency(stats?.grossRevenue)} />
             </div>
           </div>
 
@@ -211,16 +211,16 @@ const AdminDashboard = () => {
               <select
                 value={transactionFilter}
                 onChange={(e) => { setTransactionFilter(e.target.value); setTransactionPage(1); }}
-                className="bg-[#F4F5F7] dark:bg-muted text-sm font-bold dark:text-primary rounded-xl px-4 py-2 border-none outline-none focus:ring-2 focus:ring-[#5CB85C]"
+                className="bg-muted dark:bg-muted text-sm font-bold dark:text-primary rounded-xl px-4 py-2 border-none outline-none focus:ring-2 focus:ring-[#5CB85C]"
               >
                 <option value="All">All Statuses</option>
                 <option value="Paid">Paid</option>
                 <option value="Pending">Pending</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
-              <span className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2.5 rounded-xl text-sm font-bold cursor-default">
+              {/* <span className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2.5 rounded-xl text-sm font-bold cursor-default">
                 <Filter size={16} /> Filter
-              </span>
+              </span> */}
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -269,14 +269,14 @@ const AdminDashboard = () => {
               <button
                 disabled={transactionPage === 1}
                 onClick={handlePrevPage}
-                className="px-4 py-2 border border-[#5542F6] rounded-xl text-[#5542F6] text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
+                className="px-4 py-2 border border-[#5542F6] rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
                 Previous
               </button>
               <span className="text-xs font-bold text-muted-foreground dark:text-muted-foreground">Page {transactionPage} of {totalPages}</span>
               <button
                 disabled={transactionPage === totalPages}
                 onClick={handleNextPage}
-                className="px-4 py-2 border border-[#5542F6] rounded-xl text-[#5542F6] text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
+                className="px-4 py-2 border border-[#5542F6] rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
                 Next
               </button>
             </div>
@@ -288,9 +288,9 @@ const AdminDashboard = () => {
           <div className="col-span-1 lg:col-span-8 bg-card p-6 md:p-8 rounded-[2rem] border border-border shadow-sm">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-xl font-bold dark:text-primary">Best selling product</h3>
-              <button className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2 rounded-xl text-sm font-bold cursor-pointer">
+              {/* <button className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2 rounded-xl text-sm font-bold cursor-pointer">
                 <Filter size={16} /> Filter
-              </button>
+              </button> */}
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px]">
@@ -317,11 +317,11 @@ const AdminDashboard = () => {
                           </td>
                           <td className="py-4 text-sm font-bold dark:text-primary">{p.totalOrdered}</td>
                           <td className="py-4">
-                            <span className={`flex items-center gap-2 font-bold text-xs ${isStocked ? 'text-success' : 'text-[#EB5757]'}`}>
+                            <span className={`flex items-center gap-2 font-bold text-xs ${isStocked ? 'text-success' : 'text-error'}`}>
                               <span className="w-1.5 h-1.5 rounded-full bg-current" /> {isStocked ? 'Stock' : 'Stock out'}
                             </span>
                           </td>
-                          <td className="py-4 font-bold text-[#5542F6] text-sm">${details?.price?.toFixed(2) || "0.00"}</td>
+                          <td className="py-4 font-bold text-primary text-sm">${details?.price?.toFixed(2) || "0.00"}</td>
                         </tr>
                       )
                     })
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
             </div>
             <button
               onClick={() => navigate('/admin/products')}
-              className="w-full mt-6 py-3.5 border border-[#5542F6] rounded-xl text-[#5542F6] font-bold text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
+              className="w-full mt-6 py-3.5 border border-[#5542F6] rounded-xl text-primary font-bold text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
             >
               View All Products
             </button>
@@ -343,7 +343,7 @@ const AdminDashboard = () => {
             <div className="bg-card p-8 rounded-[2rem] border border-border shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold dark:text-primary">Top Products</h3>
-                <button onClick={() => navigate('/admin/products')} className="text-[#5542F6] text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
+                <button onClick={() => navigate('/admin/products')} className="text-primary text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
               </div>
               <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C4C4C4]" size={16} />
@@ -352,7 +352,7 @@ const AdminDashboard = () => {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search"
-                  className="w-full bg-[#F4F5F7] dark:bg-muted rounded-xl py-3 pl-11 text-sm focus:outline-none focus:ring-1 focus:ring-[#5542F6]/30"
+                  className="w-full bg-muted dark:bg-muted rounded-xl py-3 pl-11 text-sm focus:outline-none focus:ring-1 focus:ring-[#5542F6]/30"
                 />
               </div>
               <div className="space-y-6">
@@ -374,7 +374,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="border-2 border-dashed border-[#E5E7FF] rounded-[2rem] p-8 flex flex-col items-center text-center bg-[#F9FAFF] dark:bg-background">
-              <button onClick={() => navigate('/admin/add-product')} className="w-14 h-14 bg-[#EEF0FF] dark:bg-muted text-[#5542F6] rounded-2xl flex items-center justify-center mb-4 cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+              <button onClick={() => navigate('/admin/add-product')} className="w-14 h-14 bg-[#EEF0FF] dark:bg-muted text-primary rounded-2xl flex items-center justify-center mb-4 cursor-pointer hover:scale-105 active:scale-95 transition-transform">
                 <Plus size={28} strokeWidth={3} />
               </button>
               <h4 className="font-bold text-lg dark:text-primary">Add New Product</h4>
@@ -409,7 +409,7 @@ const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, 
           </div>
           <div className="w-[1px] h-10 bg-[#F0F0F0] mx-4 self-center" />
           <div className="flex-1">
-            <div className="text-[28px] md:text-[32px] font-black text-[#EB5757] leading-none">{value2}</div>
+            <div className="text-[28px] md:text-[32px] font-black text-error leading-none">{value2}</div>
             <div className="text-[9px] text-muted-foreground dark:text-muted-foreground uppercase mt-2 font-bold tracking-tight">
               {sub2}
             </div>
@@ -429,7 +429,7 @@ const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, 
       {onClick && (
         <button
           onClick={onClick}
-          className="text-[10px] font-bold border border-[#5542F6]/30 px-5 py-2 rounded-xl text-[#5542F6] cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
+          className="text-[10px] font-bold border border-[#5542F6]/30 px-5 py-2 rounded-xl text-primary cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
         >
           Details
         </button>
@@ -453,7 +453,7 @@ const RegionRow = ({ label, percent }) => (
       </span>
       <span className="dark:text-primary">{percent}%</span>
     </div>
-    <div className="w-full bg-[#F4F5F7] dark:bg-muted h-1.5 rounded-full overflow-hidden">
+    <div className="w-full bg-muted dark:bg-muted h-1.5 rounded-full overflow-hidden">
       <div className="bg-primary text-primary-foreground h-full rounded-full transition-all duration-700" style={{ width: `${percent}%` }} />
     </div>
   </div>
@@ -464,7 +464,7 @@ const TopProductItem = ({ name, price, id, img, onClick }) => (
     <div className="flex items-center gap-3">
       <img src={img} className="w-11 h-11 rounded-lg object-cover bg-gray-100" />
       <div>
-        <p className="text-sm font-bold dark:text-primary transition-colors group-hover:text-[#5542F6]">{name}</p>
+        <p className="text-sm font-bold dark:text-primary transition-colors group-hover:text-primary">{name}</p>
         <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold mt-0.5">Item: {id}</p>
       </div>
     </div>
