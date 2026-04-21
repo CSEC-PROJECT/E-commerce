@@ -129,7 +129,7 @@ const AdminChangePassword = ({ onClose }) => {
                             // Implement save logic here
                             onClose();
                         }}
-                        className="w-full md:w-2/3 h-14 bg-primary text-primary-foreground rounded-xl font-black flex items-center justify-center gap-3 hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20 uppercase tracking-widest text-xs"
+                        className="w-full md:w-2/3 h-14 bg-primary text-white rounded-xl font-black flex items-center justify-center gap-3 hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg uppercase tracking-widest text-xs"
                     >
                         Save Changes
                         <ArrowRight size={18} />

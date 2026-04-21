@@ -12,7 +12,7 @@ const buildUrl = (path) => {
 };
 
 export async function apiRequest(path, options = {}) {
-  const { method = "GET", headers = {}, body, token, signal } = options;
+  const { method = "GET", headers = {}, body, token } = options;
 
   const mergedHeaders = {
     ...defaultHeaders,
@@ -31,7 +31,6 @@ export async function apiRequest(path, options = {}) {
     headers: mergedHeaders,
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
-    signal,
   });
 
   const contentType = response.headers.get("Content-Type") || "";

@@ -35,40 +35,33 @@ const ProductsPage = () => {
 
   const {
     products,
+    filteredProducts,
     totalProducts,
     loading,       // true only when grid is empty (first paint)
-    isFetching,    // true for background refreshes (data already on screen)
     error,
     fetchProducts,
+    applyFilters,
     clearError,
-    cancelRequests,
   } = useProductStore();
 
   const addToast       = useToastStore((s) => s.addToast);
   const user           = useAuthStore((state) => state.user);
   const searchTimerRef = useRef(null);
 
-  const loadProducts = useCallback(() => {
-    fetchProducts({
-      category,
-      search:   searchQuery,
-      page,
-      limit:    12,
-      minPrice: minPrice ? Number(minPrice) : undefined,
-      maxPrice: maxPrice ? Number(maxPrice) : undefined,
-    }).catch((err) => {
-      if (err.name !== 'AbortError') {
-        addToast(err.message || 'Failed to load products', 'error', 5000);
-      }
-    });
-  }, [category, searchQuery, page, minPrice, maxPrice, fetchProducts, addToast]);
-
   useEffect(() => {
     clearError();
-    loadProducts();
-  }, [loadProducts, clearError]);
+  }, [clearError]);
 
-  useEffect(() => () => cancelRequests(), [cancelRequests]);
+  // Apply filters locally whenever searchParams or products change
+  useEffect(() => {
+    applyFilters({
+      category,
+      search: searchQuery,
+      minPrice,
+      maxPrice
+    });
+  }, [category, searchQuery, minPrice, maxPrice, products, applyFilters]);
+
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -93,9 +86,11 @@ const ProductsPage = () => {
 
   // Grid content decision:
   //  loading=true  → show skeletons (no data at all)
-  //  isFetching=true + data exists → dim the existing grid (keep-previous-data)
-  //  else → render products normally
   const showSkeletons = loading && products.length === 0;
+
+  // Frontend Pagination
+  const limit = 12;
+  const productsToDisplay = filteredProducts.slice((page - 1) * limit, page * limit);
 
   return (
     <div className="min-h-screen bg-background">
@@ -127,13 +122,6 @@ const ProductsPage = () => {
               </div>
 
               <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground whitespace-nowrap">
-                {/* Subtle spinner next to count while refreshing in background */}
-                {isFetching && !loading && (
-                  <svg className="animate-spin w-4 h-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
-                  </svg>
-                )}
                 {loading
                   ? 'Loading…'
                   : `${totalProducts} product${totalProducts !== 1 ? 's' : ''} found`}
@@ -185,7 +173,6 @@ const ProductsPage = () => {
             {/* ── Product grid ── */}
             <div
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10 transition-opacity duration-200"
-              style={{ opacity: isFetching && !loading ? 0.5 : 1 }}
             >
               {showSkeletons ? (
                 Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
@@ -197,13 +184,13 @@ const ProductsPage = () => {
                   <h3 className="text-lg font-semibold">Something went wrong</h3>
                   <p className="text-muted-foreground mb-6">{error}</p>
                   <button
-                    onClick={loadProducts}
+                    onClick={() => fetchProducts()}
                     className="bg-primary text-primary-foreground px-8 py-2.5 rounded-xl font-medium hover:bg-primary/90 transition-colors"
                   >
                     Retry
                   </button>
                 </div>
-              ) : products.length === 0 ? (
+              ) : productsToDisplay.length === 0 ? (
                 <div className="col-span-full py-20 text-center">
                   <p className="text-muted-foreground text-lg">No products match your criteria.</p>
                   <button
@@ -214,7 +201,7 @@ const ProductsPage = () => {
                   </button>
                 </div>
               ) : (
-                products.map((product) => (
+                productsToDisplay.map((product) => (
                   <Link to={`/product/${product._id}`} key={product._id} className="group">
                     <Card3
                       image={product.coverImage}
@@ -228,7 +215,7 @@ const ProductsPage = () => {
             </div>
 
             {/* ── Pagination ── */}
-            {!loading && products.length > 0 && (
+            {!loading && filteredProducts.length > 0 && (
               <div className="mt-16 border-t border-border pt-8">
                 <Pagination
                   total={totalProducts}

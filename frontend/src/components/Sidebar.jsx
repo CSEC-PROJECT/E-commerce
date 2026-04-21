@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { useProductStore } from '../store/productStore';
 
 const MIN_PRICE = 0;
 const MAX_PRICE = 2500;
@@ -52,7 +53,7 @@ const DualSlider = ({ minVal, maxVal, onMinChange, onMaxChange }) => {
   return (
     <div
       ref={trackRef}
-      className="relative select-none cursor-pointer"
+      className="relative select-none cursor-pointer mx-2"
       style={{ height: '20px', touchAction: 'none' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -163,12 +164,16 @@ const Sidebar = () => {
     scheduleApply(localMin, val);
   };
 
+  const products = useProductStore((state) => state.products);
+  
+  // Standard categories from screenshot
+  const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
+  const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
+  const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
+  
   const categories = [
     { id: '', label: 'All Collections' },
-    { id: 'Electronics', label: 'Electronics' },
-    { id: 'Footwear', label: 'Footwear' },
-    { id: 'Accessories', label: 'Accessories' },
-    { id: 'Apparel', label: 'Apparel' },
+    ...uniqueCategories.map(c => ({ id: c, label: c }))
   ];
 
   const handleCategoryClick = (id) => {
@@ -231,17 +236,17 @@ const Sidebar = () => {
                   onClick={() => handleCategoryClick(cat.id)}
                 >
                   <div
-                    className={`w-4 h-4 rounded border border-border flex flex-shrink-0 justify-center items-center mr-3 transition-colors ${
-                      isActive ? 'bg-primary/10' : 'bg-muted group-hover:bg-primary/5'
+                    className={`w-5 h-5 rounded flex flex-shrink-0 justify-center items-center mr-3 transition-colors ${
+                      isActive ? 'bg-primary' : 'bg-[#e5e7eb] dark:bg-muted group-hover:bg-primary/20'
                     }`}
                   >
                     {isActive && (
                       <svg
-                        className="w-3 h-3 text-primary"
+                        className="w-3.5 h-3.5 text-white"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        strokeWidth="3"
+                        strokeWidth="4"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
