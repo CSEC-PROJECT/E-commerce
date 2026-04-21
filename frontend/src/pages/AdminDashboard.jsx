@@ -127,14 +127,14 @@ const AdminDashboard = () => {
 
         {/* Row 2: Charts & Region */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <div className="col-span-1 lg:col-span-8 bg-white dark:bg-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-[#F5F5F7] dark:border-border shadow-sm">
+          <div className="col-span-1 lg:col-span-8 bg-card p-6 md:p-10 rounded-[2rem] md:rounded-[2.5rem] border border-border shadow-sm">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
               <div>
                 <h3 className="text-xl font-bold tracking-tight  dark:text-primary">Weekly Sales Performance</h3>
                 <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">Revenue analysis for the past 7 days</p>
               </div>
               <div className="flex bg-[#F4F5F7] dark:bg-muted p-1.5 rounded-2xl w-full sm:w-auto">
-                <span className="flex-1 sm:flex-none px-6 py-2 bg-white dark:bg-card shadow-sm rounded-xl text-xs font-bold text-[#5542F6] cursor-default">This week</span>
+                <span className="flex-1 sm:flex-none px-6 py-2 bg-card shadow-sm rounded-xl text-xs font-bold text-[#5542F6] cursor-default">This week</span>
               </div>
             </div>
 
@@ -166,7 +166,7 @@ const AdminDashboard = () => {
               </div>
             )}
 
-            <div className="flex flex-wrap justify-between gap-4 mt-8 pt-6 border-t border-[#F5F5F7] dark:border-border">
+            <div className="flex flex-wrap justify-between gap-4 mt-8 pt-6 border-t border-border">
               <MiniInfo label="NEW CUSTOMERS" value={stats?.newCustomers || 0} />
               <MiniInfo label="ACTIVE PRODUCTS" value={stats?.activeProducts || 0} />
               <MiniInfo label="GROSS REVENUE" value={formatCurrency(stats?.grossRevenue)} color="text-[#5542F6]" />
@@ -183,11 +183,11 @@ const AdminDashboard = () => {
               <p className="text-[14px] opacity-70 mb-10">Users browsing the store</p>
               <div className="flex gap-1.5 items-end h-16">
                 {[40, 25, 45, 90, 35, 40].map((h, i) => (
-                  <div key={i} className={`flex-1 rounded-md ${i === 3 ? 'bg-white dark:bg-card' : 'bg-white dark:bg-card/30'}`} style={{ height: `${h}%` }} />
+                  <div key={i} className={`flex-1 rounded-md ${i === 3 ? 'bg-card' : 'bg-card/30'}`} style={{ height: `${h}%` }} />
                 ))}
               </div>
             </div>
-            <div className="bg-white dark:bg-card p-8 rounded-[2rem] border border-[#F5F5F7] dark:border-border shadow-sm">
+            <div className="bg-card p-8 rounded-[2rem] border border-border shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold dark:text-primary">Sales by Region</h3>
                 <span className="text-xs font-bold cursor-default">Full Map</span>
@@ -203,7 +203,7 @@ const AdminDashboard = () => {
         </section>
 
         {/* Row 3: Recent Transactions */}
-        <section id="recent-transactions" className="bg-white dark:bg-card rounded-[2rem] border border-[#F5F5F7] dark:border-border p-6 md:p-8 shadow-sm">
+        <section id="recent-transactions" className="bg-card rounded-[2rem] border border-border p-6 md:p-8 shadow-sm">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <h3 className="text-xl font-bold dark:text-primary">Recent Transaction</h3>
 
@@ -226,7 +226,7 @@ const AdminDashboard = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="text-muted-foreground dark:text-muted-foreground text-xs font-bold uppercase tracking-wider border-b border-[#F5F5F7] dark:border-border">
+                <tr className="text-muted-foreground dark:text-muted-foreground text-xs font-bold uppercase tracking-wider border-b border-border">
                   <th className="pb-4">No</th>
                   <th className="pb-4">Id Customer</th>
                   <th className="pb-4">Order Date</th>
@@ -285,7 +285,7 @@ const AdminDashboard = () => {
 
         {/* Row 4: Best Selling & Add Product */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
-          <div className="col-span-1 lg:col-span-8 bg-white dark:bg-card p-6 md:p-8 rounded-[2rem] border border-[#F5F5F7] dark:border-border shadow-sm">
+          <div className="col-span-1 lg:col-span-8 bg-card p-6 md:p-8 rounded-[2rem] border border-border shadow-sm">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-xl font-bold dark:text-primary">Best selling product</h3>
               <button className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2 rounded-xl text-sm font-bold cursor-pointer">
@@ -340,7 +340,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="col-span-1 lg:col-span-4 space-y-6">
-            <div className="bg-white dark:bg-card p-8 rounded-[2rem] border border-[#F5F5F7] dark:border-border shadow-sm">
+            <div className="bg-card p-8 rounded-[2rem] border border-border shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold dark:text-primary">Top Products</h3>
                 <button onClick={() => navigate('/admin/products')} className="text-[#5542F6] text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
@@ -380,8 +380,8 @@ const AdminDashboard = () => {
               <h4 className="font-bold text-lg dark:text-primary">Add New Product</h4>
               <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-2 mb-6 px-4">Select a category below to start listing your next best-seller</p>
               <div className="flex gap-3">
-                <button onClick={() => navigate('/admin/add-product?category=Electronics')} className="px-5 py-2 bg-white dark:bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Electronics</button>
-                <button onClick={() => navigate('/admin/add-product?category=Fashion')} className="px-5 py-2 bg-white dark:bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Fashion</button>
+                <button onClick={() => navigate('/admin/add-product?category=Electronics')} className="px-5 py-2 bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Electronics</button>
+                <button onClick={() => navigate('/admin/add-product?category=Fashion')} className="px-5 py-2 bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Fashion</button>
               </div>
             </div>
           </div>
@@ -393,7 +393,7 @@ const AdminDashboard = () => {
 
 /* --- STAT CARD --- */
 const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, sub1, sub2, onClick }) => (
-  <div className="bg-white dark:bg-card p-6 rounded-[2.5rem] border border-[#F5F5F7] dark:border-border shadow-sm flex flex-col justify-between h-full min-h-[220px]">
+  <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm flex flex-col justify-between h-full min-h-[220px]">
     <div>
       <div className="flex justify-between items-center text-muted-foreground dark:text-muted-foreground mb-5">
         <span className="text-[10px] font-bold uppercase tracking-widest">{title}</span>
