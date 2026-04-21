@@ -4,7 +4,6 @@ import { apiRequest } from '../lib/apiClient';
 import { useAuthStore } from '../store/authStore';
 import useCartStore from '../store/cartStore';
 
-// Animated checkmark circle
 const SuccessIcon = () => (
     <div className="relative mx-auto mb-8" style={{ width: 96, height: 96 }}>
         <div className="absolute inset-0 rounded-full bg-emerald-500/10 animate-ping" style={{ animationDuration: '2s' }} />
@@ -45,7 +44,6 @@ const TransactionStatusPage = () => {
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
-        // Chapa appends tx_ref and status to the return_url as query params
         const tx = searchParams.get('tx_ref') || searchParams.get('trx_ref');
         const chapaStatus = searchParams.get('status');
 
@@ -58,13 +56,11 @@ const TransactionStatusPage = () => {
 
         setTxRef(tx);
 
-        // If Chapa already signals a failed status in the URL, don't bother verifying
         if (chapaStatus && chapaStatus !== 'success') {
             setStatus('failed');
             return;
         }
 
-        // Verify with our backend
         const verify = async () => {
             try {
                 const data = await apiRequest(`/api/pay/verify/${tx}`, {
@@ -75,14 +71,12 @@ const TransactionStatusPage = () => {
                 if (data?.status === 'success' || data?.message === 'Payment verified successfully' || data?.message === 'Payment already verified') {
                     setDetails(data?.data);
                     setStatus('success');
-                    // Cart is paid — clear it
                     clearCart();
                 } else {
                     setStatus('failed');
                 }
             } catch (err) {
                 console.error('Verification error:', err);
-                // If backend says not successful
                 if (err.message?.toLowerCase().includes('not successful')) {
                     setStatus('failed');
                 } else {
