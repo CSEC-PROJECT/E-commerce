@@ -1,14 +1,16 @@
 import React from "react";
 import { X, Tag, Package, Truck, Star } from "lucide-react";
 
-export default function ProductPreviewModal({ isOpen, onClose, onPublish, formData = {}, coverImage = null }) {
+export default function ProductPreviewModal({ isOpen, onClose, onPublish, formData = {}, coverImage = null, isEditing = false }) {
   if (!isOpen) return null;
 
   // Derive a local URL for the cover image so we can render it
-  const coverPreviewUrl = coverImage instanceof File ? URL.createObjectURL(coverImage) : null;
+  const coverPreviewUrl = coverImage instanceof File
+    ? URL.createObjectURL(coverImage)
+    : formData.coverImageURL || null;
 
-  const displayPrice   = formData.price     ? `$${Number(formData.price).toFixed(2)}`        : "—";
-  const comparePrice   = formData.comparePrice ? `$${Number(formData.comparePrice).toFixed(2)}` : null;
+  const displayPrice   = formData.price     ? `ETB ${Number(formData.price).toFixed(2)}`        : "—";
+  const comparePrice   = formData.comparePrice ? `ETB ${Number(formData.comparePrice).toFixed(2)}` : null;
   const discount       = formData.comparePrice && formData.price
     ? Math.round((1 - Number(formData.price) / Number(formData.comparePrice)) * 100)
     : null;

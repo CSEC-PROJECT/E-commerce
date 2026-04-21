@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import Order from "../../models/order.model.js";
-import Cart from "../../models/cart.model.js";
 import Product from "../../models/product.model.js";
 
 const createOrder = async (req,res) =>{
@@ -16,7 +15,14 @@ const createOrder = async (req,res) =>{
         }
 
         // Fetch product details from the database to ensure data integrity
-        const productIds = items.map(item => item.productId);
+        const productIds = items
+            .map(item => item.productId)
+            .filter((id) => mongoose.Types.ObjectId.isValid(id));
+
+        if (productIds.length !== items.length) {
+            return res.status(400).json({ message: "Each item must include a valid productId" });
+        }
+
         const products = await Product.find({ '_id': { $in: productIds } });
 
         const productMap = products.reduce((map, product) => {
@@ -24,12 +30,13 @@ const createOrder = async (req,res) =>{
             return map;
         }, {});
 
+        const missingProductId = items.find((item) => !productMap[item.productId])?.productId;
+        if (missingProductId) {
+            return res.status(400).json({ message: `Product with ID ${missingProductId} not found` });
+        }
+
         const orderItems = items.map(item => {
             const product = productMap[item.productId];
-            if (!product) {
-                // This case should ideally not be hit if cart is managed properly
-                throw new Error(`Product with ID ${item.productId} not found`);
-            }
             return {
                 productId: item.productId,
                 name: product.name,
@@ -45,9 +52,6 @@ const createOrder = async (req,res) =>{
             status
         })
         await newOrder.save();
-
-        // Clear the user's cart after creating the order
-        await Cart.findOneAndUpdate({ user: userId }, { items: [], totalPrice: 0 });
 
         return res.status(201).json({
             message:"Order created successfully",

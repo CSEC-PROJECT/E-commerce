@@ -7,6 +7,11 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
     const { user, accessToken } = useAuthStore();
     const [loading, setLoading] = useState(false);
 
+    const resolveProductId = (item) => {
+        if (!item) return null;
+        return item.product?._id || item.product || item.productId?._id || item.productId || item.id || null;
+    };
+
     const handleCheckout = async () => {
         if (!cartItems || cartItems.length === 0) {
             toast.error("Your cart is empty");
@@ -19,13 +24,24 @@ const OrderSummary = ({ subtotal, tax, total, cartItems }) => {
 
         setLoading(true);
         try {
+            const normalizedItems = cartItems
+                .map((item) => {
+                    const productId = resolveProductId(item);
+                    return {
+                        productId,
+                        name: item.product?.name || item.name,
+                        quantity: Number(item.quantity) || 1,
+                        price: Number(item.price) || 0,
+                    };
+                })
+                .filter((item) => item.productId);
+
+            if (normalizedItems.length !== cartItems.length) {
+                throw new Error('Some cart items are invalid. Please remove and add them again.');
+            }
+
             const orderPayload = {
-                items: cartItems.map(item => ({
-                    productId: item.product?._id || item.product,
-                    name: item.product?.name,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
+                items: normalizedItems,
                 totalPrice: total,
                 status: 'pending'
             };

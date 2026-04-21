@@ -13,7 +13,7 @@ const getDashboardStats = asyncHandler(async (req, res) => {
     {
       $match: {
         createdAt: { $gte: sevenDaysAgo },
-        paymentStatus: "Paid",
+        paymentStatus: "paid",
       },
     },
     {
@@ -39,12 +39,12 @@ const getDashboardStats = asyncHandler(async (req, res) => {
   ]);
 
   const pendingOrders = await Order.countDocuments({
-    status: "Pending",
+    status: "pending",
     createdAt: { $gte: sevenDaysAgo },
   });
 
   const cancelledOrders = await Order.countDocuments({
-    status: "Cancelled",
+    paymentStatus: "failed",
     createdAt: { $gte: sevenDaysAgo },
   });
 
@@ -78,7 +78,7 @@ const getWeeklySalesPerformance = asyncHandler(async (req, res) => {
     {
       $match: {
         createdAt: { $gte: sevenDaysAgo },
-        paymentStatus: "Paid",
+        paymentStatus: "paid",
       },
     },
     {

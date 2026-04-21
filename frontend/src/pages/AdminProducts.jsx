@@ -147,11 +147,11 @@ const AdminProducts = () => {
               disabled={loading}
               className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
               <option>Any Price</option>
-              <option>Under $50</option>
-              <option>$50 - $100</option>
-              <option>$100 - $200</option>
-              <option>$200 - $500</option>
-              <option>$500+</option>
+              <option>Under ETB 50</option>
+              <option>ETB 50 - ETB 100</option>
+              <option>ETB 100 - ETB 200</option>
+              <option>ETB 200 - ETB 500</option>
+              <option>ETB 500+</option>
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
@@ -255,7 +255,7 @@ const AdminProducts = () => {
                     displayedProducts.map((product) => {
                       const id = product._id || product.id;
                       const dateStr = product.createdAt ? new Date(product.createdAt).toLocaleDateString() : 'N/A';
-                      const formattedPrice = typeof product.price === 'number' ? `$${product.price.toFixed(2)}` : 'N/A';
+                      const formattedPrice = typeof product.price === 'number' ? `ETB ${product.price.toFixed(2)}` : 'N/A';
 
                       return (
                         <tr key={id} className="hover:bg-muted/50 transition-colors">

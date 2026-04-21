@@ -1,11 +1,93 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Hero from "../components/home/Hero";
 import CuratedCategories from "../components/home/CuratedCategories";
 import Newsletter from "../components/home/Newsletter";
 import ProductCard from "../components/ProductCard";
-import { useProductStore } from "../store/productStore";
+import useCartStore from "../store/cartStore";
+import { useAuthStore } from "../store/authStore";
 import { useToastStore } from "../store/toastStore";
+import { useProductStore } from "../store/productStore";
+import { ShoppingCart, Star } from "lucide-react";
+
+/* ─── Home Product Card ─── */
+const HomeProductCard = ({ product }) => {
+  const { user } = useAuthStore();
+  const addToCart = useCartStore((state) => state.addToCart);
+  const addToast = useToastStore((state) => state.addToast);
+  const navigate = useNavigate();
+
+  const handleAddToCart = async (e) => {
+    e.preventDefault();
+    
+    if (user) {
+      await addToCart({ product: product._id, quantity: 1, price: product.discountedPrice ?? product.price });
+      addToast('Product added to cart', 'success');
+    } else {
+      addToast('Please login to add items to your cart', 'info');
+      navigate('/login');
+    }
+  };
+
+  const price = product.discountedPrice ?? product.price;
+
+  return (
+    <Link to={`/product/${product._id}`} className="group bg-white rounded-[2rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
+      {/* Image */}
+      <div className="w-full aspect-square bg-gray-100 rounded-[1.5rem] overflow-hidden mb-5">
+        <img 
+          src={product.coverImage} 
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      </div>
+
+      {/* Content */}
+      <div className="flex flex-col flex-grow px-1">
+        <div className="flex justify-between items-start mb-1">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-indigo-600">
+            {product.category || "New"}
+          </span>
+          <span className="text-xl font-black text-indigo-600">
+            ETB {price?.toFixed(2)}
+          </span>
+        </div>
+        
+        <h3 className="text-lg font-bold text-gray-900 leading-snug mb-4 line-clamp-2">
+          {product.name}
+        </h3>
+
+        <div className="flex justify-between items-center mb-6 mt-auto">
+          <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-700">
+            <Star size={14} className="fill-amber-400 text-amber-400" />
+            <span>{product.averageRating?.toFixed(1) || "5.0"}</span>
+            <span className="text-gray-400 font-medium text-xs">({product.reviews?.length || 0})</span>
+          </div>
+          
+          <div className="flex items-center gap-1.5 text-xs font-bold">
+            {product.status?.toLowerCase() === 'new' ? (
+              <><span className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-emerald-700 capitalize">{product.status}</span></>
+            ) : product.status?.toLowerCase() === 'slightly used' ? (
+              <><span className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-blue-700 capitalize">{product.status}</span></>
+            ) : product.status?.toLowerCase() === 'used' ? (
+              <><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="text-amber-700 capitalize">{product.status}</span></>
+            ) : (
+              <><span className="w-2 h-2 rounded-full bg-gray-500" /><span className="text-gray-700 capitalize">{product.status || 'Available'}</span></>
+            )}
+          </div>
+        </div>
+
+        <button 
+          onClick={handleAddToCart}
+          className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
+        >
+          <ShoppingCart size={18} />
+          Add to Cart
+        </button>
+      </div>
+    </Link>
+  );
+};
 
 
 /* ─── Skeleton Card (pulse placeholder while loading) ─── */
@@ -120,18 +202,9 @@ export default function Home() {
             {/* Products */}
             {latestProducts.length > 0 &&
               latestProducts.map((product) => (
-                <ProductCard
+                <HomeProductCard
                   key={product._id}
-                  id={product._id}
-                  image={product.coverImage}
-                  title={product.name}
-                  price={product.discountedPrice ?? product.price}
-                  status={
-                    product.stock > 0
-                      ? "IN STOCK"
-                      : "OUT OF STOCK"
-                  }
-                  rating={product.averageRating}
+                  product={product}
                 />
               ))
             }
