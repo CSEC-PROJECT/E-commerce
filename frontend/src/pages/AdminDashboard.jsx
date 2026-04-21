@@ -146,21 +146,21 @@ const AdminDashboard = () => {
                   <AreaChart data={salesPerformance.length > 0 ? salesPerformance : [{ day: 'SUN', sales: 0 }]} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#5542F6" stopOpacity={0.15} />
-                        <stop offset="95%" stopColor="#5542F6" stopOpacity={0} />
+                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.15} />
+                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid vertical={false} stroke="#F0F0F0" />
+                    <CartesianGrid vertical={false} stroke="var(--border)" />
                     <XAxis
                       dataKey="day"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#7C3AED', fontSize: 12, fontWeight: 600 }}
+                      tick={{ fill: 'var(--primary)', fontSize: 12, fontWeight: 600 }}
                       dy={10}
                       padding={{ left: 10, right: 10 }}
                     />
                     <YAxis hide={true} />
-                    <Area type="monotone" dataKey="sales" stroke="#5542F6" strokeWidth={4} fill="url(#colorVal)" />
+                    <Area type="monotone" dataKey="sales" stroke="var(--primary)" strokeWidth={4} fill="url(#colorVal)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -211,7 +211,7 @@ const AdminDashboard = () => {
               <select
                 value={transactionFilter}
                 onChange={(e) => { setTransactionFilter(e.target.value); setTransactionPage(1); }}
-                className="bg-muted dark:bg-muted text-sm font-bold dark:text-primary rounded-xl px-4 py-2 border-none outline-none focus:ring-2 focus:ring-[#5CB85C]"
+                className="bg-muted dark:bg-muted text-sm font-bold dark:text-primary rounded-xl px-4 py-2 border-none outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="All">All Statuses</option>
                 <option value="Paid">Paid</option>
@@ -241,14 +241,14 @@ const AdminDashboard = () => {
                   </tr>
                 ) : paginatedTransactions.length === 0 ? (
                   <tr>
-                    <td colSpan="5" className="py-10 text-center text-gray-500 font-bold">No transactions found.</td>
+                    <td colSpan="5" className="py-10 text-center text-muted-foreground font-bold">No transactions found.</td>
                   </tr>
                 ) : (
                   paginatedTransactions.map((t, idx) => {
                     const status = t.paymentStatus !== "Pending" ? t.paymentStatus : t.status;
                     const isPaid = status?.toLowerCase() === "paid";
                     return (
-                      <tr key={t._id} className="group hover:bg-gray-50 dark:bg-muted/50">
+                      <tr key={t._id} className="group hover:bg-muted/50">
                         <td className="py-5 text-muted-foreground dark:text-muted-foreground font-medium">{(transactionPage - 1) * transactionsPerPage + idx + 1}.</td>
                         <td className="py-5 font-bold dark:text-primary">#{t._id.substring(t._id.length - 6).toUpperCase()}</td>
                         <td className="py-5 dark:text-primary font-medium">{formatDate(t.createdAt)}</td>
@@ -269,14 +269,14 @@ const AdminDashboard = () => {
               <button
                 disabled={transactionPage === 1}
                 onClick={handlePrevPage}
-                className="px-4 py-2 border border-[#5542F6] rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
+                className="px-4 py-2 border border-primary rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
                 Previous
               </button>
               <span className="text-xs font-bold text-muted-foreground dark:text-muted-foreground">Page {transactionPage} of {totalPages}</span>
               <button
                 disabled={transactionPage === totalPages}
                 onClick={handleNextPage}
-                className="px-4 py-2 border border-[#5542F6] rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
+                className="px-4 py-2 border border-primary rounded-xl text-primary text-xs font-bold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary hover:text-primary-foreground transition-all">
                 Next
               </button>
             </div>
@@ -295,14 +295,14 @@ const AdminDashboard = () => {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px]">
                 <thead>
-                  <tr className="bg-[#F4FDF6] text-[10px] text-muted-foreground dark:text-muted-foreground uppercase font-bold tracking-widest text-left">
+                  <tr className="bg-secondary text-[10px] text-muted-foreground dark:text-muted-foreground uppercase font-bold tracking-widest text-left">
                     <th className="p-4 rounded-l-xl pl-6">Product</th>
                     <th className="p-4">Total Order</th>
                     <th className="p-4">Status</th>
                     <th className="p-4 rounded-r-xl pr-6">Price</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#F5F5F7]">
+                <tbody className="divide-y divide-border">
                   {loadingBestSelling ? (
                     <tr><td colSpan="4" className="py-10 text-center"><Loader2 className="animate-spin inline-block text-primary" size={24} /></td></tr>
                   ) : bestSellingProducts.length > 0 ? (
@@ -310,7 +310,7 @@ const AdminDashboard = () => {
                       const details = p.productDetails;
                       const isStocked = details?.stock > 0;
                       return (
-                        <tr key={i} className="hover:bg-gray-50 dark:bg-muted/30">
+                        <tr key={i} className="hover:bg-muted/30">
                           <td className="py-4 flex items-center gap-4 pl-2">
                             <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
                             <span className="font-bold text-sm dark:text-primary">{details?.name || "Unknown Product"}</span>
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
             </div>
             <button
               onClick={() => navigate('/admin/products')}
-              className="w-full mt-6 py-3.5 border border-[#5542F6] rounded-xl text-primary font-bold text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
+              className="w-full mt-6 py-3.5 border border-primary rounded-xl text-primary font-bold text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
             >
               View All Products
             </button>
@@ -346,13 +346,13 @@ const AdminDashboard = () => {
                 <button onClick={() => navigate('/admin/products')} className="text-primary text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
               </div>
               <div className="relative mb-6">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-[#C4C4C4]" size={16} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search"
-                  className="w-full bg-muted dark:bg-muted rounded-xl py-3 pl-11 text-sm focus:outline-none focus:ring-1 focus:ring-[#5542F6]/30"
+                  className="w-full bg-muted dark:bg-muted rounded-xl py-3 pl-11 text-sm focus:outline-none focus:ring-1 focus:ring-primary/30"
                 />
               </div>
               <div className="space-y-6">
@@ -368,20 +368,20 @@ const AdminDashboard = () => {
                     />
                   ))
                 ) : (
-                  <p className="text-sm font-bold text-gray-400 text-center">No products found</p>
+                  <p className="text-sm font-bold text-muted-foreground text-center">No products found</p>
                 )}
               </div>
             </div>
 
-            <div className="border-2 border-dashed border-[#E5E7FF] rounded-[2rem] p-8 flex flex-col items-center text-center bg-[#F9FAFF] dark:bg-background">
-              <button onClick={() => navigate('/admin/add-product')} className="w-14 h-14 bg-[#EEF0FF] dark:bg-muted text-primary rounded-2xl flex items-center justify-center mb-4 cursor-pointer hover:scale-105 active:scale-95 transition-transform">
+            <div className="border-2 border-dashed border-accent rounded-[2rem] p-8 flex flex-col items-center text-center bg-surface-soft dark:bg-background">
+              <button onClick={() => navigate('/admin/add-product')} className="w-14 h-14 bg-accent dark:bg-muted text-primary rounded-2xl flex items-center justify-center mb-4 cursor-pointer hover:scale-105 active:scale-95 transition-transform">
                 <Plus size={28} strokeWidth={3} />
               </button>
               <h4 className="font-bold text-lg dark:text-primary">Add New Product</h4>
               <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-2 mb-6 px-4">Select a category below to start listing your next best-seller</p>
               <div className="flex gap-3">
-                <button onClick={() => navigate('/admin/add-product?category=Electronics')} className="px-5 py-2 bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Electronics</button>
-                <button onClick={() => navigate('/admin/add-product?category=Fashion')} className="px-5 py-2 bg-card border border-[#F0F0F0] dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-[#5542F6]">Fashion</button>
+                <button onClick={() => navigate('/admin/add-product?category=Electronics')} className="px-5 py-2 bg-card border border-border dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-primary">Electronics</button>
+                <button onClick={() => navigate('/admin/add-product?category=Fashion')} className="px-5 py-2 bg-card border border-border dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-primary">Fashion</button>
               </div>
             </div>
           </div>
@@ -395,20 +395,20 @@ const AdminDashboard = () => {
 const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, sub1, sub2, onClick }) => (
   <div className="bg-card p-6 rounded-[2.5rem] border border-border shadow-sm flex flex-col justify-between h-full min-h-[220px]">
     <div>
-      <div className="flex justify-between items-center text-muted-foreground dark:text-muted-foreground mb-5">
+      <div className="flex justify-center items-center text-muted-foreground dark:text-muted-foreground mb-5">
         <span className="text-[10px] font-bold uppercase tracking-widest">{title}</span>
-        <MoreVertical size={18} className="cursor-pointer" />
+        {/* <MoreVertical size={18} className="cursor-pointer" /> */}
       </div>
       {isDouble ? (
-        <div className="flex items-start">
-          <div className="flex-1">
+        <div className="flex items-center justify-center gap-6">
+          <div className="flex flex-col items-center text-center">
             <div className="text-[28px] md:text-[32px] font-black leading-none dark:text-primary">{value}</div>
             <div className="text-[9px] text-muted-foreground dark:text-muted-foreground uppercase mt-2 font-bold tracking-tight">
               {sub1}
             </div>
           </div>
-          <div className="w-[1px] h-10 bg-[#F0F0F0] mx-4 self-center" />
-          <div className="flex-1">
+          <div className="w-[1px] h-10 bg-border self-center" />
+          <div className="flex flex-col items-center text-center">
             <div className="text-[28px] md:text-[32px] font-black text-error leading-none">{value2}</div>
             <div className="text-[9px] text-muted-foreground dark:text-muted-foreground uppercase mt-2 font-bold tracking-tight">
               {sub2}
@@ -417,11 +417,13 @@ const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, 
         </div>
       ) : (
         <>
-          <div className="flex items-baseline gap-2 mb-1">
-            <span className="text-[38px] md:text-[44px] font-black leading-none tracking-tight dark:text-primary">{value}</span>
-            <span className={`text-[10px] font-bold ${color}`}>{subValue}</span>
+          <div className="flex flex-col items-center text-center gap-1 mb-1">
+            <div className="flex items-baseline gap-2">
+              <span className="text-[38px] md:text-[44px] font-black leading-none tracking-tight dark:text-primary">{value}</span>
+              <span className={`text-[10px] font-bold ${color}`}>{subValue}</span>
+            </div>
+            <p className="text-[9px] text-muted-foreground dark:text-muted-foreground mt-1.5 uppercase font-extrabold tracking-widest">{subDetail}</p>
           </div>
-          <p className="text-[9px] text-muted-foreground dark:text-muted-foreground mt-1.5 uppercase font-extrabold tracking-widest">{subDetail}</p>
         </>
       )}
     </div>
@@ -429,7 +431,7 @@ const StatCard = ({ title, value, value2, subValue, subDetail, color, isDouble, 
       {onClick && (
         <button
           onClick={onClick}
-          className="text-[10px] font-bold border border-[#5542F6]/30 px-5 py-2 rounded-xl text-primary cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
+          className="text-[10px] font-bold border border-primary/30 px-5 py-2 rounded-xl text-primary cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
         >
           Details
         </button>
