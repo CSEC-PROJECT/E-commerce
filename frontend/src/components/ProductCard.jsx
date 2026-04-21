@@ -7,17 +7,17 @@ import { useToastStore } from '../store/toastStore';
 
 const StarRating = ({ rating = 5 }) => (
   <div className="flex items-center gap-1">
-    <div className="flex text-amber-400">
+    <div className="flex text-warning">
       {[...Array(5)].map((_, i) => (
         <Star 
           key={i} 
           size={12} 
           fill={i < Math.floor(rating) ? "currentColor" : "none"} 
-          className={i < Math.floor(rating) ? "" : "text-gray-300"}
+          className={i < Math.floor(rating) ? "" : "text-muted"}
         />
       ))}
     </div>
-    <span className="text-[10px] font-medium text-gray-500 uppercase tracking-tighter">
+    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tighter">
       {rating?.toFixed(1)}
     </span>
   </div>
@@ -43,26 +43,26 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusClasses = (status) => {
     switch (status?.toLowerCase()) {
       case 'new':
-        return 'bg-emerald-100/90 text-emerald-700 border-emerald-200';
+        return 'bg-success/10 text-success border-success/20';
       case 'slightly used':
-        return 'bg-blue-100/90 text-blue-700 border-blue-200';
+        return 'bg-primary/10 text-primary border-primary/20';
       case 'used':
-        return 'bg-amber-100/90 text-amber-700 border-amber-200';
+        return 'bg-warning/10 text-warning-foreground border-warning/20';
       default:
-        return 'bg-gray-100/90 text-gray-700 border-gray-200';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   return (
     <Link 
       to={`/product/${id}`} 
-      className="group relative flex flex-col bg-white rounded-2xl p-3 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
+      className="group relative flex flex-col bg-card rounded-2xl p-3 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(0,0,0,0.05)]"
     >
       {/* Image Container */}
-      <div className="relative aspect-[4/5] mb-4 rounded-xl overflow-hidden bg-gray-50">
+      <div className="relative aspect-[4/5] mb-4 rounded-xl overflow-hidden bg-muted">
         <img 
           src={image} 
           alt={title} 
@@ -72,7 +72,7 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
         {/* Status Badges */}
         {status && (
           <div className="absolute top-2 left-2 z-10">
-            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-sm backdrop-blur-md border ${getStatusColor(status)}`}>
+            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-sm backdrop-blur-md border ${getStatusClasses(status)}`}>
               {status}
             </span>
           </div>
@@ -82,7 +82,7 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
         <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out hidden md:block">
           <button
             onClick={handleAddToCart}
-            className="w-full py-3 bg-gray-900 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-2 hover:bg-black transition-colors shadow-xl"
+            className="w-full py-3 bg-primary text-primary-foreground rounded-xl text-xs font-semibold flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors shadow-xl"
           >
             <Plus size={14} /> Quick Add
           </button>
@@ -92,10 +92,10 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
       {/* Product Info */}
       <div className="px-1 flex flex-col gap-1.5">
         <div className="flex flex-col gap-1">
-          <h3 className="text-sm font-semibold text-gray-900 leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="text-sm font-semibold text-foreground leading-tight line-clamp-2 group-hover:text-primary transition-colors">
             {title}
           </h3>
-          <p className="text-base font-bold text-gray-900">
+          <p className="text-base font-bold text-primary">
             ETB {price?.toFixed(2)}
           </p>
         </div>
@@ -106,7 +106,7 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
           {/* Mobile Add Button */}
           <button 
             onClick={handleAddToCart}
-            className="md:hidden p-2 rounded-full bg-gray-900 text-white active:scale-95 transition-all"
+            className="md:hidden p-2 rounded-full bg-primary text-primary-foreground active:scale-95 transition-all"
           >
             <ShoppingCart size={14} />
           </button>
