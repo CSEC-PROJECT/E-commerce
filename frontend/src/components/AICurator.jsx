@@ -1,9 +1,33 @@
-import React, { useState } from 'react';
-import { Sparkles, X, Send, Plus, Package, RotateCcw, Info, Ruler } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Sparkles, X, Send, Plus, Package, RotateCcw, Info, Ruler, SendHorizontal } from 'lucide-react';
 
 const AICurator = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [message, setMessage] = useState('');
+    const chatRef = useRef(null);
+    const fabRef = useRef(null);
+
+    // Enhanced click outside logic to close the AI UI reliably
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            // Close if click is outside BOTH the chat window and the FAB
+            if (isOpen && 
+                chatRef.current && !chatRef.current.contains(event.target) && 
+                fabRef.current && !fabRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isOpen]);
 
     const quickActions = [
         { icon: <Package size={16} />, label: 'Track Order' },
@@ -16,11 +40,12 @@ const AICurator = () => {
         <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-6">
             {/* Chat Window */}
             <div 
+                ref={chatRef}
                 className={`transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] origin-bottom-right ${
                     isOpen 
                         ? 'scale-100 opacity-100 translate-y-0' 
                         : 'scale-90 opacity-0 translate-y-10 pointer-events-none'
-                } w-[420px] max-w-[calc(100vw-4rem)] h-[650px] max-h-[calc(100vh-10rem)] bg-card rounded-[2.5rem] shadow-[0_40px_80px_-15px_rgba(0,0,0,0.15)] border border-outline-variant/10 overflow-hidden flex flex-col`}
+                } w-[420px] max-w-[calc(100vw-4rem)] h-[650px] max-h-[calc(100vh-10rem)] bg-card rounded-[2.5rem] shadow-2xl shadow-primary/10 border border-outline-variant/10 overflow-hidden flex flex-col`}
             >
                 {/* Header */}
                 <div className="p-8 bg-primary text-primary-foreground relative overflow-hidden shrink-0">
@@ -32,16 +57,16 @@ const AICurator = () => {
                                 <Sparkles size={24} />
                             </div>
                             <div>
-                                <h3 className="font-heading font-black text-xl tracking-tight">Curator AI</h3>
+                                <h3 className="font-heading font-black text-xl tracking-tight text-primary-foreground">Curator AI</h3>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <span className="w-2 h-2 bg-success rounded-full animate-pulse"></span>
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80">Assistant Active</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] opacity-80 text-primary-foreground">Assistant Active</span>
                                 </div>
                             </div>
                         </div>
                         <button 
                             onClick={() => setIsOpen(false)}
-                            className="p-2 hover:bg-primary-foreground/10 rounded-full transition-all"
+                            className="p-2 hover:bg-primary-foreground/10 rounded-full transition-all text-primary-foreground"
                         >
                             <X size={20} />
                         </button>
@@ -82,7 +107,7 @@ const AICurator = () => {
                     </div>
                 </div>
 
-                {/* Input Area - EXACTLY MATCHING IMAGE */}
+                {/* Input Area */}
                 <div className="p-8 bg-card border-t border-outline-variant/5">
                     <div className="flex items-center gap-4 p-2 bg-background border border-outline-variant/20 rounded-full shadow-inner focus-within:border-primary/30 transition-all">
                         <button className="p-3 text-muted-foreground/60 hover:text-primary transition-colors ml-1">
@@ -95,8 +120,9 @@ const AICurator = () => {
                             onChange={(e) => setMessage(e.target.value)}
                             className="flex-1 bg-transparent border-none focus:ring-0 text-[15px] font-sans py-2 placeholder:text-muted-foreground/40 text-foreground"
                         />
-                        <button className="w-12 h-12 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all mr-1">
-                            <Send size={20} className="ml-1" />
+                        {/* Send Button - Icon Updated to SendHorizontal to match image exactly */}
+                        <button className="w-16 h-16 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all mr-1 shrink-0">
+                            <SendHorizontal size={28} className="fill-current" />
                         </button>
                     </div>
                 </div>
@@ -104,10 +130,11 @@ const AICurator = () => {
 
             {/* Trigger FAB */}
             <button 
+                ref={fabRef}
                 onClick={() => setIsOpen(!isOpen)}
-                className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 shadow-2xl relative group ${
+                className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 shadow-2xl shadow-primary/20 relative group ${
                     isOpen 
-                        ? 'bg-on-surface text-background rotate-[135deg]' 
+                        ? 'bg-secondary text-secondary-foreground rotate-[135deg]' 
                         : 'bg-primary text-primary-foreground shadow-primary/30 hover:scale-110 active:scale-95'
                 }`}
             >
@@ -118,7 +145,7 @@ const AICurator = () => {
                 {isOpen ? <X size={32} /> : <Sparkles size={32} className="animate-pulse" />}
                 
                 {!isOpen && (
-                    <div className="absolute right-24 bg-on-surface text-background px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all">
+                    <div className="absolute right-24 bg-secondary text-secondary-foreground px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all shadow-lg shadow-primary/5">
                         Talk to your Curator
                     </div>
                 )}
