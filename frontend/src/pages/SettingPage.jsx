@@ -25,10 +25,10 @@ const CustomSelect = ({ options, value, onChange }) => {
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full bg-muted text-foreground px-3 py-2 rounded-lg flex justify-between items-center border border-transparent focus:outline-none focus:ring-1 focus:ring-primary"
+                className="w-full text-foreground py-1 flex justify-between items-center bg-transparent focus:outline-none"
             >
-                <span className="text-sm">{value}</span>
-                <ChevronDown size={16} className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                <span className="text-sm font-medium">{value}</span>
+                <ChevronDown size={14} className={`text-muted-foreground transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
             </button>
             {isOpen && (
                 <div className="absolute top-full left-0 w-full mt-1 bg-card border rounded-lg shadow-md z-50 max-h-60 overflow-y-auto animate-in fade-in slide-in-from-top-1 duration-200">
@@ -75,7 +75,7 @@ const SettingPage = () => {
 
     const { theme, setTheme } = useThemeStore();
     const [openChangePassword, setOpenChangePassword] = useState(false);
-    
+
     // Select dropdown states
     const [currency, setCurrency] = useState('USD ($)');
     const [timezone, setTimezone] = useState('(GMT-08:00) Pacific');
@@ -94,7 +94,7 @@ const SettingPage = () => {
                     <p className="text-sm text-muted-foreground">Configure how your store operates across the globe</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <button className="text-sm font-bold text-foreground hover:text-primary transition-colors">
+                    <button className="text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
                         Reset
                     </button>
                     <button className="text-sm font-bold bg-primary text-white px-5 py-2.5 rounded-lg hover:opacity-90 transition-opacity">
@@ -126,7 +126,7 @@ const SettingPage = () => {
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Store Name</label>
                                 <input
                                     type="text"
-                                    defaultValue="The Atelier Admin"
+                                    placeholder="The Atelier Admin"
                                     className="w-full bg-muted text-foreground placeholder-muted-foreground rounded-lg px-3 py-2 text-sm border-none focus:outline-none focus:ring-1 focus:ring-primary"
                                 />
                             </div>
@@ -134,7 +134,7 @@ const SettingPage = () => {
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Store Email</label>
                                 <input
                                     type="email"
-                                    defaultValue="contact@theatelier.com"
+                                    placeholder="contact@theatelier.com"
                                     className="w-full bg-muted text-foreground placeholder-muted-foreground rounded-lg px-3 py-2 text-sm border-none focus:outline-none focus:ring-1 focus:ring-primary"
                                 />
                             </div>
@@ -144,7 +144,7 @@ const SettingPage = () => {
                             <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Phone Number</label>
                             <input
                                 type="text"
-                                defaultValue="+1 (555) 000-1234"
+                                placeholder="+1 (555) 000-1234"
                                 className="w-full bg-muted text-foreground placeholder-muted-foreground rounded-lg px-3 py-2 text-sm border-none focus:outline-none focus:ring-1 focus:ring-primary"
                             />
                         </div>
@@ -153,7 +153,7 @@ const SettingPage = () => {
                             <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Address</label>
                             <textarea
                                 rows="3"
-                                defaultValue="742 Evergreen Terrace, Springfield, OR 97403, USA"
+                                placeholder="742 Evergreen Terrace, Springfield, OR 97403, USA"
                                 className="w-full bg-muted text-foreground placeholder-muted-foreground rounded-lg px-3 py-2 text-sm border-none focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                             />
                         </div>
@@ -161,26 +161,26 @@ const SettingPage = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-6 pb-2">
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Currency</label>
-                                <CustomSelect 
-                                    options={['USD ($)', 'EUR (€)', 'GBP (£)']} 
-                                    value={currency} 
-                                    onChange={setCurrency} 
+                                <CustomSelect
+                                    options={['USD ($)', 'EUR (€)', 'GBP (£)']}
+                                    value={currency}
+                                    onChange={setCurrency}
                                 />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Timezone</label>
-                                <CustomSelect 
-                                    options={['(GMT-08:00) Pacific', '(GMT-05:00) Eastern', '(GMT+00:00) UTC']} 
-                                    value={timezone} 
-                                    onChange={setTimezone} 
+                                <CustomSelect
+                                    options={['(GMT-08:00) Pacific', '(GMT-05:00) Eastern', '(GMT+00:00) UTC']}
+                                    value={timezone}
+                                    onChange={setTimezone}
                                 />
                             </div>
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Language</label>
-                                <CustomSelect 
-                                    options={['English (US)', 'Spanish (ES)', 'French (FR)']} 
-                                    value={language} 
-                                    onChange={setLanguage} 
+                                <CustomSelect
+                                    options={['English (US)', 'Spanish (ES)', 'French (FR)']}
+                                    value={language}
+                                    onChange={setLanguage}
                                 />
                             </div>
                         </div>
@@ -214,13 +214,13 @@ const SettingPage = () => {
                             <Toggle active={toggles.sessionTimeout} onClick={() => handleToggle('sessionTimeout')} />
                         </div>
 
-                        <button 
+                        <button
                             onClick={() => setOpenChangePassword(true)}
                             className="w-full flex items-center justify-center gap-2 bg-secondary text-primary font-bold py-2.5 rounded-lg mb-3 hover:opacity-90 transition-opacity text-sm"
                         >
                             <RotateCcwKey size={16} /> Change Password
                         </button>
-                        <button className="w-full flex items-center justify-center gap-2 text-destructive font-bold py-2.5 rounded-lg hover:opacity-90 transition-opacity text-sm">
+                        <button className="w-full flex items-center justify-center gap-2 bg-destructive text-destructive-foreground font-bold py-2.5 rounded-lg hover:brightness-110 transition-all text-sm">
                             <LogOut size={16} /> Logout from all devices
                         </button>
                     </div>
@@ -239,16 +239,16 @@ const SettingPage = () => {
 
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                             <span className="text-sm font-bold text-foreground">Theme Mode</span>
-                            <div className="flex items-center gap-2 self-start sm:self-auto">
+                            <div className="flex items-center p-1 bg-muted rounded-lg self-start sm:self-auto">
                                 <button
                                     onClick={() => setTheme('light')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-surface-soft hover:text-foreground'}`}
+                                    className={`flex items-center justify-center gap-2 px-6 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'light' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     <Sun size={14} /> Light
                                 </button>
                                 <button
                                     onClick={() => setTheme('dark')}
-                                    className={`flex items-center gap-2 px-4 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-muted text-muted-foreground hover:bg-surface-soft hover:text-foreground'}`}
+                                    className={`flex items-center justify-center gap-2 px-6 py-1.5 rounded-md text-sm font-bold transition-all ${theme === 'dark' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                 >
                                     <Moon size={14} /> Dark
                                 </button>
@@ -379,7 +379,7 @@ const SettingPage = () => {
                 <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
                     <History size={16} /> Last modified by Admin on Oct 24, 2023
                 </div>
-                <button className="w-full sm:w-auto bg-primary text-white text-sm font-bold py-3 px-8 rounded-lg hover:opacity-90 transition-opacity uppercase tracking-wider">
+                <button className="w-full sm:w-auto bg-primary text-white text-sm font-bold py-3 px-10 rounded-lg hover:opacity-90 transition-opacity uppercase tracking-wider">
                     Save All Changes
                 </button>
             </div>

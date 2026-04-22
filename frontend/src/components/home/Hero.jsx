@@ -2,14 +2,12 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Truck, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
-import axios from "axios";
+import { useProductStore } from "../../store/productStore";
 import hero1 from "../../assets/ImagesForHome/hero1.png";
-
-const API_BASE = "https://e-commerce-he4h.onrender.com/api";
 
 export default function Hero() {
   const navigate = useNavigate();
-
+  const products = useProductStore((state) => state.products);
   // Each slide is { id: string|null, name: string, coverImage: string }
   const [slides, setSlides] = useState([]);
   const [index, setIndex] = useState(0);
@@ -17,31 +15,21 @@ export default function Hero() {
   const [transitioning, setTransitioning] = useState(false);
   const timerRef = useRef(null);
 
-  /* ── Fetch products on mount ─────────────────────────── */
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const { data } = await axios.get(`${API_BASE}/products`, {
-          params: { limit: 20 },
-        });
+    if (products.length > 0) {
+      const fetched = products
+        .filter((p) => p.coverImage) // only products that have an image
+        .slice(0, 10) // Limit to top 10 for hero carousel
+        .map((p) => ({ id: p._id, name: p.name, coverImage: p.coverImage }));
 
-        const fetched = (data.products || [])
-          .filter((p) => p.coverImage) // only products that have an image
-          .map((p) => ({ id: p._id, name: p.name, coverImage: p.coverImage }));
-
-        // If backend returned at least one product use them, otherwise fallback
-        if (fetched.length > 0) {
-          setSlides(fetched);
-        } else {
-          setSlides([]); // will trigger fallback render
-        }
-      } catch {
-        setSlides([]); // fetch failed → use fallback
+      if (fetched.length > 0) {
+        setSlides(fetched);
+      } else {
+        setSlides([]);
       }
-    };
-
-    fetchProducts();
-  }, []);
+    }
+  }, [products]);
 
   /* ── Auto-advance every 2.5 s (only when there are real slides) ── */
   useEffect(() => {
