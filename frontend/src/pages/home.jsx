@@ -89,14 +89,11 @@ const HomeProductCard = ({ product }) => {
   );
 };
 
-
 /* ─── Skeleton Card (pulse placeholder while loading) ─── */
 function SkeletonCard() {
   return (
     <div className="flex flex-col w-full bg-card rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm border border-transparent animate-pulse">
-      {/* Image placeholder */}
       <div className="w-full aspect-[4/5] bg-muted rounded-xl sm:rounded-2xl mb-3 sm:mb-4" />
-      {/* Content placeholders */}
       <div className="flex flex-col px-0.5 sm:px-1 mb-3 sm:mb-4">
         <div className="flex justify-between items-start mb-2">
           <div className="h-3 w-16 bg-muted rounded" />
@@ -104,12 +101,10 @@ function SkeletonCard() {
         </div>
         <div className="h-4 w-3/4 bg-muted rounded mt-1" />
       </div>
-      {/* Meta row placeholder */}
       <div className="flex items-center justify-between px-0.5 sm:px-1 mb-3 sm:mb-5 mt-auto">
         <div className="h-3 w-20 bg-muted rounded" />
         <div className="h-3 w-14 bg-muted rounded" />
       </div>
-      {/* Button placeholder */}
       <div className="w-full h-11 sm:h-[52px] bg-muted rounded-lg sm:rounded-xl" />
     </div>
   );
@@ -145,6 +140,8 @@ function formatPrice(price) {
 }
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = React.useState("");
   const { latestProducts, loading, error, fetchLatestProducts, clearError } = useProductStore();
   const addToast = useToastStore((s) => s.addToast);
 
@@ -168,6 +165,41 @@ export default function Home() {
   return (
     <div className="font-sans antialiased bg-background text-foreground">
       <Hero />
+
+      {/* Global Search Bar Section */}
+      <section className="py-12 px-4 md:px-8">
+        <div className="container mx-auto max-w-3xl">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (searchQuery.trim()) {
+                navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+              }
+            }}
+            className="relative group"
+          >
+            <input
+              type="text"
+              placeholder="Search for premium products, fashion, and more..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-14 pr-32 py-5 bg-card border border-border rounded-2xl text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm group-hover:shadow-md"
+            />
+            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+              </svg>
+            </div>
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+      </section>
+
       <CuratedCategories />
 
       {/* Product Selection Section using Card2 mapped from API */}

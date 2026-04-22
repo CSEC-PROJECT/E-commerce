@@ -8,6 +8,7 @@ import { Toaster } from 'react-hot-toast'
 import { useAuthStore } from './store/authStore'
 import ToastContainer from './components/Common/ToastContainer'
 import useThemeStore from './store/themeStore'
+import { useProductStore } from './store/productStore'
 
 // Pages
 import Home from './pages/home'
@@ -88,13 +89,20 @@ const App = () => {
     initTheme()
   }, [initTheme])
 
+  useEffect(() => {
+    useProductStore.getState().fetchProducts().catch(console.error)
+    useProductStore.getState().fetchCategories().catch(console.error)
+  }, [])
+
   return (
+
     <>
       <ToastContainer />
       <AppRoutes />
       <Toaster position="bottom-right" reverseOrder={false} />
     </>
   )
+
 }
 
 export default App

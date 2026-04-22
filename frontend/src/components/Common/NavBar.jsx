@@ -4,14 +4,7 @@ import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import toast from 'react-hot-toast';
 import useCartStore from '../../store/cartStore';
-
-// ── Shared category list – matches backend values exactly ──
-const CATEGORIES = [
-  { label: 'Footwear',    value: 'Footwear' },
-  { label: 'Accessories', value: 'Accessories' },
-  { label: 'Apparel',     value: 'Apparel' },
-  { label: 'Electronics', value: 'Electronics' },
-];
+import { useProductStore } from '../../store/productStore';
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -31,6 +24,19 @@ const NavBar = () => {
     const logout = useAuthStore((state) => state.logout);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
+
+    const products = useProductStore((state) => state.products);
+    
+    // Standard backend categories as requested
+    const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
+    
+    // Dynamic categories from products (merging standard + any extra from DB)
+    const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
+    const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
+    
+    const CATEGORIES = uniqueCategories.map(c => ({ label: c, value: c }));
+
+    const [searchQuery, setSearchQuery] = useState('');
 
     const isAdmin = Array.isArray(user?.role)
         ? user.role.includes('admin')
@@ -74,6 +80,16 @@ const NavBar = () => {
 
     const handleCategoryNav = (value) => {
         navigate(`/products?category=${encodeURIComponent(value)}`);
+    };
+
+    const handleSearchSubmit = (e) => {
+        if (e.key === 'Enter') {
+            if (searchQuery.trim()) {
+                navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+            } else {
+                navigate(`/products`);
+            }
+        }
     };
 
     // Dark mode toggle
@@ -332,6 +348,9 @@ const NavBar = () => {
                                 <input
                                     type="text"
                                     placeholder="Search..."
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={handleSearchSubmit}
                                     className="w-full pl-9 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted border border-transparent rounded-[8px] text-[15px] text-foreground placeholder-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
                                 />
                             </div>
