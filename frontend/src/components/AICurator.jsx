@@ -107,7 +107,7 @@ const AICurator = () => {
                 onClick={() => setIsOpen(!isOpen)}
                 className={`w-20 h-20 rounded-[2.5rem] flex items-center justify-center transition-all duration-500 shadow-2xl relative group ${
                     isOpen 
-                        ? 'bg-on-surface text-background rotate-[135deg]' 
+                        ? 'bg-secondary text-secondary-foreground rotate-[135deg]' 
                         : 'bg-primary text-primary-foreground shadow-primary/30 hover:scale-110 active:scale-95'
                 }`}
             >
@@ -118,7 +118,7 @@ const AICurator = () => {
                 {isOpen ? <X size={32} /> : <Sparkles size={32} className="animate-pulse" />}
                 
                 {!isOpen && (
-                    <div className="absolute right-24 bg-on-surface text-background px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all">
+                    <div className="absolute right-24 bg-secondary text-secondary-foreground px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0 transition-all">
                         Talk to your Curator
                     </div>
                 )}
