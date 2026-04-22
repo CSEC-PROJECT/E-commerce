@@ -4,8 +4,28 @@ import Catagory1 from "../../assets/ImagesForHome/Catagories1.png"
 import Catagory2 from "../../assets/ImagesForHome/Catagories2.png"
 import Catagory3 from "../../assets/ImagesForHome/Catagories3.png"
 
+import { useProductStore } from "../../store/productStore";
+
 export default function CuratedCategories() {
-  const categories = [
+  const products = useProductStore((state) => state.products);
+  
+  // Extract unique categories from products
+  const uniqueCategories = [...new Set(products.filter(p => p.category).map(p => p.category))];
+  
+  const baseCategories = [
+    { action: "Step into your best day", image: Catagory1 },
+    { action: "Elevate every outfit", image: Catagory2 },
+    { action: "Life is your runway", image: Catagory3 },
+  ];
+
+  const dynamicCategories = uniqueCategories.slice(0, 3).map((title, index) => ({
+    id: index + 1,
+    title,
+    action: baseCategories[index]?.action || "Discover more",
+    image: baseCategories[index]?.image || Catagory1
+  }));
+
+  const displayCategories = dynamicCategories.length > 0 ? dynamicCategories : [
     { id: 1, title: "Footwear", action: "Step into your best day", image: Catagory1 },
     { id: 2, title: "Accessories", action: "Elevate every outfit", image: Catagory2 },
     { id: 3, title: "Apparel", action: "Life is your runway", image: Catagory3 },
@@ -28,7 +48,7 @@ export default function CuratedCategories() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {categories.map((category) => (
+          {displayCategories.map((category) => (
             <Link
               key={category.id}
               to={`/products?category=${encodeURIComponent(category.title)}`}

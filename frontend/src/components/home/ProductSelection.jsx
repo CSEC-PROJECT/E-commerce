@@ -2,34 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { ShoppingCart, Star } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "../ui/button";
-import { apiRequest } from "../../lib/apiClient";
 import useCartStore from "../../store/cartStore";
 import { useAuthStore } from "../../store/authStore";
+import { useProductStore } from "../../store/productStore";
 import toast from "react-hot-toast";
 
 export default function ProductSelection() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const allProducts = useProductStore(state => state.products);
+  const isGlobalLoading = useProductStore(state => state.loading);
+  const products = allProducts.slice(0, 4);
+  const loading = isGlobalLoading && products.length === 0;
+
   const addToCart = useCartStore(state => state.addToCart);
   const user = useAuthStore(state => state.user);
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-      const fetchProducts = async () => {
-          try {
-              const res = await apiRequest('/api/products?limit=4');
-              if (res && res.products) {
-                  setProducts(res.products);
-              }
-          } catch (e) {
-              console.error("Failed to load featured products", e);
-          } finally {
-              setLoading(false);
-          }
-      };
-      fetchProducts();
-  }, []);
 
   const handleAddToCart = async (e, product) => {
       e.preventDefault();

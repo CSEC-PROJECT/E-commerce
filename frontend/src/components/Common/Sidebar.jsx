@@ -31,7 +31,7 @@ const Sidebar = () => {
               {({ isActive }) => (
                 <>
                   {isActive && (
-                    <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-[#5542F6]" />
+                    <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-primary text-primary-foreground" />
                   )}
                   <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   {item.text}
