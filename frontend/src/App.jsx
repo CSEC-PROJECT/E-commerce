@@ -9,8 +9,8 @@ import { useAuthStore } from './store/authStore'
 import ToastContainer from './components/Common/ToastContainer'
 import useThemeStore from './store/themeStore'
 import { useProductStore } from './store/productStore'
+import useCartStore from './store/cartStore'
 
-// Pages
 import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
@@ -28,24 +28,28 @@ import AddProduct from './pages/AddProduct'
 import MyProducts from './pages/MyProducts'
 import ProductPreview from './pages/ProductPreviewPage'
 import TransactionStatusPage from './pages/TransactionStatusPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 
 function AppRoutes() {
   const location = useLocation()
-  const hideMainChrome = location.pathname.startsWith('/admin') || location.pathname === '/my-products'
+  
+  const hideMainChrome = ['/login', '/signup', '/forgot-password'].includes(location.pathname) || location.pathname.startsWith('/reset-password');
 
   return (
     <>
       {!hideMainChrome && <NavBar />}
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<TransactionStatusPage success={true} />} />
@@ -66,8 +70,6 @@ function AppRoutes() {
     </>
   )
 }
-
-import useCartStore from './store/cartStore'
 
 const App = () => {
   const { initializeAuth } = useAuthStore()

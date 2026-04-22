@@ -80,9 +80,9 @@ const AdminDashboard = () => {
   };
 
   const formatCurrency = (val) => {
-    if (val === undefined || val === null) return "$0";
-    if (val >= 1000) return `$${(val / 1000).toFixed(1)}k`;
-    return `$${val}`;
+    if (val === undefined || val === null) return "ETB 0";
+    if (val >= 1000) return `ETB ${(val / 1000).toFixed(1)}k`;
+    return `ETB ${val}`;
   };
 
   return (
@@ -255,7 +255,7 @@ const AdminDashboard = () => {
                         <td className={`py-5 font-bold flex items-center gap-2 ${getStatusColor(status)}`}>
                           <span className="w-2 h-2 rounded-full bg-current" /> {status}
                         </td>
-                        <td className="py-5 font-bold dark:text-primary">${(t.totalPrice || 0).toFixed(2)}</td>
+                        <td className="py-5 font-bold dark:text-primary">ETB {(t.totalPrice || 0).toFixed(2)}</td>
                       </tr>
                     )
                   })
@@ -321,7 +321,7 @@ const AdminDashboard = () => {
                               <span className="w-1.5 h-1.5 rounded-full bg-current" /> {isStocked ? 'Stock' : 'Stock out'}
                             </span>
                           </td>
-                          <td className="py-4 font-bold text-primary text-sm">${details?.price?.toFixed(2) || "0.00"}</td>
+                          <td className="py-4 font-bold text-primary text-sm">ETB {details?.price?.toFixed(2) || "0.00"}</td>
                         </tr>
                       )
                     })
@@ -332,7 +332,7 @@ const AdminDashboard = () => {
               </table>
             </div>
             <button
-              onClick={() => navigate('/admin/products')}
+              onClick={() => navigate('/admin/products', { state: { scrollToTop: true } })}
               className="w-full mt-6 py-3.5 border border-primary rounded-xl text-primary font-bold text-sm cursor-pointer hover:bg-primary hover:text-primary-foreground transition-all"
             >
               View All Products
@@ -343,7 +343,7 @@ const AdminDashboard = () => {
             <div className="bg-card p-8 rounded-[2rem] border border-border shadow-sm">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold dark:text-primary">Top Products</h3>
-                <button onClick={() => navigate('/admin/products')} className="text-primary text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
+                <button onClick={() => navigate('/admin/products', { state: { scrollToTop: true } })} className="text-primary text-[10px] font-bold uppercase cursor-pointer hover:underline">All product</button>
               </div>
               <div className="relative mb-6">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
@@ -361,7 +361,7 @@ const AdminDashboard = () => {
                     <TopProductItem
                       key={prod._id}
                       name={prod.name}
-                      price={`$${prod.price.toFixed(2)}`}
+                      price={`ETB ${prod.price.toFixed(2)}`}
                       id={`#${prod._id.substring(prod._id.length - 6).toUpperCase()}`}
                       img={prod.coverImage}
                       onClick={() => navigate(`/product/${prod._id}`)}

@@ -54,9 +54,46 @@ export async function apiRequest(path, options = {}) {
 
   const contentType = response.headers.get("Content-Type") || "";
   const isJson = contentType.includes("application/json");
-  const data = isJson ? await response.json().catch(() => null) : null;
+  let data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
+    if (response.status === 401) {
+      try {
+        const refreshResult = await useAuthStore.getState().refresh();
+        if (refreshResult?.accessToken) {
+          const retryResponse = await fetch(buildUrl(path), {
+            method: normalizedMethod,
+            headers: {
+              ...mergedHeaders,
+              Authorization: `Bearer ${refreshResult.accessToken}`,
+            },
+            credentials: "include",
+            body: body ? JSON.stringify(body) : undefined,
+            signal,
+            cache: normalizedMethod === "GET" ? "no-store" : "default",
+          });
+
+          const retryContentType = retryResponse.headers.get("Content-Type") || "";
+          const retryIsJson = retryContentType.includes("application/json");
+          const retryData = retryIsJson ? await retryResponse.json().catch(() => null) : null;
+
+          if (retryResponse.ok) {
+            return retryData;
+          } else {
+            const message =
+              retryData?.chapaError?.message ||
+              retryData?.error ||
+              retryData?.message ||
+              "Request failed after refresh";
+            throw new Error(message);
+          }
+        }
+      } catch (refreshError) {
+        useAuthStore.getState().logout();
+        throw new Error("Session expired. Please log in again.");
+      }
+    }
+
     // Surface the most specific error message available
     const message =
       data?.chapaError?.message ||

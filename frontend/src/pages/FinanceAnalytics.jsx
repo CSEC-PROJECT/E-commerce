@@ -903,7 +903,6 @@ const FinanceAnalytics = ({ embedded = false }) => {
                 </div>
               </div>
 
-              {/* Timestamps */}
               <div className="bg-muted/40 rounded-2xl p-5 border">
                 <p className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground mb-4">Timeline</p>
                 <div className="space-y-3">
@@ -931,7 +930,6 @@ const FinanceAnalytics = ({ embedded = false }) => {
               </div>
             </div>
 
-            {/* Footer */}
             <div className="px-6 py-4 border-t sticky bottom-0 bg-card">
               <button
                 onClick={() => setIsDetailOpen(false)}
@@ -944,7 +942,6 @@ const FinanceAnalytics = ({ embedded = false }) => {
         </div>
       )}
 
-      {/* Slide-in animation keyframe */}
       <style>{`
         @keyframes slideInRight {
           from { transform: translateX(100%); opacity: 0; }

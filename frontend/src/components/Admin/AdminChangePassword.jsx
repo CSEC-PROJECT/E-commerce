@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Eye, EyeOff, ArrowRight, CheckCircle, X } from "lucide-react";
 
-const AdminChangePassword = ({ onClose }) => {
+const AdminChangePassword = ({ onClose, onChangePassword }) => {
     const [showCurrent, setShowCurrent] = useState(false);
     const [showNew, setShowNew] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -19,6 +19,13 @@ const AdminChangePassword = ({ onClose }) => {
         setPasswords((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (isMatch) {
+            onChangePassword({ oldPassword: passwords.current, newPassword: passwords.new });
+        }
+    };
+
     return (
         <div className="bg-card w-full rounded-2xl p-6 md:p-8 shadow-lg relative overflow-hidden">
             {/* Close button for better UX on mobile */}
@@ -34,7 +41,7 @@ const AdminChangePassword = ({ onClose }) => {
                 <p className="text-sm text-muted-foreground mt-1 font-medium">Keep your account secure with a strong password</p>
             </div>
 
-            <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Current Password */}
                 <div>
                     <label className="block text-[11px] font-black tracking-widest text-foreground uppercase mb-2 px-1">
@@ -117,25 +124,17 @@ const AdminChangePassword = ({ onClose }) => {
                 </div>
 
                 {/* Submit Button */}
-                <div className="pt-4 flex flex-col md:flex-row gap-4">
+                <div className="flex justify-end mt-8">
                     <button
-                        onClick={onClose}
-                        className="w-full md:w-1/3 h-14 bg-muted text-foreground rounded-xl font-bold flex items-center justify-center hover:bg-surface-soft transition-all"
+                        type="submit"
+                        disabled={!isMatch}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 h-12 px-6 transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
                     >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={() => {
-                            // Implement save logic here
-                            onClose();
-                        }}
-                        className="w-full md:w-2/3 h-14 bg-primary text-white rounded-xl font-black flex items-center justify-center gap-3 hover:opacity-90 hover:scale-[1.02] active:scale-95 transition-all shadow-lg uppercase tracking-widest text-xs"
-                    >
-                        Save Changes
-                        <ArrowRight size={18} />
+                        <span>Update Password</span>
+                        <ArrowRight size={16} />
                     </button>
                 </div>
-            </div>
+            </form>
         </div>
     );
 };
