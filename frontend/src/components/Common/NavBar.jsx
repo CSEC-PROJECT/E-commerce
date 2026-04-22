@@ -410,7 +410,7 @@ const NavBar = () => {
                                                 {/* My Products – User only */}
                                                 {!isAdmin && (
                                                     <Link
-                                                        to="/products"
+                                                        to="/my-products"
                                                         role="menuitem"
                                                         onClick={() => setUserMenuOpen(false)}
                                                         className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
