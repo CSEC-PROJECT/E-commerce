@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Card3 from '../components/Common/Card3';
+import ProductCard from '../components/ProductCard';
 import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
 import { useProductStore } from '../store/productStore';
@@ -201,15 +201,16 @@ const ProductsPage = () => {
                   </button>
                 </div>
               ) : (
-                productsToDisplay.map((product) => (
-                  <Link to={`/product/${product._id}`} key={product._id} className="group">
-                    <Card3
-                      image={product.coverImage}
-                      title={product.name}
-                      price={formatPrice(product.price)}
-                      inStock={product.stock > 0}
-                    />
-                  </Link>
+                products.map((product) => (
+                  <ProductCard
+                    key={product._id}
+                    id={product._id}
+                    image={product.coverImage}
+                    title={product.name}
+                    price={product.discountedPrice ?? product.price}
+                    status={product.status}
+                    rating={product.averageRating || product.rating || 5}
+                  />
                 ))
               )}
             </div>

@@ -12,7 +12,7 @@ const CartPage = () => {
 
     useEffect(() => {
         getCart();
-    }, [getCart]);
+    }, []);
 
     const cartItems = cart?.items || [];
     
@@ -77,9 +77,9 @@ const CartPage = () => {
                 <div className="flex flex-col lg:flex-row gap-10">
                     <div className="flex-1 flex flex-col gap-5">
                         {cartItems.length > 0 ? (
-                            cartItems.map((item) => {
+                            cartItems.map((item, index) => {
                                 const mappedItem = {
-                                    id: item.product?._id || item.product, // ensure we have the id for store actions
+                                    id: item.product?._id || item.product || item.productId?._id || item.productId || item.id, // support both populated and plain cart item shapes
                                     image: item.product?.coverImage || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=60",
                                     category: item.product?.category || "CATEGORY",
                                     title: item.product?.name || "Product",
@@ -89,9 +89,11 @@ const CartPage = () => {
                                     price: item.price || 0
                                 };
 
+                                const rowKey = item._id || mappedItem.id || `cart-item-${index}`;
+
                                 return (
                                 <CartItem
-                                    key={item._id || mappedItem.id}
+                                    key={rowKey}
                                     item={mappedItem}
                                     onUpdateQuantity={handleUpdateQuantity}
                                     onRemove={handleRemoveItem}
@@ -112,7 +114,7 @@ const CartPage = () => {
                         )}
                     </div>
 
-                    <div className="w-full lg:w-[400px]">
+                    <div className="w-full lg:w-100">
                         <OrderSummary 
                             subtotal={subtotal} 
                             tax={tax} 

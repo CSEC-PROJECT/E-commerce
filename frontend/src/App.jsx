@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom"
+import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
 import ProtectedRoute from './components/auth/ProtectedRoute'
@@ -45,14 +45,12 @@ function AppRoutes() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-        {/* Protected user routes */}
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
         <Route path="/my-products" element={<MyProducts />} />
-        <Route path="/transaction/success" element={<ProtectedRoute><TransactionStatusPage success={true} /></ProtectedRoute>} />
-        <Route path="/transaction/fail" element={<ProtectedRoute><TransactionStatusPage success={false} /></ProtectedRoute>} />
+        <Route path="/transaction/success" element={<TransactionStatusPage success={true} />} />
+        <Route path="/transaction/fail" element={<TransactionStatusPage success={false} />} />
 
-        {/* Admin routes */}
         <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
@@ -61,6 +59,7 @@ function AppRoutes() {
         <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
         <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
+        <Route path="/admin/edit-product/:id" element={<AdminRoute><AddProduct /></AdminRoute>} />
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
       {!hideMainChrome && <Footer />}
@@ -68,13 +67,23 @@ function AppRoutes() {
   )
 }
 
+import useCartStore from './store/cartStore'
+
 const App = () => {
   const { initializeAuth } = useAuthStore()
+  const getCart = useCartStore((state) => state.getCart)
+  const user = useAuthStore((state) => state.user)
   const initTheme = useThemeStore((state) => state.initTheme)
 
   useEffect(() => {
     initializeAuth()
   }, [initializeAuth])
+
+  useEffect(() => {
+    if (user) {
+      getCart()
+    }
+  }, [user, getCart])
 
   useEffect(() => {
     initTheme()
@@ -89,7 +98,7 @@ const App = () => {
 
     <>
       <ToastContainer />
-      <AppRoutes />   {/* ✅ no BrowserRouter */}
+      <AppRoutes />
       <Toaster position="bottom-right" reverseOrder={false} />
     </>
   )

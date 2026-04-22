@@ -1,6 +1,17 @@
 import { useAuthStore } from "../store/authStore";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com";
+const resolveDefaultApiBaseUrl = () => {
+  if (typeof window !== "undefined") {
+    const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    if (isLocalhost) {
+      return "http://localhost:3000";
+    }
+  }
+
+  return "https://e-commerce-he4h.onrender.com";
+};
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || resolveDefaultApiBaseUrl();
 
 const defaultHeaders = {
   "Content-Type": "application/json",
@@ -12,12 +23,18 @@ const buildUrl = (path) => {
 };
 
 export async function apiRequest(path, options = {}) {
-  const { method = "GET", headers = {}, body, token } = options;
+  const { method = "GET", headers = {}, body, token, signal } = options;
+  const normalizedMethod = String(method).toUpperCase();
 
   const mergedHeaders = {
     ...defaultHeaders,
     ...headers,
   };
+
+  if (normalizedMethod === "GET") {
+    mergedHeaders["Cache-Control"] = "no-cache";
+    mergedHeaders.Pragma = "no-cache";
+  }
 
   const stateToken = useAuthStore.getState().accessToken;
   const finalToken = token || stateToken;
@@ -27,10 +44,12 @@ export async function apiRequest(path, options = {}) {
   }
 
   const response = await fetch(buildUrl(path), {
-    method,
+    method: normalizedMethod,
     headers: mergedHeaders,
     credentials: "include",
     body: body ? JSON.stringify(body) : undefined,
+    signal,
+    cache: normalizedMethod === "GET" ? "no-store" : "default",
   });
 
   const contentType = response.headers.get("Content-Type") || "";

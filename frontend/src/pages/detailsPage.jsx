@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apiRequest } from '../lib/apiClient';
-import Card4 from '../components/Common/Card4';
+import ProductCard from '../components/ProductCard';
 import useCartStore from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
@@ -46,6 +46,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
   const [activeImage, setActiveImage] = useState("");
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchProduct = async () => {
       try {
         setLoading(true);
@@ -94,7 +95,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
 
   const productGallery = [
     product.coverImage,
-    ...(product.images || [])
+    ...(product.detailImages || [])
   ].filter(Boolean);
 
 
@@ -143,18 +144,35 @@ const ProductDetail = ({ onCategoryLoad }) => {
             <span className="text-sm font-medium flex items-center gap-1">★ {product.rating || "4.9"} <span className="text-muted-foreground font-normal">({product.reviews || "88"} reviews)</span></span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6 leading-[0.95] text-foreground uppercase">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-6 leading-[0.95] text-foreground uppercase">
             {product.name}
           </h1>
 
           <div className="flex items-center gap-4 mb-8">
-            <span className="text-4xl font-bold text-primary">ETB {product.price?.toFixed(2)}</span>
-            <span className="text-xl text-muted-foreground line-through font-medium">ETB {(product.price * 1.25).toFixed(2)}</span>
+              <span className="text-3xl font-bold text-primary">ETB {product.price?.toFixed(2)}</span>
+            <span className="text-lg text-muted-foreground line-through font-medium">ETB {(product.price * 1.25).toFixed(2)}</span>
             {product.stock > 0 ? (
-                <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-600 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                  <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                  In Stock ({product.stock})
-                </span>
+                product.status?.toLowerCase() === 'new' ? (
+                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    {product.status}
+                  </span>
+                ) : product.status?.toLowerCase() === 'slightly used' ? (
+                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-blue-700 bg-blue-100 px-3 py-1 rounded-full border border-blue-200">
+                    <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+                    {product.status}
+                  </span>
+                ) : product.status?.toLowerCase() === 'used' ? (
+                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-amber-700 bg-amber-100 px-3 py-1 rounded-full border border-amber-200">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
+                    {product.status}
+                  </span>
+                ) : (
+                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-700 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                    <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
+                    {product.status || 'Available'}
+                  </span>
+                )
             ) : (
                 <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-destructive bg-destructive/10 px-3 py-1 rounded-full border border-destructive/20">
                   Out of Stock
@@ -175,15 +193,13 @@ const ProductDetail = ({ onCategoryLoad }) => {
               <TechnicalDetail label="Material" value={product.material || "Premium Hand-Finished"} iconPath="/Icons/stacks.svg" />
               <TechnicalDetail label="Type" value={product.category || "General"} iconPath="/Icons/square_foot.svg" />
               <TechnicalDetail label="Stock Status" value={product.stock > 0 ? "Available" : "Sold Out"} iconPath="/Icons/weight.svg" />
-              <TechnicalDetail label="Origin" value="Global Sourced" iconPath="/Icons/history.svg" />
+              <TechnicalDetail label="Origin" value={product.madeIn || "Global Sourced"} iconPath="/Icons/history.svg" />
             </div>
           </section>
 
-          {/* Action Row with QUANTITY Label */}
           <div className="mt-auto space-y-6">
             <div className="flex flex-wrap items-end gap-4">
 
-              {/* Quantity Selector with Label */}
               <div className="space-y-3">
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Quantity</p>
                 <div className="flex items-center border border-border rounded-xl overflow-hidden bg-muted h-[56px]">
@@ -306,22 +322,78 @@ const ReviewsSection = () => {
   );
 };
 
+const DetailRelatedCard = ({ product }) => {
+  const price = product.discountedPrice ?? product.price;
+  
+  return (
+    <Link to={`/product/${product._id}`} onClick={() => window.scrollTo(0, 0)} className="group bg-white rounded-[2rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-border/50">
+      <div className="w-full aspect-square bg-gray-100 rounded-[1.5rem] overflow-hidden mb-5">
+        <img 
+          src={product.coverImage} 
+          alt={product.name}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+          onError={(e) => { e.target.src = "https://via.placeholder.com/400x400?text=Not+Found"; }}
+        />
+      </div>
+
+      <div className="flex flex-col flex-grow px-1">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-[12px] font-bold uppercase tracking-widest text-indigo-600 truncate mr-2">
+            {product.category || "New"}
+          </span>
+          <span className="text-lg font-black text-indigo-600 tracking-tight shrink-0">
+            ETB {price?.toFixed(2)}
+          </span>
+        </div>
+        
+        <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1 line-clamp-2">
+          {product.name}
+        </h3>
+
+        <div className="flex justify-between items-center mt-auto pt-2">
+          <div className="flex items-center gap-1.5 text-base font-bold text-gray-900">
+            <span className="text-amber-400">★</span>
+            <span>{product.averageRating?.toFixed(1) || product.rating?.toFixed(1) || "5.0"}</span>
+          </div>
+          
+          <div className="flex items-center gap-1.5 text-xs uppercase font-bold tracking-widest">
+            {product.status?.toLowerCase() === 'new' ? (
+              <><span className="w-2 h-2 rounded-full bg-emerald-500" /><span className="text-emerald-700">{product.status}</span></>
+            ) : product.status?.toLowerCase() === 'slightly used' ? (
+              <><span className="w-2 h-2 rounded-full bg-blue-500" /><span className="text-blue-700">{product.status}</span></>
+            ) : product.status?.toLowerCase() === 'used' ? (
+              <><span className="w-2 h-2 rounded-full bg-amber-500" /><span className="text-amber-700">{product.status}</span></>
+            ) : (
+              <><span className="w-2 h-2 rounded-full bg-gray-500" /><span className="text-gray-700">{product.status || 'Available'}</span></>
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const RelatedProductsSection = ({ category }) => {
   const [products, setProducts] = useState([]);
+  const { id } = useParams();
 
   useEffect(() => {
+    if (!category) return;
+
     const fetchRelated = async () => {
       try {
-        const query = category ? `?category=${category}&limit=4` : `?limit=4`;
+        const query = `?category=${encodeURIComponent(category)}&limit=5`;
         const data = await apiRequest(`/api/products${query}`);
-        if(data && data.products) setProducts(data.products.slice(0, 4));
+        if(data && data.products) {
+          const filtered = data.products.filter(p => p._id !== id).slice(0, 4);
+          setProducts(filtered);
+        }
       } catch (err) {
         console.error(err);
       }
     };
     fetchRelated();
-  }, [category]);
+  }, [category, id]);
 
   if (products.length === 0) return null;
 
@@ -329,8 +401,8 @@ const RelatedProductsSection = ({ category }) => {
     <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 font-sans">
       <div className="flex justify-between items-end mb-10">
         <div>
-          <h2 className="text-4xl font-black tracking-tighter mb-2 text-foreground">Pairs well with</h2>
-          <p className="text-muted-foreground text-sm font-medium">Curated combinations for the discerning eye.</p>
+          <h2 className="text-4xl font-black tracking-tighter mb-2 text-foreground">You Might Also Like</h2>
+          <p className="text-muted-foreground text-sm font-medium">Explore more items from this collection.</p>
         </div>
         <Link to="/products" className="text-[11px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2 group hover:opacity-80 transition-opacity">
           Browse More <span className="transition-transform group-hover:translate-x-1">→</span>
@@ -338,18 +410,10 @@ const RelatedProductsSection = ({ category }) => {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         {products.map((product) => (
-          <Link to={`/product/${product._id}`} key={product._id}>
-            <Card4
-              image={product.coverImage}
-              category={product.category}
-              title={product.name}
-              price={product.price}
-              rating={product.rating || 5}
-              reviews={product.reviews || 0}
-              inStock={product.stock > 0}
-              id={product._id}
-            />
-          </Link>
+          <DetailRelatedCard
+            key={product._id}
+            product={product}
+          />
         ))}
       </div>
     </section>

@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { apiRequest } from '../lib/apiClient';
 import { useAuthStore } from './authStore';
 
+const resolveProductId = (item) => item?.product?._id || item?.product || item?.productId?._id || item?.productId || item?.id || null;
+
 const useCartStore = create((set, get) => ({
   cart: { items: [], totalPrice: 0 },
   loading: false,
@@ -28,9 +30,12 @@ const useCartStore = create((set, get) => ({
     try {
       const currentCart = get().cart;
       const items = currentCart ? [...(currentCart.items || [])] : [];
-      const itemProductId = item.product?._id || item.product;
+      const itemProductId = resolveProductId(item);
+      if (!itemProductId) {
+        throw new Error('Invalid product data');
+      }
       const existingItemIndex = items.findIndex((i) => {
-        const id = i.product?._id || i.product;
+        const id = resolveProductId(i);
         return id === itemProductId;
       });
 
@@ -41,10 +46,10 @@ const useCartStore = create((set, get) => ({
       }
 
       const cleanItems = items.map(i => ({
-        product: i.product?._id || i.product,
+        product: resolveProductId(i),
         quantity: i.quantity,
         price: i.price
-      }));
+      })).filter(i => i.product);
       const totalPrice = cleanItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
       const cartId = currentCart?._id;
@@ -64,14 +69,14 @@ const useCartStore = create((set, get) => ({
     try {
       const currentCart = get().cart;
       const items = (currentCart?.items || []).map((item) => {
-        const id = item.product?._id || item.product;
+        const id = resolveProductId(item);
         return id === productId ? { ...item, quantity } : item;
       });
       const cleanItems = items.map(i => ({
-        product: i.product?._id || i.product,
+        product: resolveProductId(i),
         quantity: i.quantity,
         price: i.price
-      }));
+      })).filter(i => i.product);
       const totalPrice = cleanItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
       const cartId = currentCart?._id;
@@ -91,14 +96,14 @@ const useCartStore = create((set, get) => ({
     try {
       const currentCart = get().cart;
       const items = (currentCart?.items || []).filter((item) => {
-        const id = item.product?._id || item.product;
+        const id = resolveProductId(item);
         return id !== productId;
       });
       const cleanItems = items.map(i => ({
-        product: i.product?._id || i.product,
+        product: resolveProductId(i),
         quantity: i.quantity,
         price: i.price
-      }));
+      })).filter(i => i.product);
       const totalPrice = cleanItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
       const cartId = currentCart?._id;
@@ -121,7 +126,6 @@ const useCartStore = create((set, get) => ({
       if (cartId) await apiRequest(`/api/user/cart/${cartId}`, { method: 'DELETE', token });
       set({ cart: { items: [], totalPrice: 0 }, loading: false });
     } catch (error) {
-      // Still clear local state even if API fails
       set({ cart: { items: [], totalPrice: 0 }, error: null, loading: false });
     }
   },

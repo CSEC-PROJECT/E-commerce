@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import ProductPreviewModal from './ProductPreview';
 import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
@@ -141,8 +142,11 @@ const Shipping = ({ formData, handleChange }) => {
   );
 };
 
-const MediaUpload = ({ coverImage, setCoverImage, detailImages, setDetailImages }) => {
+const MediaUpload = ({ coverImage, setCoverImage, detailImages, setDetailImages, isEditing, formData }) => {
   const [isOn, setIsOn] = useState(false);
+
+  // Derive existing image states
+  const hasExistingCover = isEditing && !!formData?.coverImageURL;
 
   return (
     <SectionContainer
@@ -155,6 +159,11 @@ const MediaUpload = ({ coverImage, setCoverImage, detailImages, setDetailImages 
           <button onClick={() => document.getElementById('coverImage').click()} type="button" className="w-full border-2 border-dashed border-border rounded-xl p-8 flex flex-col items-center justify-center text-center hover:bg-muted/50 transition-all group">
             {coverImage ? (
               <p className="text-sm font-bold text-foreground mb-1">Selected: {coverImage.name}</p>
+            ) : hasExistingCover ? (
+              <>
+                <img src={formData.coverImageURL} alt="Current cover" className="w-16 h-16 object-cover rounded-md mb-2 border border-border" />
+                <p className="text-sm font-bold text-foreground mb-1">Click to replace existing cover image</p>
+              </>
             ) : (
               <>
                 <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4 text-primary group-hover:scale-110 transition-transform">
@@ -264,28 +273,63 @@ const defaultFormData = {
 };
 
 const AddProduct = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const { createProduct } = useProductStore();
+  const { createProduct, updateProduct, fetchProductById } = useProductStore();
   const { addToast } = useToastStore();
 
   const [formData, setFormData] = useState(defaultFormData);
   const [coverImage, setCoverImage] = useState(null);
   const [detailImages, setDetailImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const isEditing = !!id;
 
-  // ── Restore draft on mount ──────────────────────────────────────────────────
+  // ── Retrieve Existing Product or Restore Draft ─────────────────────────────
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem(DRAFT_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setFormData(prev => ({ ...prev, ...parsed }));
-        addToast('Draft restored — continue where you left off.', 'info');
+    if (isEditing) {
+      const getProduct = async () => {
+        try {
+          const prod = await fetchProductById(id);
+          if (prod) {
+            setFormData({
+              name: prod.name || '',
+              description: prod.description || '',
+              price: prod.price || '',
+              comparePrice: prod.comparePrice || '',
+              stock: prod.stock || '',
+              stockStatus: prod.stockStatus || 'In Stock',
+              status: prod.status || 'new',
+              shippingType: prod.shippingType || 'free',
+              shippingCost: prod.shippingCost || '',
+              category: prod.category || 'Electronics',
+              material: prod.material || '',
+              madeIn: prod.madeIn || '',
+              dimensions: prod.dimensions || '',
+              weight: prod.weight || '',
+              deliveryTime: prod.deliveryTime || '3 Days',
+              coverImageURL: prod.coverImage || prod.img || ''
+            });
+            // Not setting images here, user will have to re-upload if they want to change them.
+          }
+        } catch (err) {
+          addToast('Failed to load product details.', 'error');
+        }
+      };
+      getProduct();
+    } else {
+      try {
+        const saved = localStorage.getItem(DRAFT_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setFormData(prev => ({ ...prev, ...parsed }));
+          addToast('Draft restored — continue where you left off.', 'info');
+        }
+      } catch {
+        // ignore corrupt data
       }
-    } catch {
-      // ignore corrupt data
     }
-  }, []);
+  }, [id, isEditing]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -294,6 +338,7 @@ const AddProduct = () => {
 
   // ── Save Draft ──────────────────────────────────────────────────────────────
   const handleSaveDraft = () => {
+    if (isEditing) return; // Disable draft when editing
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(formData));
       addToast('Draft saved! Your progress has been stored locally.', 'success');
@@ -304,8 +349,14 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.stock || !coverImage) {
-      alert("Please fill all required fields: name, description, price, stock, category, and cover image.");
+    if (!formData.name || !formData.description || !formData.price || !formData.category || !formData.stock) {
+      alert("Please fill all required fields: name, description, price, stock, category.");
+      return;
+    }
+    
+    // Cover image is required only when creating new product
+    if (!isEditing && !coverImage) {
+      alert("Please upload a cover image.");
       return;
     }
     
@@ -315,21 +366,25 @@ const AddProduct = () => {
       Object.keys(formData).forEach(key => {
         data.append(key, formData[key]);
       });
-      data.append('coverImage', coverImage);
+      if (coverImage) data.append('coverImage', coverImage);
       
       detailImages.forEach(img => {
         if (img) data.append('detailImages', img);
       });
 
-      await createProduct(data);
-      localStorage.removeItem(DRAFT_KEY);
-      addToast('Product published successfully!', 'success');
-      setFormData(defaultFormData);
-      setCoverImage(null);
-      setDetailImages([]);
+      if (isEditing) {
+        await updateProduct(id, data);
+        addToast('Product updated successfully!', 'success');
+        navigate('/admin/products');
+      } else {
+        await createProduct(data);
+        localStorage.removeItem(DRAFT_KEY);
+        addToast('Product published successfully!', 'success');
+        navigate('/admin/products');
+      }
     } catch (error) {
       console.error(error);
-      addToast(error.message || 'Failed to create product', 'error');
+      addToast(error.message || `Failed to ${isEditing ? 'update' : 'create'} product`, 'error');
     } finally {
       setLoading(false);
     }
@@ -343,21 +398,30 @@ const AddProduct = () => {
         onPublish={() => document.querySelector('form')?.requestSubmit()}
         formData={formData}
         coverImage={coverImage}
+        isEditing={isEditing}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
           <div>
-            <h1 className="text-4xl font-black tracking-tight text-foreground mb-2">Add Product</h1>
-            <p className="text-muted-foreground font-medium text-sm">Create a new exhibit for your Digital Atelier</p>
+            <h1 className="text-4xl font-black tracking-tight text-foreground mb-2">{isEditing ? 'Edit Product' : 'Add Product'}</h1>
+            <p className="text-muted-foreground font-medium text-sm">{isEditing ? 'Update details of your existing product' : 'Create a new exhibit for your Digital Atelier'}</p>
           </div>
           <div className="flex items-center gap-3">
-            <button type="button" onClick={handleSaveDraft} className="px-5 py-2.5 text-xs font-black tracking-widest uppercase rounded-xl text-primary hover:bg-primary/10 transition-colors border border-transparent hover:border-primary/20">
-              Save Draft
+            <button type="button" onClick={() => navigate('/admin/products')} className="px-5 py-2.5 text-xs font-black tracking-widest uppercase rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-colors border border-transparent hover:border-border/50">
+              Back to Products
             </button>
+            {!isEditing && (
+              <button type="button" onClick={handleSaveDraft} className="px-5 py-2.5 text-xs font-black tracking-widest uppercase rounded-xl text-primary hover:bg-primary/10 transition-colors border border-transparent hover:border-primary/20">
+                Save Draft
+              </button>
+            )}
             <button type="button" onClick={() => setIsPreviewOpen(true)} className="px-6 py-2.5 text-xs font-black tracking-widest uppercase rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-sm">
-              Preview
+              {isEditing ? 'Preview Edit' : 'Preview'}
+            </button>
+            <button type="submit" disabled={loading} onClick={() => document.querySelector('form')?.requestSubmit()} className="cursor-pointer px-6 py-2.5 text-xs font-black tracking-widest uppercase rounded-xl border border-primary text-primary hover:bg-primary/5 transition-all shadow-sm">
+              {loading ? "Publishing..." : isEditing ? 'Publish Edit' : 'Publish Product'}
             </button>
           </div>
         </div>
@@ -376,7 +440,7 @@ const AddProduct = () => {
 
           {/* Right Column (Sidebar Specs) */}
           <div className="lg:col-span-1">
-            <MediaUpload coverImage={coverImage} setCoverImage={setCoverImage} detailImages={detailImages} setDetailImages={setDetailImages} />
+            <MediaUpload coverImage={coverImage} setCoverImage={setCoverImage} detailImages={detailImages} setDetailImages={setDetailImages} isEditing={isEditing} formData={formData} />
             <Organization formData={formData} handleChange={handleChange} />
             <TechnicalDetails formData={formData} handleChange={handleChange} />
 
@@ -403,7 +467,7 @@ const AddProduct = () => {
             </div>
             
             <button disabled={loading} type="submit" className="w-full px-6 py-4 text-sm font-black tracking-widest uppercase rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-opacity shadow-sm disabled:opacity-50">
-              {loading ? "Publishing..." : "Publish Product"}
+              {loading ? "Publishing..." : isEditing ? "Publish Edit" : "Publish Product"}
             </button>
 
           </div>

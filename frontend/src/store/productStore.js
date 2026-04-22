@@ -50,12 +50,17 @@ export const useProductStore = create((set, get) => ({
    */
   fetchProducts: async () => {
     const state = get();
-    // Do not refetch if we already have data or are loading
-    if (state.loading || state.products.length > 0) {
+    const key   = makeCacheKey(params);
+
+    // Deduplication: skip if already loading
+    if (state.loading && state._productsController) {
       return state.products;
     }
 
-    set({ loading: true, error: null });
+    // ── 2. Cancel any previous in-flight request ──────────────────────────────
+    if (state._productsController) {
+      state._productsController.abort();
+    }
 
     try {
       // Fetch up to 20 items to load them all into local state for filtering
@@ -178,6 +183,31 @@ export const useProductStore = create((set, get) => ({
       return data;
     } catch (err) {
       set({ loading: false, error: err.message || "Failed to create product" });
+      throw err;
+    }
+  },
+
+  updateProduct: async (id, formData) => {
+    set({ loading: true, error: null });
+    try {
+      const token = localStorage.getItem("auth-storage") ? JSON.parse(localStorage.getItem("auth-storage"))?.state?.accessToken : null;
+      const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com";
+      const response = await fetch(`${BASE_URL}/api/admin/products/${id}`, {
+        method: 'PUT',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
+        body: formData // FormData sets Content-Type automatically
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update product');
+      }
+      get().invalidateCache();
+      set({ loading: false, error: null });
+      return data;
+    } catch (err) {
+      set({ loading: false, error: err.message || "Failed to update product" });
       throw err;
     }
   },
