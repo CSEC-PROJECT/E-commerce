@@ -71,8 +71,8 @@ export default function ProductSelection() {
                   <div className="flex justify-between items-center mb-6 mt-auto">
                     <div className="flex items-center gap-1.5">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      <span className="text-sm font-extrabold text-gray-700">{product.rating || 5.0}</span>
-                      <span className="text-sm text-gray-400 font-medium">({product.reviews || 0})</span>
+                      <span className="text-sm font-extrabold text-gray-700">{Number(product.averageRating ?? 0).toFixed(1)}</span>
+                      <span className="text-sm text-gray-400 font-medium">({Number(product.reviewCount ?? 0)})</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>

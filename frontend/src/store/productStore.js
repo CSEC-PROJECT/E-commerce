@@ -106,12 +106,14 @@ export const useProductStore = create((set, get) => ({
   },
 
   // ── applyFilters ───────────────────────────────────────────────────────────
-  applyFilters: ({ search, minPrice, maxPrice }) => {
+  applyFilters: ({ category, search, minPrice, maxPrice }) => {
     const { products, selectedCategory } = get();
     let filtered = [...products];
 
-    if (selectedCategory) {
-      filtered = filtered.filter((p) => p.category?.toLowerCase() === selectedCategory.toLowerCase());
+    const effectiveCategory = category || selectedCategory;
+
+    if (effectiveCategory) {
+      filtered = filtered.filter((p) => p.category?.toLowerCase() === effectiveCategory.toLowerCase());
     }
     
     if (search) {

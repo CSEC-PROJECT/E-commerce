@@ -3,16 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { useProductStore } from '../store/productStore';
 
 const MIN_PRICE = 0;
-const MAX_PRICE = 2500;
-const STEP = 50;
-const GAP = 50; // minimum gap between min and max
+const MAX_PRICE = 100000;
+const STEP = 100;
+const GAP = 100; // minimum gap between min and max
 
-// ─── Custom dual-thumb slider ───────────────────────────────────────────────
-// Uses Pointer Events API (works for mouse + touch) on a single track div.
-// Determines which thumb to move based on proximity to the click/tap point.
 const DualSlider = ({ minVal, maxVal, onMinChange, onMaxChange }) => {
   const trackRef = useRef(null);
-  const dragging = useRef(null); // 'min' | 'max' | null
+  const dragging = useRef(null);
 
   const getValueFromPointer = useCallback((clientX) => {
     const rect = trackRef.current.getBoundingClientRect();
@@ -185,7 +182,7 @@ const Sidebar = () => {
   };
 
   const formatLabel = (val) =>
-    val >= MAX_PRICE ? `$${MAX_PRICE.toLocaleString()}+` : `$${val.toLocaleString()}`;
+    val >= MAX_PRICE ? `ETB ${MAX_PRICE.toLocaleString()}+` : `ETB ${val.toLocaleString()}`;
 
   const hasFilters = activeCategory || localMin > MIN_PRICE || localMax < MAX_PRICE;
 

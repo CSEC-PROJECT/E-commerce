@@ -4,7 +4,7 @@ const resolveDefaultApiBaseUrl = () => {
   if (typeof window !== "undefined") {
     const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     if (isLocalhost) {
-      return "https://e-commerce-he4h.onrender.com";
+      return "http://localhost:3000";
     }
   }
 
@@ -88,7 +88,7 @@ export async function apiRequest(path, options = {}) {
             throw new Error(message);
           }
         }
-      } catch (refreshError) {
+      } catch {
         useAuthStore.getState().logout();
         throw new Error("Session expired. Please log in again.");
       }

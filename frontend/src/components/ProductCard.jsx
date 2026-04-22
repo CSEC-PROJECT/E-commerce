@@ -7,7 +7,7 @@ import { useToastStore } from '../store/toastStore';
 
 const StarRating = ({ rating = 5 }) => (
   <div className="flex items-center gap-1">
-    <div className="flex text-warning">
+    <div className="flex text-warning text-yellow-400">
       {[...Array(5)].map((_, i) => (
         <Star 
           key={i} 
@@ -18,7 +18,7 @@ const StarRating = ({ rating = 5 }) => (
       ))}
     </div>
     <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-tighter">
-      {rating?.toFixed(1)}
+      {Number(rating ?? 0).toFixed(1)}
     </span>
   </div>
 );
@@ -72,7 +72,7 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
         {/* Status Badges */}
         {status && (
           <div className="absolute top-2 left-2 z-10">
-            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-sm backdrop-blur-md border ${getStatusClasses(status)}`}>
+            <span className={`px-2.5 py-1 text-[10px]  font-bold uppercase tracking-widest rounded-lg shadow-sm backdrop-blur-md border ${getStatusClasses(status)}`}>
               {status}
             </span>
           </div>
@@ -101,7 +101,7 @@ const ProductCard = ({ id, image, title, price, status, rating }) => {
         </div>
 
         <div className="flex items-center justify-between mt-1">
-          {rating && <StarRating rating={rating} />}
+          <StarRating rating={rating} />
           
           {/* Mobile Add Button */}
           <button 

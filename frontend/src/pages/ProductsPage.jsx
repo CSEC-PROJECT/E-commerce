@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Sidebar from '../components/Sidebar';
@@ -6,11 +6,6 @@ import Pagination from '../components/Pagination';
 import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
 import { useAuthStore } from '../store/authStore';
-
-const formatPrice = (price) =>
-  typeof price === 'number'
-    ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-    : price;
 
 // Skeleton — only shown on the very first load (no cached data yet)
 const SkeletonCard = () => (
@@ -32,6 +27,7 @@ const ProductsPage = () => {
   const minPrice    = searchParams.get('minPrice')  || '';
   const maxPrice    = searchParams.get('maxPrice')  || '';
   const page        = parseInt(searchParams.get('page') || '1', 10);
+  const [searchInput, setSearchInput] = useState(searchQuery);
 
   const {
     products,
@@ -52,6 +48,16 @@ const ProductsPage = () => {
     clearError();
   }, [clearError]);
 
+  useEffect(() => {
+    fetchProducts().catch((err) => {
+      addToast(err.message || 'Failed to load products', 'error');
+    });
+  }, [fetchProducts, addToast]);
+
+  useEffect(() => {
+    setSearchInput(searchQuery);
+  }, [searchQuery]);
+
   // Apply filters locally whenever searchParams or products change
   useEffect(() => {
     applyFilters({
@@ -65,6 +71,7 @@ const ProductsPage = () => {
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
+    setSearchInput(value);
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
       const next = new URLSearchParams(searchParams);
@@ -107,7 +114,7 @@ const ProductsPage = () => {
                 <input
                   id="product-search"
                   type="text"
-                  defaultValue={searchQuery}
+                  value={searchInput}
                   onChange={handleSearchChange}
                   placeholder="Search products..."
                   className="w-full pl-12 pr-4 py-3.5 bg-muted rounded-xl outline-none focus:ring-2 focus:ring-primary/10 transition-all"
@@ -158,7 +165,7 @@ const ProductsPage = () => {
                     }}
                     className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted text-foreground text-xs font-bold rounded-full hover:bg-accent transition-colors"
                   >
-                    {minPrice ? `$${Number(minPrice).toLocaleString()}` : '$0'} – {maxPrice ? `$${Number(maxPrice).toLocaleString()}` : '$2,500+'} <span className="text-sm">×</span>
+                    {minPrice ? `ETB ${Number(minPrice).toLocaleString()}` : 'ETB0'} – {maxPrice ? `ETB ${Number(maxPrice).toLocaleString()}` : 'ETB100,000'} <span className="text-sm">×</span>
                   </button>
                 )}
                 <button
@@ -201,7 +208,7 @@ const ProductsPage = () => {
                   </button>
                 </div>
               ) : (
-                products.map((product) => (
+                productsToDisplay.map((product) => (
                   <ProductCard
                     key={product._id}
                     id={product._id}
@@ -209,7 +216,7 @@ const ProductsPage = () => {
                     title={product.name}
                     price={product.discountedPrice ?? product.price}
                     status={product.status}
-                    rating={product.averageRating || product.rating || 5}
+                    rating={Number(product.averageRating ?? 0)}
                   />
                 ))
               )}

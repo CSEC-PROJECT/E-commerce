@@ -95,28 +95,10 @@ export default function Hero() {
           />
         </div>
 
-        {/* ── Dot / arrow navigation (only when real slides exist) ── */}
         {!isFallback && slides.length > 1 && (
           <>
-            {/* Prev arrow */}
-            <button
-              onClick={goPrev}
-              aria-label="Previous product"
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5 text-white" />
-            </button>
+            
 
-            {/* Next arrow */}
-            <button
-              onClick={goNext}
-              aria-label="Next product"
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
-            >
-              <ChevronRight className="w-5 h-5 text-white" />
-            </button>
-
-            {/* Dot indicators */}
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex gap-2">
               {slides.map((_, i) => (
                 <button
@@ -132,16 +114,13 @@ export default function Hero() {
           </>
         )}
 
-        {/* ── Text Content ── */}
         <div className="relative z-20 px-8 py-20 lg:px-20 w-full">
           <div className="max-w-xl">
 
-            {/* Badge */}
             <div className="inline-flex items-center bg-[#5c53e5] text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-widest mb-8 uppercase">
               {isFallback ? "New Season Collection" : current.name}
             </div>
 
-            {/* Title */}
             <h1 className="text-5xl md:text-6xl lg:text-[5rem] font-extrabold leading-[1.05] mb-6 tracking-tight">
               Shop <br />
               Premium <br />
