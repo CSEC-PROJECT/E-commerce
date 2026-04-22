@@ -13,7 +13,7 @@ const AdminUsers = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  
+
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
@@ -86,21 +86,8 @@ const AdminUsers = () => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 p-6 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
-        <AdminHeader 
-          title="Users" 
-          subtitle="Manage users and monitor activity"
-        >
-          <button 
-            onClick={handleExport}
-            className="cursor-pointer flex items-center gap-2 bg-[#EEEDFE] text-[#5542F6] px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-[#E4E2FD] active:scale-95 transition-all shadow-sm shrink-0"
-          >
-            <DownloadCloud size={18} />
-            Export Report
-          </button>
-        </AdminHeader>
-
         {/* Search Bar - Custom Addition */}
-        <div className="mt-8 mb-4">
+        <div className="mt-0 mb-4">
           <div className="relative max-w-md w-full">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
               <Search className="w-5 h-5" />
@@ -117,32 +104,32 @@ const AdminUsers = () => {
 
         {/* Stat Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-4">
-          <StatCard 
-            title="Total Users" 
-            value={totalUsers || "0"} 
-            change="" 
-            trendingInfo="vs last month" 
-            icon={UserPlus} 
-            iconBg="bg-indigo-50 dark:bg-indigo-500/10" 
-            iconColor="text-[#5542F6] dark:text-indigo-400" 
+          <StatCard
+            title="Total Users"
+            value={totalUsers || "0"}
+            change=""
+            trendingInfo="vs last month"
+            icon={UserPlus}
+            iconBg="bg-indigo-50 dark:bg-indigo-500/10"
+            iconColor="text-[#5542F6] dark:text-indigo-400"
           />
-          <StatCard 
-            title="New Users" 
-            value="--" 
-            change="" 
-            trendingInfo="ACTIVE NOW" 
-            icon={UsersIcon} 
-            iconBg="bg-green-50 dark:bg-green-500/10" 
-            iconColor="text-green-500 dark:text-green-400" 
+          <StatCard
+            title="New Users"
+            value="--"
+            change=""
+            trendingInfo="ACTIVE NOW"
+            icon={UsersIcon}
+            iconBg="bg-green-50 dark:bg-green-500/10"
+            iconColor="text-green-500 dark:text-green-400"
           />
-          <StatCard 
-            title="Total Visits" 
-            value="--" 
-            change="" 
-            trendingInfo="Daily average" 
-            icon={MousePointerClick} 
-            iconBg="bg-gray-100 dark:bg-gray-500/10" 
-            iconColor="text-gray-400 dark:text-gray-400" 
+          <StatCard
+            title="Total Visits"
+            value="--"
+            change=""
+            trendingInfo="Daily average"
+            icon={MousePointerClick}
+            iconBg="bg-gray-100 dark:bg-gray-500/10"
+            iconColor="text-gray-400 dark:text-gray-400"
           />
         </div>
 
@@ -153,18 +140,18 @@ const AdminUsers = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           )}
-          <UsersTable 
-             users={users} 
-             currentPage={currentPage}
-             setCurrentPage={setCurrentPage}
-             totalPages={totalPages}
-             totalUsers={totalUsers}
-             onDelete={handleDeleteClick}
-             onBan={handleBanUser}
+          <UsersTable
+            users={users}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+            totalUsers={totalUsers}
+            onDelete={handleDeleteClick}
+            onBan={handleBanUser}
           />
         </div>
 
-        <ConfirmModal 
+        <ConfirmModal
           isOpen={isDeleteModalOpen}
           onClose={() => setIsDeleteModalOpen(false)}
           onConfirm={confirmDelete}
