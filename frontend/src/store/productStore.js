@@ -10,8 +10,6 @@ export const useProductStore = create((set, get) => ({
   loading: false,        
   error: null,
 
-  error: null,
-
   categories: [],
   selectedCategory: null,
   hasFetchedCategories: false,
@@ -50,21 +48,15 @@ export const useProductStore = create((set, get) => ({
    */
   fetchProducts: async () => {
     const state = get();
-    const key   = makeCacheKey(params);
+    if (state.products.length > 0) return state.products;
 
-    // Deduplication: skip if already loading
-    if (state.loading && state._productsController) {
-      return state.products;
-    }
+    if (state.loading) return state.products;
 
-    // ── 2. Cancel any previous in-flight request ──────────────────────────────
-    if (state._productsController) {
-      state._productsController.abort();
-    }
+    set({ loading: true, error: null });
 
     try {
-      // Fetch up to 20 items to load them all into local state for filtering
-      const result = await apiRequest("/api/products?limit=20");
+      // Fetch enough items to power local filtering/pagination
+      const result = await apiRequest("/api/products?limit=100");
       const products = result?.products || [];
       const total = result?.total ?? products.length;
 
@@ -82,7 +74,7 @@ export const useProductStore = create((set, get) => ({
         loading: false,
         error: err.message || "Failed to load products",
       });
-      return mockProducts;
+      return [];
     }
   },
 

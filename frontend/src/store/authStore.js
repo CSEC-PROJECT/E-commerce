@@ -96,6 +96,35 @@ export const useAuthStore = create(
         });
       },
 
+      requestPasswordReset: async (email) => {
+        set({ loading: true, error: null });
+        try {
+          const result = await apiRequest("/api/auth/password-reset/request", {
+            method: "POST",
+            body: { email },
+          });
+          set({ loading: false });
+          return result;
+        } catch (err) {
+          set({ loading: false, error: err.message || "Password reset request failed" });
+          throw err;
+        }
+      },
+
+      confirmPasswordReset: async ({ token, newPassword }) => {
+        set({ loading: true, error: null });
+        try {
+          const result = await apiRequest("/api/auth/password-reset/confirm", {
+            method: "POST",
+            body: { token, newPassword },
+          });
+          set({ loading: false });
+          return result;
+        } catch (err) {
+          set({ loading: false, error: err.message || "Password reset confirmation failed" });
+          throw err;
+        }
+      },
 
       logout: async () => {
         const { refreshToken } = get();

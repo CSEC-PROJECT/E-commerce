@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Search, Bell, Grid, Plus, Edit2, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import Sidebar from '../components/Common/Sidebar';
 import { useProducts } from '../hooks/useProducts';
 
 const StatusBadge = ({ status }) => {
-  let bgColor = "bg-green-100 dark:bg-green-900/30";
-  let textColor = "text-green-600 dark:text-green-400";
-  const upperStatus = status?.toUpperCase() || '';
+  let bgColor = "bg-muted";
+  let textColor = "text-muted-foreground";
+  const normalizedStatus = String(status || '').toLowerCase();
 
-  if (upperStatus === "LOW STOCK" || upperStatus === "LOW") {
-    bgColor = "bg-red-100 dark:bg-red-900/30";
-    textColor = "text-red-500 dark:text-red-400";
-  } else if (upperStatus === "OUT OF STOCK" || upperStatus === "OUT") {
-    bgColor = "bg-indigo-100 dark:bg-indigo-900/30";
-    textColor = "text-indigo-600 dark:text-indigo-400";
+  if (normalizedStatus === 'new') {
+    bgColor = "bg-emerald-100 dark:bg-emerald-900/30";
+    textColor = "text-emerald-700 dark:text-emerald-400";
+  } else if (normalizedStatus === 'slightly used') {
+    bgColor = "bg-blue-100 dark:bg-blue-900/30";
+    textColor = "text-blue-700 dark:text-blue-400";
+  } else if (normalizedStatus === 'used') {
+    bgColor = "bg-amber-100 dark:bg-amber-900/30";
+    textColor = "text-amber-700 dark:text-amber-400";
   }
 
   return (
     <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider capitalize ${bgColor} ${textColor}`}>
-      {status || 'Unknown'}
+      {status || 'unknown'}
     </span>
   );
 };
 
 const AdminProducts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainRef = useRef(null);
 
   // State Declarations
   const [activeTab, setActiveTab] = useState('All');
@@ -37,6 +42,13 @@ const AdminProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 5;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [location.key, currentPage]);
 
   const { products, loading, error, totalPages, deleteProduct } = useProducts({
     searchQuery,
@@ -80,7 +92,7 @@ const AdminProducts = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans">
       <Sidebar />
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
+      <main ref={mainRef} className="flex-1 p-4 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
 
         {/* Header */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -155,14 +167,15 @@ const AdminProducts = () => {
             </select>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Stock Status</label>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Product Status</label>
             <select
               value={statusFilter}
               onChange={(e) => { 
                 const val = e.target.value;
                 setStatusFilter(val); 
-                if (val === 'Out of Stock') setActiveTab('Out');
-                else if (val === 'In Stock') setActiveTab('Sale');
+                if (val === 'new') setActiveTab('New');
+                else if (val === 'slightly used') setActiveTab('SlightlyUsed');
+                else if (val === 'used') setActiveTab('Used');
                 else if (val === 'Any Status') setActiveTab('All');
                 else setActiveTab('');
                 setCurrentPage(1); 
@@ -170,9 +183,9 @@ const AdminProducts = () => {
               disabled={loading}
               className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
               <option>Any Status</option>
-              <option>In Stock</option>
-              <option>Out of Stock</option>
-              <option>Low Stock</option>
+              <option value="new">new</option>
+              <option value="slightly used">slightly used</option>
+              <option value="used">used</option>
             </select>
           </div>
           <div className="flex-1 min-w-[200px] flex items-end">
@@ -196,18 +209,25 @@ const AdminProducts = () => {
               All Product
             </button>
             <button
-              onClick={() => { setActiveTab('Sale'); setStatusFilter('In Stock'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('New'); setStatusFilter('new'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Sale' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'New' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              On Sale
+              New
             </button>
             <button
-              onClick={() => { setActiveTab('Out'); setStatusFilter('Out of Stock'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('SlightlyUsed'); setStatusFilter('slightly used'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Out' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'SlightlyUsed' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Out of Stock
+              Slightly Used
+            </button>
+            <button
+              onClick={() => { setActiveTab('Used'); setStatusFilter('used'); setCurrentPage(1); }}
+              disabled={loading}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Used' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Used
             </button>
           </div>
 
@@ -246,7 +266,7 @@ const AdminProducts = () => {
                     <th className="py-4">Created Date</th>
                     <th className="py-4">Price</th>
                     <th className="py-4">Order</th>
-                    <th className="py-4 text-center">Stock Status</th>
+                    <th className="py-4 text-center">Product Status</th>
                     <th className="py-4 pr-6 text-right">Action</th>
                   </tr>
                 </thead>
@@ -268,7 +288,7 @@ const AdminProducts = () => {
                           <td className="py-4 font-bold text-foreground">{formattedPrice}</td>
                           <td className="py-4 text-muted-foreground font-medium">{product.order || '-'}</td>
                           <td className="py-4 text-center">
-                            <StatusBadge status={product.status || 'IN STOCK'} />
+                            <StatusBadge status={product.status || 'unknown'} />
                           </td>
                           <td className="py-4 pr-6">
                             <div className="flex justify-end gap-3 text-muted-foreground">

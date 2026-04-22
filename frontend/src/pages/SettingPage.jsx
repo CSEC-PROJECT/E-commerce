@@ -5,6 +5,8 @@ import {
 } from "lucide-react";
 import AdminChangePassword from '../components/Admin/AdminChangePassword';
 import useThemeStore from '../store/themeStore';
+import { apiRequest } from '../lib/apiClient';
+import toast from 'react-hot-toast';
 
 const CustomSelect = ({ options, value, onChange }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -75,6 +77,19 @@ const SettingPage = () => {
 
     const { theme, setTheme } = useThemeStore();
     const [openChangePassword, setOpenChangePassword] = useState(false);
+
+    const handlePasswordChange = async ({ oldPassword, newPassword }) => {
+        try {
+            await apiRequest('/api/auth/change-password', {
+                method: 'POST',
+                body: { oldPassword, newPassword },
+            });
+            toast.success('Password changed successfully');
+            setOpenChangePassword(false);
+        } catch (error) {
+            toast.error(error.message || 'Failed to change password');
+        }
+    };
 
     // Select dropdown states
     const [currency, setCurrency] = useState('USD ($)');
@@ -369,7 +384,11 @@ const SettingPage = () => {
 
                     {/* Modal Content */}
                     <div className="relative z-10 w-full max-w-md mx-4 animate-in fade-in zoom-in-95 duration-200">
-                        <AdminChangePassword onClose={() => setOpenChangePassword(false)} />
+                        <AdminChangePassword
+                            isOpen={openChangePassword}
+                            onClose={() => setOpenChangePassword(false)}
+                            onChangePassword={handlePasswordChange}
+                        />
                     </div>
                 </div>
             )}

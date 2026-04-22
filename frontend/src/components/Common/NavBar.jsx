@@ -38,9 +38,9 @@ const NavBar = () => {
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const isAdmin = Array.isArray(user?.role)
+    const isAdmin = !!accessToken && (Array.isArray(user?.role)
         ? user.role.includes('admin')
-        : user?.role === 'admin';
+        : user?.role === 'admin');
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -118,6 +118,15 @@ const NavBar = () => {
     }, [isMobileMenuOpen]);
 
     const isActive = (path) => location.pathname === path;
+    const isAdminRoute = location.pathname.startsWith('/admin');
+
+    const handleMobileMenuButton = () => {
+        if (isAdminRoute) {
+            window.dispatchEvent(new CustomEvent('admin-sidebar:toggle'));
+            return;
+        }
+        setIsMobileMenuOpen(true);
+    };
 
     // Do not render NavBar on Login or Signup pages
     if (location.pathname === '/login' || location.pathname === '/signup') {
@@ -267,6 +276,9 @@ const NavBar = () => {
                                         <Link to="/products" className={navLinkClass('/products')}>
                                             Products
                                         </Link>
+                                        <Link to="/cart" className={navLinkClass('/cart')}>
+                                            Collections
+                                        </Link>
                                         <Link to="/about" className={navLinkClass('/about')}>
                                             About Us
                                         </Link>
@@ -355,8 +367,8 @@ const NavBar = () => {
                                 />
                             </div>
 
-                            {/* Cart Icon – Logged-in User only */}
-                            {(!isAdmin && accessToken) && (
+                            {/* Cart Icon – visible for non-admin users */}
+                            {!isAdmin && (
                                 <Link to="/cart" className="relative text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md" aria-label="Cart">
                                     <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -446,8 +458,8 @@ const NavBar = () => {
 
                             {/* Mobile menu button */}
                             <button
-                                onClick={() => setIsMobileMenuOpen(true)}
-                                className="md:hidden p-2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md transition-colors"
+                                onClick={handleMobileMenuButton}
+                                className={`${isAdminRoute ? 'lg:hidden' : 'md:hidden'} p-2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md transition-colors`}
                                 aria-expanded={isMobileMenuOpen}
                                 aria-label="Open navigation menu"
                             >
@@ -631,6 +643,9 @@ const NavBar = () => {
                                 <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/products')}>
                                     Products
                                 </Link>
+                                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
+                                    Collections
+                                </Link>
                                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
                                     About Us
                                 </Link>
@@ -705,8 +720,8 @@ const NavBar = () => {
                 {/* Drawer Bottom Actions */}
                 <div className="p-6 border-t border-border bg-muted/30">
                     <div className="flex flex-col gap-4">
-                        {/* Cart link – Logged-in User only */}
-                        {(!isAdmin && accessToken) && (
+                        {/* Cart link – visible for non-admin users */}
+                        {!isAdmin && (
                             <Link
                                 to="/cart"
                                 onClick={() => setIsMobileMenuOpen(false)}
@@ -731,7 +746,7 @@ const NavBar = () => {
                                 {/* My Products – User only */}
                                 {!isAdmin && (
                                     <Link
-                                        to="/products"
+                                        to="/my-products"
                                         onClick={() => setIsMobileMenuOpen(false)}
                                         className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-foreground border border-border bg-background hover:bg-muted rounded-md transition-colors"
                                     >
