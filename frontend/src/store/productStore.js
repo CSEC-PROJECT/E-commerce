@@ -82,7 +82,7 @@ export const useProductStore = create((set, get) => ({
         loading: false,
         error: err.message || "Failed to load products",
       });
-      throw err;
+      return mockProducts;
     }
   },
 
