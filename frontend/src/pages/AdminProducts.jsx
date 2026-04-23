@@ -9,10 +9,10 @@ const StatusBadge = ({ status }) => {
   let textColor = "text-green-600 dark:text-green-400";
   const upperStatus = status?.toUpperCase() || '';
 
-  if (upperStatus === "LOW STOCK" || upperStatus === "LOW") {
-    bgColor = "bg-red-100 dark:bg-red-900/30";
-    textColor = "text-red-500 dark:text-red-400";
-  } else if (upperStatus === "OUT OF STOCK" || upperStatus === "OUT") {
+  if (upperStatus === "SLIGHTLY USED") {
+    bgColor = "bg-amber-100 dark:bg-amber-900/30";
+    textColor = "text-amber-600 dark:text-amber-400";
+  } else if (upperStatus === "USED") {
     bgColor = "bg-indigo-100 dark:bg-indigo-900/30";
     textColor = "text-indigo-600 dark:text-indigo-400";
   }
@@ -28,12 +28,12 @@ const AdminProducts = () => {
   const navigate = useNavigate();
 
   // State Declarations
-  const [activeTab, setActiveTab] = useState('All');
+  const [activeTab, setActiveTab] = useState('All Product');
   const [searchQuery, setSearchQuery] = useState('');
   const [tabSearchQuery, setTabSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All Categories');
   const [priceFilter, setPriceFilter] = useState('Any Price');
-  const [statusFilter, setStatusFilter] = useState('Any Status');
+  const [statusFilter, setStatusFilter] = useState('All Product');
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 5;
@@ -52,10 +52,10 @@ const AdminProducts = () => {
   const handleClearFilters = () => {
     setCategoryFilter('All Categories');
     setPriceFilter('Any Price');
-    setStatusFilter('Any Status');
+    setStatusFilter('All Product');
     setSearchQuery('');
     setTabSearchQuery('');
-    setActiveTab('All');
+    setActiveTab('All Product');
     setCurrentPage(1);
   };
 
@@ -168,18 +168,18 @@ const AdminProducts = () => {
                 onChange={(e) => {
                   const val = e.target.value;
                   setStatusFilter(val);
-                  if (val === 'Out of Stock') setActiveTab('Out');
-                  else if (val === 'In Stock') setActiveTab('Sale');
-                  else if (val === 'Any Status') setActiveTab('All');
-                  else setActiveTab('');
+                  if (val === 'All Product') setActiveTab('All Product');
+                  else if (val === 'New') setActiveTab('New');
+                  else if (val === 'Slightly Used') setActiveTab('Slightly Used');
+                  else if (val === 'Used') setActiveTab('Used');
                   setCurrentPage(1);
                 }}
                 disabled={loading}
                 className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
-                <option>Any Status</option>
-                <option>In Stock</option>
-                <option>Out of Stock</option>
-                <option>Low Stock</option>
+                <option>All Product</option>
+                <option>New</option>
+                <option>Slightly Used</option>
+                <option>Used</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             </div>
@@ -198,25 +198,25 @@ const AdminProducts = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
           <div className="flex bg-muted rounded-2xl p-1.5 w-full sm:w-auto border border-border">
             <button
-              onClick={() => { setActiveTab('All'); setStatusFilter('Any Status'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('All Product'); setStatusFilter('All Product'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'All' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'All Product' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
               All Product
             </button>
             <button
-              onClick={() => { setActiveTab('Sale'); setStatusFilter('In Stock'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('Slightly Used'); setStatusFilter('Slightly Used'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Sale' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Slightly Used' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              On Sale
+              Slightly Used
             </button>
             <button
-              onClick={() => { setActiveTab('Out'); setStatusFilter('Out of Stock'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('Used'); setStatusFilter('Used'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Out' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Used' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Out of Stock
+              Used
             </button>
           </div>
 

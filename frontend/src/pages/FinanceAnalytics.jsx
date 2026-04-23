@@ -426,8 +426,8 @@ const FinanceAnalytics = ({ embedded = false }) => {
   };
 
   return (
-    <div className={`min-h-screen bg-background p-8 text-sm ${embedded ? "pt-6" : "pt-20"}`}>
-      <div className="max-w-7xl mx-auto xl:px-4">
+    <div className={`min-h-screen bg-background text-sm ${embedded ? "p-6 md:p-10 pb-24 lg:pb-10 w-full" : "p-8 pt-20"}`}>
+      <div className={embedded ? "w-full" : "max-w-7xl mx-auto xl:px-4"}>
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
           <div>
@@ -710,7 +710,7 @@ const FinanceAnalytics = ({ embedded = false }) => {
           </div>
 
           {/* Pagination */}
-          <div className="flex justify-between items-center mt-8 border-t pt-6">
+          <div className="flex flex-col sm:flex-row justify-end items-center gap-4 mt-8 border-t pt-6">
               <button
                 onClick={() => canGoPrev && setCurrentPage((prev) => prev - 1)}
                 disabled={!canGoPrev}
