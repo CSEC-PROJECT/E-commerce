@@ -1,17 +1,6 @@
 import { useAuthStore } from "../store/authStore";
 
-const resolveDefaultApiBaseUrl = () => {
-  if (typeof window !== "undefined") {
-    const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-    if (isLocalhost) {
-      return "http://localhost:3000";
-    }
-  }
-
-  return "https://e-commerce-he4h.onrender.com";
-};
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || resolveDefaultApiBaseUrl();
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com";
 
 const defaultHeaders = {
   "Content-Type": "application/json",
