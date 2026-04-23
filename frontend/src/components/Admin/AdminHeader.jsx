@@ -19,7 +19,7 @@ const AdminHeader = ({ title, subtitle, children }) => {
         <div className="flex items-center gap-4 ml-6">
           <button 
             onClick={() => alert("No new notifications!")}
-            className="cursor-pointer text-gray-400 hover:text-gray-800 hover:bg-gray-100 transition-all p-2.5 rounded-full active:scale-90"
+            className="cursor-pointer text-gray-400 hover:text-gray-800 hover:bg-muted transition-all p-2.5 rounded-full active:scale-90"
           >
             <Bell size={20} />
           </button>

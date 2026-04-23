@@ -110,7 +110,7 @@ const AdminUsers = () => {
             change=""
             trendingInfo="vs last month"
             icon={UserPlus}
-            iconBg="bg-indigo-50 dark:bg-indigo-500/10"
+            iconBg="bg-primary/10 dark:bg-primary/10"
             iconColor="text-[#5542F6] dark:text-indigo-400"
           />
           <StatCard
@@ -128,8 +128,8 @@ const AdminUsers = () => {
             change=""
             trendingInfo="Daily average"
             icon={MousePointerClick}
-            iconBg="bg-gray-100 dark:bg-gray-500/10"
-            iconColor="text-gray-400 dark:text-gray-400"
+            iconBg="bg-muted dark:bg-gray-500/10"
+            iconColor="text-muted-foreground dark:text-muted-foreground"
           />
         </div>
 

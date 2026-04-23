@@ -168,7 +168,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
                     {product.status}
                   </span>
                 ) : (
-                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-700 bg-gray-100 px-3 py-1 rounded-full border border-gray-200">
+                  <span className="ml-auto flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-gray-700 bg-muted px-3 py-1 rounded-full border border-gray-200">
                     <span className="w-2 h-2 bg-gray-500 rounded-full animate-pulse" />
                     {product.status || 'Available'}
                   </span>
@@ -327,7 +327,7 @@ const DetailRelatedCard = ({ product }) => {
   
   return (
     <Link to={`/product/${product._id}`} onClick={() => window.scrollTo(0, 0)} className="group bg-white rounded-[2rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-border/50">
-      <div className="w-full aspect-square bg-gray-100 rounded-[1.5rem] overflow-hidden mb-5">
+      <div className="w-full aspect-square bg-muted rounded-[1.5rem] overflow-hidden mb-5">
         <img 
           src={product.coverImage} 
           alt={product.name}

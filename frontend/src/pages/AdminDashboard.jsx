@@ -312,7 +312,7 @@ const AdminDashboard = () => {
                       return (
                         <tr key={i} className="hover:bg-muted/30">
                           <td className="py-4 flex items-center gap-4 pl-2">
-                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
+                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-muted" />
                             <span className="font-bold text-sm dark:text-primary">{details?.name || "Unknown Product"}</span>
                           </td>
                           <td className="py-4 text-sm font-bold dark:text-primary">{p.totalOrdered}</td>
@@ -464,7 +464,7 @@ const RegionRow = ({ label, percent }) => (
 const TopProductItem = ({ name, price, id, img, onClick }) => (
   <div onClick={onClick} className="flex items-center justify-between group cursor-pointer">
     <div className="flex items-center gap-3">
-      <img src={img} className="w-11 h-11 rounded-lg object-cover bg-gray-100" />
+      <img src={img} className="w-11 h-11 rounded-lg object-cover bg-muted" />
       <div>
         <p className="text-sm font-bold dark:text-primary transition-colors group-hover:text-primary">{name}</p>
         <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold mt-0.5">Item: {id}</p>

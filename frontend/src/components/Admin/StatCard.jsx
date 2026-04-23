@@ -2,7 +2,7 @@ import React from 'react';
 
 const StatCard = ({ title, value, change, trendingInfo, icon: Icon, iconBg, iconColor }) => {
   return (
-    <div className="bg-white rounded-[20px] p-6 flex flex-col justify-between shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-gray-100 min-h-[140px]">
+    <div className="bg-card rounded-[20px] p-6 flex flex-col justify-between shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] border border-border min-h-[140px]">
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-[11px] font-bold text-[#92959E] uppercase tracking-wider mb-2">{title}</h3>
