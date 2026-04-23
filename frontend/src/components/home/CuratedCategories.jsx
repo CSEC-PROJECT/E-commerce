@@ -43,7 +43,7 @@ export default function CuratedCategories() {
             to="/products"
             className="text-[#5c53e5] hover:text-[#7c74ff] font-bold text-lg flex items-center gap-2 mt-4 md:mt-0 transition-colors"
           >
-            View All <ArrowRight className="w-5 h-5" />
+            View All 
           </Link>
         </div>
 

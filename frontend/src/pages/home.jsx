@@ -46,7 +46,7 @@ const HomeProductCard = ({ product }) => {
       {/* Content */}
       <div className="flex flex-col flex-grow px-1">
         <div className="flex justify-between items-start mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400text-primary">
             {product.category || "New"}
           </span>
           <span className="text-xl font-black text-primary">
@@ -60,18 +60,18 @@ const HomeProductCard = ({ product }) => {
 
         <div className="flex justify-between items-center mb-6 mt-auto">
           <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground/80">
-            <Star size={14} className="fill-warning text-warning" />
-            <span>{product.averageRating?.toFixed(1) || "5.0"}</span>
-            <span className="text-muted-foreground font-medium text-xs">({product.reviews?.length || 0})</span>
+            <Star size={14} className="fill-warning text-warning text-yellow-400" />
+            <span>{Number(product.averageRating ?? 0).toFixed(1)}</span>
+            <span className="text-muted-foreground font-medium text-xs ">({Number(product.reviewCount ?? 0)})</span>
           </div>
           
-          <div className="flex items-center gap-1.5 text-xs font-bold">
+          <div className="flex items-center gap-1.5 text-xs font-bold ">
             {product.status?.toLowerCase() === 'new' ? (
               <><span className="w-2 h-2 rounded-full bg-success" /><span className="text-success capitalize">{product.status}</span></>
             ) : product.status?.toLowerCase() === 'slightly used' ? (
               <><span className="w-2 h-2 rounded-full bg-primary" /><span className="text-primary capitalize">{product.status}</span></>
             ) : product.status?.toLowerCase() === 'used' ? (
-              <><span className="w-2 h-2 rounded-full bg-warning" /><span className="text-warning-foreground capitalize">{product.status}</span></>
+              <><span className="w-2 h-2 rounded-full bg-warning" /><span className="text-warning-foreground text-yellow-400 capitalize">{product.status}</span></>
             ) : (
               <><span className="w-2 h-2 rounded-full bg-muted-foreground" /><span className="text-muted-foreground capitalize">{product.status || 'Available'}</span></>
             )}
@@ -132,14 +132,6 @@ function ErrorState({ message, onRetry }) {
   );
 }
 
-/* ─── Helpers ─── */
-function formatPrice(price) {
-  if (typeof price === "number") {
-    return `$${price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-  return price;
-}
-
 export default function Home() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -168,40 +160,6 @@ export default function Home() {
     <div className="font-sans antialiased bg-background text-foreground">
       <Hero />
 
-      {/* Global Search Bar Section */}
-      <section className="py-12 px-4 md:px-8">
-        <div className="container mx-auto max-w-3xl">
-          <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-              }
-            }}
-            className="relative group"
-          >
-            <input
-              type="text"
-              placeholder="Search for premium products, fashion, and more..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-14 pr-32 py-5 bg-card border border-border rounded-2xl text-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm group-hover:shadow-md"
-            />
-            <div className="absolute left-5 top-1/2 -translate-y-1/2 text-muted-foreground">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-              </svg>
-            </div>
-            <button
-              type="submit"
-              className="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-      </section>
-
       <CuratedCategories />
 
       {/* Product Selection Section using Card2 mapped from API */}
@@ -216,9 +174,9 @@ export default function Home() {
             </div>
             <Link
               to="/products"
-              className="text-primary hover:opacity-80 font-bold text-[11px] uppercase tracking-[0.2em] flex items-center gap-2 mt-4 md:mt-0 transition-opacity group"
+              className="text-primary hover:opacity-80 font-bold text-[15px] uppercase tracking-[0.2em] flex items-center gap-2 mt-4 md:mt-0 transition-opacity group"
             >
-              View All <span className="transition-transform group-hover:translate-x-1">→</span>
+              View All
             </Link>
           </div>
 
