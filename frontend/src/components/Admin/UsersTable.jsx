@@ -6,12 +6,12 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
   const getPaginationGroup = () => {
     let start = Math.max(currentPage - 1, 1);
     let end = Math.min(start + 2, totalPages);
-    
+
     if (end - start < 2 && totalPages >= 3) {
       if (start === 1) end = 3;
       else Math.max(totalPages - 2, 1);
     }
-    
+
     const pages = [];
     for (let i = start; i <= end; i++) {
       pages.push(i);
@@ -24,10 +24,10 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
       {/* Table Header / Title */}
       <div className="flex justify-between items-center p-6 border-b border-border/40">
         <h2 className="text-xl font-extrabold text-foreground">Users List</h2>
-        <button 
+        <button
           onClick={() => alert("Filter functionality coming soon!")}
           className="cursor-pointer p-2 hover:bg-muted rounded-xl transition-all text-muted-foreground hover:text-foreground active:scale-95">
-          <Filter size={20} />
+          {/* <Filter size={20} /> */}
         </button>
       </div>
 
@@ -64,14 +64,14 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
                 </td>
                 <td className="py-4 pr-6">
                   <div className="flex justify-end gap-3 text-muted-foreground">
-                    <button 
+                    {/* <button
                       onClick={() => onBan && onBan(user._id)}
                       className={`cursor-pointer transition-all active:scale-90 hover:bg-muted hover:text-foreground p-1.5 rounded-lg`}
                       title="Ban User"
-                    >
-                      <Ban size={18} />
-                    </button>
-                    <button 
+                    > 
+                    <Ban size={18} />
+                  </button> */}
+                    <button
                       onClick={() => onDelete && onDelete(user._id)}
                       className="cursor-pointer hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-lg transition-all active:scale-90"
                       title="Delete User"
@@ -94,54 +94,56 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
       </div>
 
       {/* Pagination */}
-      {totalPages > 0 && (
-        <div className="p-6 border-t border-border/40 flex flex-col sm:flex-row justify-between items-center gap-4 bg-card">
-          <p className="text-sm text-muted-foreground font-medium">
-            Showing page {currentPage} of {totalPages} ({totalUsers} total users)
-          </p>
-          <div className="flex items-center gap-1">
-            <button 
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              className="cursor-pointer p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted rounded-lg">
-              <ChevronLeft size={18} />
-            </button>
-            
-            {getPaginationGroup().map(page => (
+      {
+        totalPages > 0 && (
+          <div className="p-6 border-t border-border/40 flex flex-col sm:flex-row justify-between items-center gap-4 bg-card">
+            <p className="text-sm text-muted-foreground font-medium">
+              Showing page {currentPage} of {totalPages} ({totalUsers} total users)
+            </p>
+            <div className="flex items-center gap-1">
               <button
-                key={page}
-                onClick={() => setCurrentPage(page)}
-                className={`cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all active:scale-95
-                  ${currentPage === page 
-                    ? 'bg-primary text-primary-foreground shadow-sm' 
-                    : 'text-muted-foreground hover:bg-muted'}`}
-              >
-                {page}
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                className="cursor-pointer p-1.5 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted rounded-lg">
+                <ChevronLeft size={18} />
               </button>
-            ))}
-            
-            {totalPages > 3 && currentPage < totalPages - 1 && (
-              <>
-                <span className="px-1 text-muted-foreground">...</span>
+
+              {getPaginationGroup().map(page => (
                 <button
-                  onClick={() => setCurrentPage(totalPages)}
-                  className={`cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all active:scale-95 hover:bg-muted text-muted-foreground`}
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all active:scale-95
+                  ${currentPage === page
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:bg-muted'}`}
                 >
-                  {totalPages}
+                  {page}
                 </button>
-              </>
-            )}
-            
-            <button 
-              disabled={currentPage === totalPages}
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              className="cursor-pointer p-1.5 text-muted-foreground hover:text-foreground transition-colors ml-1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted rounded-lg">
-              <ChevronRight size={18} />
-            </button>
+              ))}
+
+              {totalPages > 3 && currentPage < totalPages - 1 && (
+                <>
+                  <span className="px-1 text-muted-foreground">...</span>
+                  <button
+                    onClick={() => setCurrentPage(totalPages)}
+                    className={`cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all active:scale-95 hover:bg-muted text-muted-foreground`}
+                  >
+                    {totalPages}
+                  </button>
+                </>
+              )}
+
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                className="cursor-pointer p-1.5 text-muted-foreground hover:text-foreground transition-colors ml-1 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-muted rounded-lg">
+                <ChevronRight size={18} />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
+import BottomNav from './components/Common/BottomNav'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import AdminRoute from './components/auth/AdminRoute'
 import { Toaster } from 'react-hot-toast'
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
       {!hideMainChrome && <Footer />}
+      {!hideMainChrome && <BottomNav />}
     </>
   )
 }

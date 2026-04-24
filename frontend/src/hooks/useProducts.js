@@ -15,6 +15,12 @@ export const useProducts = ({
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
 
+  const mapStatusToApiValue = (value) => {
+    if (!value || value === 'All Product') return undefined;
+    if (value === 'Slightly Used') return 'slightly used';
+    return String(value).toLowerCase();
+  };
+
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -23,15 +29,15 @@ export const useProducts = ({
       // Combine search queries
       const search = [searchQuery, tabSearchQuery].filter(Boolean).join(' ').trim();
       const category = categoryFilter !== 'All Categories' ? categoryFilter : undefined;
-      const status = statusFilter !== 'Any Status' ? statusFilter : undefined;
+      const status = mapStatusToApiValue(statusFilter);
       
       let minPrice, maxPrice;
       if (priceFilter !== 'Any Price') {
-        if (priceFilter === 'Under $50') maxPrice = 50;
-        else if (priceFilter === '$50 - $100') { minPrice = 50; maxPrice = 100; }
-        else if (priceFilter === '$100 - $200') { minPrice = 100; maxPrice = 200; }
-        else if (priceFilter === '$200 - $500') { minPrice = 200; maxPrice = 500; }
-        else if (priceFilter === '$500+') minPrice = 500;
+        if (priceFilter === 'Under ETB 50') maxPrice = 50;
+        else if (priceFilter === 'ETB 50 - ETB 100') { minPrice = 50; maxPrice = 100; }
+        else if (priceFilter === 'ETB 100 - ETB 200') { minPrice = 100; maxPrice = 200; }
+        else if (priceFilter === 'ETB 200 - ETB 500') { minPrice = 200; maxPrice = 500; }
+        else if (priceFilter === 'ETB 500+') minPrice = 500;
       }
 
       const response = await productsApi.getProducts({

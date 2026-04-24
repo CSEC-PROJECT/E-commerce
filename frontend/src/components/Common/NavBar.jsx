@@ -110,10 +110,6 @@ const NavBar = () => {
     const isAdminRoute = location.pathname.startsWith('/admin');
 
     const handleMobileMenuButton = () => {
-        if (isAdminRoute) {
-            window.dispatchEvent(new CustomEvent('admin-sidebar:toggle'));
-            return;
-        }
         setIsMobileMenuOpen(true);
     };
 
@@ -155,11 +151,11 @@ const NavBar = () => {
                                 {/* ── Admin links ── */}
                                 {isAdmin ? (
                                     <>
-                                        <Link to="/admin/dashboard" className={navLinkClass('/admin/dashboard')}>
-                                            Dashboard
-                                        </Link>
                                         <Link to="/" className={navLinkClass('/')}>
                                             Home
+                                        </Link>
+                                        <Link to="/cart" className={navLinkClass('/cart')}>
+                                            Collections
                                         </Link>
 
                                         {/* Admin Categories Dropdown */}
@@ -527,11 +523,11 @@ const NavBar = () => {
                         {/* ── Admin sidebar links ── */}
                         {isAdmin ? (
                             <>
-                                <Link to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/admin/dashboard')}>
-                                    Dashboard
-                                </Link>
                                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/')}>
                                     Home
+                                </Link>
+                                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
+                                    Collections
                                 </Link>
 
                                 {/* Collapsible Categories */}
@@ -722,7 +718,7 @@ const NavBar = () => {
                             <Link
                                 to="/cart"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-between px-4 py-3 text-base font-medium text-foreground hover:bg-muted bg-background rounded-md border border-border transition-colors focus:outline-none shadow-sm"
+                                className={`flex items-center px-4 py-3 text-base font-medium text-foreground hover:bg-muted bg-background rounded-md border border-border transition-colors focus:outline-none shadow-sm ${cartItemCount > 0 ? 'justify-between' : 'justify-center'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <svg className="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">

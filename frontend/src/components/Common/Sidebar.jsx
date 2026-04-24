@@ -44,7 +44,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <aside className="hidden lg:flex w-64 bg-white dark:bg-card h-[calc(100vh-72px)] flex-col border-r border-[#F4F5F7] dark:border-border sticky top-[72px] self-start overflow-y-auto">
+      <aside className="hidden lg:flex w-64 bg-card h-[calc(100vh-72px)] flex-col border-r border-border sticky top-[72px] self-start overflow-y-auto">
         <nav className="flex-1 pt-6">
           {NAVIGATION_ITEMS.map((item) => (
             <NavLink
@@ -54,15 +54,15 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `flex items-center gap-4 px-8 py-4 text-[14px] font-bold transition-all relative
                 ${isActive
-                  ? 'bg-[#F4F5FF] dark:bg-muted text-[#5542F6]'
-                  : 'text-[#92959E] dark:text-muted-foreground hover:text-[#5542F6] hover:bg-gray-50 dark:bg-muted'
+                  ? 'bg-primary/10 text-primary'
+                  : 'text-muted-foreground hover:text-primary hover:bg-muted'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   {isActive && (
-                    <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-primary text-primary-foreground" />
+                    <div className="absolute right-0 top-0 bottom-0 w-[3px] bg-primary" />
                   )}
                   <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
                   {item.text}
@@ -78,13 +78,13 @@ const Sidebar = () => {
         <>
           {isMobileSidebarOpen && (
             <div
-              className="lg:hidden fixed inset-0 bg-black/40 z-50"
+              className="lg:hidden fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50"
               onClick={() => setIsMobileSidebarOpen(false)}
               aria-hidden="true"
             />
           )}
 
-          <aside className={`lg:hidden fixed top-[72px] bottom-0 left-0 w-72 max-w-[85vw] bg-white dark:bg-card border-r border-[#F4F5F7] dark:border-border z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+          <aside className={`lg:hidden fixed top-[72px] bottom-0 left-0 w-72 max-w-[85vw] bg-card border-r border-border z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
             <div className="flex items-center justify-between px-4 py-3 border-b border-border">
               <h2 className="text-sm font-bold text-foreground">Admin Menu</h2>
               <button
@@ -109,8 +109,8 @@ const Sidebar = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 text-sm font-semibold transition-colors ${
                       isActive
-                        ? 'bg-[#F4F5FF] dark:bg-muted text-[#5542F6]'
-                        : 'text-[#92959E] dark:text-muted-foreground hover:text-[#5542F6] hover:bg-gray-50 dark:hover:bg-muted'
+                        ? 'bg-primary/10 text-primary'
+                        : 'text-muted-foreground hover:text-primary hover:bg-muted'
                     }`
                   }
                 >
@@ -128,7 +128,7 @@ const Sidebar = () => {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-destructive/30 text-destructive font-semibold hover:bg-destructive/10 transition-colors"
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-destructive text-destructive font-semibold hover:bg-destructive/10 transition-colors"
               >
                 <LogOut size={17} />
                 Log out
@@ -138,21 +138,6 @@ const Sidebar = () => {
         </>
       )}
 
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-card border-t border-[#F4F5F7] dark:border-border flex justify-around items-center py-3 z-50">
-        {NAVIGATION_ITEMS.map((item) => (
-          <NavLink
-            key={item.id}
-            to={item.to}
-            end={item.id === 'dashboard'}
-            className={({ isActive }) =>
-              `p-2 rounded-lg ${isActive ? 'text-[#5542F6] bg-[#F4F5FF] dark:bg-muted' : 'text-[#92959E] dark:text-muted-foreground'}`
-            }
-            aria-label={item.text}
-          >
-            {({ isActive }) => <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />}
-          </NavLink>
-        ))}
-      </nav>
     </>
   );
 };
