@@ -48,9 +48,15 @@ export const useProductStore = create((set, get) => ({
    */
   fetchProducts: async () => {
     const state = get();
-    if (state.products.length > 0) return state.products;
+    // If already loading, return the existing promise if it exists, or just wait
+    if (state.loading) {
+      // Small delay and retry if still loading, to handle concurrent calls
+      await new Promise(resolve => setTimeout(resolve, 100));
+      const newState = get();
+      if (newState.products.length > 0) return newState.products;
+    }
 
-    if (state.loading) return state.products;
+    if (state.products.length > 0) return state.products;
 
     set({ loading: true, error: null });
 
@@ -58,7 +64,7 @@ export const useProductStore = create((set, get) => ({
       // Fetch enough items to power local filtering/pagination
       const result = await apiRequest("/api/products?limit=100");
       const products = result?.products || [];
-      const total = result?.total ?? products.length;
+      const total = result?.total || products.length;
 
       set({
         products,

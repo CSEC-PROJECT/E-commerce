@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import { apiRequest } from '../lib/apiClient';
 import ProductCard from '../components/ProductCard';
+import AICurator from '../components/AICurator';
 import useCartStore from '../store/cartStore';
 import { useAuthStore } from '../store/authStore';
 import toast from 'react-hot-toast';
@@ -599,6 +600,7 @@ const DetailsPage = () => {
     <div className="border-t border-border bg-muted/20">
       <RelatedProductsSection category={category} />
     </div>
+    {/* <AICurator page="product" productId={id} /> */}
   </main>
 )};
 

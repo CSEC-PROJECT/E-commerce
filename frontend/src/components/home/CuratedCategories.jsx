@@ -9,7 +9,6 @@ import { useProductStore } from "../../store/productStore";
 export default function CuratedCategories() {
   const products = useProductStore((state) => state.products);
   
-  // Extract unique categories from products
   const uniqueCategories = [...new Set(products.filter(p => p.category).map(p => p.category))];
   
   const baseCategories = [
@@ -36,7 +35,7 @@ export default function CuratedCategories() {
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-end mb-12">
           <div>
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-gray-900 tracking-tight">Curated Categories</h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-3 text-foreground tracking-tight">Curated Categories</h2>
             <p className="text-gray-500 text-base md:text-lg font-medium">Explore the range, tailored for you.</p>
           </div>
           <Link

@@ -15,6 +15,7 @@ import paymentRoutes from "./routes/payment.route.js"
 import successMessage from './routes/payCheck.route.js';
 import dashboardAdminRoutes from "./routes/admin/dashboard.route.js";
 import financeAdminRoutes from "./routes/admin/finance.route.js";
+import ragRoutes from "./routes/rag.route.js";
 
 
 import swaggerUi from "swagger-ui-express";
@@ -44,12 +45,10 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.indexOf(origin) === -1) {
-      // If the origin isn't present in allowedOrigins, it's blocked
-      // We can also just return true here during dev
+
       return callback(null, true); 
     }
     return callback(null, true);
@@ -79,6 +78,7 @@ app.use("/api/pay",paymentRoutes)
 app.use("/checkout",successMessage)
 app.use("/api/admin/dashboard", dashboardAdminRoutes);
 app.use("/api/admin/finance", financeAdminRoutes);
+app.use("/api/rag", ragRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

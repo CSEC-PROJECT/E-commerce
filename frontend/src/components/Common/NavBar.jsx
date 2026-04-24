@@ -27,10 +27,8 @@ const NavBar = () => {
 
     const products = useProductStore((state) => state.products);
     
-    // Standard backend categories as requested
     const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
     
-    // Dynamic categories from products (merging standard + any extra from DB)
     const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
     const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
     
@@ -73,7 +71,6 @@ const NavBar = () => {
         }
     };
 
-    // Detect active category from URL for navbar highlight
     const searchParams = new URLSearchParams(location.search);
     const activeCategory = searchParams.get('category') || '';
     const isCategoryActive = location.pathname === '/products' && activeCategory !== '';
@@ -149,211 +146,69 @@ const NavBar = () => {
         <>
             <nav className="bg-background border-b border-border sticky top-0 z-40">
                 <div className="w-full px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-[72px]">
-
+                    <div className="flex justify-between items-center h-[72px] gap-4">
                         {/* Left Section: Logo & Nav Links */}
-                        <div className="flex items-center gap-8 lg:gap-14 pl-2 lg:pl-4">
+                        <div className="flex items-center gap-6 lg:gap-10 flex-shrink-0">
                             {/* Logo */}
                             <Link to="/" className="flex items-center outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
-                                <span className="text-[26px] font-black tracking-tight text-foreground whitespace-nowrap">
+                                <span className="text-2xl font-black tracking-tight text-foreground whitespace-nowrap">
                                     E-Shop
                                 </span>
                             </Link>
 
-                            {/* Desktop Nav */}
-                            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center h-full">
-
-                                {/* ── Admin links ── */}
+                            {/* Desktop Nav Links */}
+                            <div className="hidden md:flex items-center space-x-5 lg:space-x-7 h-full">
                                 {isAdmin ? (
                                     <>
-                                        <Link to="/admin/dashboard" className={navLinkClass('/admin/dashboard')}>
-                                            Dashboard
-                                        </Link>
-                                        <Link to="/" className={navLinkClass('/')}>
-                                            Home
-                                        </Link>
-
-                                        {/* Admin Categories Dropdown */}
-                                        <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
-                                                Categories
-                                                <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </button>
-                                            <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
-                                                <div className="px-3 py-1.5 mb-1">
-                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Shop by Category</span>
-                                                </div>
-                                                {CATEGORIES.map((cat) => (
-                                                    <button
-                                                        key={cat.value}
-                                                        onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
-                                                    >
-                                                        {activeCategory === cat.value && (
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                                                        )}
-                                                        {cat.label}
-                                                    </button>
-                                                ))}
-                                                <div className="border-t border-border mt-2 pt-2 px-4">
-                                                    <Link
-                                                        to="/products"
-                                                        className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
-                                                    >
-                                                        View All Products
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <Link to="/products" className={navLinkClass('/products')}>
-                                            Products
-                                        </Link>
-                                        <Link to="/about" className={navLinkClass('/about')}>
-                                            About Us
-                                        </Link>
-                                    </>
-                                ) : !accessToken ? (
-                                    /* ── Landing Page (Not logged in) links ── */
-                                    <>
-                                        <Link to="/" className={navLinkClass('/')}>
-                                            Home
-                                        </Link>
-
+                                        <Link to="/admin/dashboard" className={navLinkClass('/admin/dashboard')}>Dashboard</Link>
+                                        <Link to="/" className={navLinkClass('/')}>Home</Link>
                                         {/* Categories Dropdown */}
                                         <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
+                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${isCategoryActive ? 'text-primary border-b-[2.5px] border-primary h-full' : 'text-muted-foreground hover:text-primary'}`}>
                                                 Categories
                                                 <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </button>
                                             <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
-                                                <div className="px-3 py-1.5 mb-1">
-                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Shop by Category</span>
-                                                </div>
                                                 {CATEGORIES.map((cat) => (
-                                                    <button
-                                                        key={cat.value}
-                                                        onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
-                                                    >
-                                                        {activeCategory === cat.value && (
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                                                        )}
-                                                        {cat.label}
-                                                    </button>
+                                                    <button key={cat.value} onClick={() => handleCategoryNav(cat.value)} className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-muted hover:text-primary transition-colors">{cat.label}</button>
                                                 ))}
-                                                <div className="border-t border-border mt-2 pt-2 px-4">
-                                                    <Link
-                                                        to="/products"
-                                                        className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
-                                                    >
-                                                        View All Products
-                                                    </Link>
-                                                </div>
                                             </div>
                                         </div>
-
-                                        <Link to="/products" className={navLinkClass('/products')}>
-                                            Products
-                                        </Link>
-                                        <Link to="/cart" className={navLinkClass('/cart')}>
-                                            Collections
-                                        </Link>
-                                        <Link to="/about" className={navLinkClass('/about')}>
-                                            About Us
-                                        </Link>
+                                        <Link to="/products" className={navLinkClass('/products')}>Products</Link>
+                                        <Link to="/about" className={navLinkClass('/about')}>About</Link>
                                     </>
                                 ) : (
-                                    /* ── User links ── */
                                     <>
-                                        <Link to="/" className={navLinkClass('/')}>
-                                            Home
-                                        </Link>
-
-                                        {/* User Categories Dropdown */}
+                                        <Link to="/" className={navLinkClass('/')}>Home</Link>
                                         <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
+                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${isCategoryActive ? 'text-primary border-b-[2.5px] border-primary h-full' : 'text-muted-foreground hover:text-primary'}`}>
                                                 Categories
                                                 <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </button>
                                             <div className="absolute top-full left-0 hidden group-hover:block w-52 bg-card border border-border rounded-xl shadow-xl py-2 z-50">
-                                                <div className="px-3 py-1.5 mb-1">
-                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Shop by Category</span>
-                                                </div>
                                                 {CATEGORIES.map((cat) => (
-                                                    <button
-                                                        key={cat.value}
-                                                        onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
-                                                    >
-                                                        {activeCategory === cat.value && (
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
-                                                        )}
-                                                        {cat.label}
-                                                    </button>
+                                                    <button key={cat.value} onClick={() => handleCategoryNav(cat.value)} className="w-full text-left px-4 py-2.5 text-sm font-medium hover:bg-muted hover:text-primary transition-colors">{cat.label}</button>
                                                 ))}
-                                                <div className="border-t border-border mt-2 pt-2 px-4">
-                                                    <Link
-                                                        to="/products"
-                                                        className="text-xs font-semibold text-primary hover:opacity-80 transition-opacity"
-                                                    >
-                                                        View All Products
-                                                    </Link>
-                                                </div>
                                             </div>
                                         </div>
-
-                                        <Link to="/products" className={navLinkClass('/products')}>
-                                            Products
-                                        </Link>
-                                        <Link to="/cart" className={navLinkClass('/cart')}>
-                                            Collections
-                                        </Link>
-                                        <Link to="/about" className={navLinkClass('/about')}>
-                                            About Us
-                                        </Link>
+                                        <Link to="/products" className={navLinkClass('/products')}>Products</Link>
+                                        <Link to="/cart" className={navLinkClass('/cart')}>Collections</Link>
+                                        <Link to="/about" className={navLinkClass('/about')}>About</Link>
                                     </>
                                 )}
                             </div>
                         </div>
 
-                        {/* Right Section: Actions */}
-                        <div className="flex items-center justify-end gap-5 sm:gap-6 flex-1 pr-2 lg:pr-4">
-
+                        {/* Right Section: Search & Actions */}
+                        <div className="flex items-center justify-end gap-4 sm:gap-6 flex-1">
                             {/* Search Bar */}
-                            <div className="hidden lg:block flex-1 max-w-[280px] xl:max-w-[340px] relative">
+                            <div className="hidden lg:block w-full max-w-[240px] xl:max-w-[300px] relative">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg className="h-[16px] w-[16px] text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
                                 </div>
@@ -363,110 +218,88 @@ const NavBar = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearchSubmit}
-                                    className="w-full pl-9 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted border border-transparent rounded-[8px] text-[15px] text-foreground placeholder-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
+                                    className="w-full pl-9 pr-4 py-2 bg-muted border border-transparent rounded-lg text-sm focus:outline-none focus:bg-background focus:border-primary transition-all font-medium"
                                 />
                             </div>
 
-                            {/* Cart Icon – visible for non-admin users */}
-                            {!isAdmin && (
-                                <Link to="/cart" className="relative text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md" aria-label="Cart">
-                                    <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    {cartItemCount > 0 && (
-                                        <span className="absolute -top-2 -right-2.5 flex h-[20px] w-[20px] items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground border-[2.5px] border-background">
-                                            {cartItemCount}
-                                        </span>
-                                    )}
-                                </Link>
-                            )}
-
-                            {/* Dark / Light Mode Toggle – both User & Admin */}
-                            <button
-                                onClick={toggleDarkMode}
-                                className="text-foreground/80 hover:text-primary transition-all duration-300 focus:outline-none hidden sm:flex items-center justify-center w-9 h-9 rounded-lg hover:bg-muted cursor-pointer"
-                                aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-                            >
-                                {isDark ? (
-                                    <svg className="h-[22px] w-[22px] transition-transform duration-300 rotate-0 hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
-                                        <circle cx="12" cy="12" r="5" />
-                                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-                                    </svg>
-                                ) : (
-                                    <svg className="h-[22px] w-[22px] fill-current transition-transform duration-300" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-                                    </svg>
-                                )}
-                            </button>
-
-                            {/* Desktop User menu – always visible */}
-                            <div className="hidden md:block relative" ref={userMenuRef}>
-                                {accessToken ? (
-                                    <>
-                                        <button
-                                            type="button"
-                                            onClick={() => setUserMenuOpen((o) => !o)}
-                                            className="flex items-center justify-center w-10 h-10 border-[1.5px] border-none text-primary hover:bg-primary/5 rounded-[8px] transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background cursor-pointer"
-                                            aria-expanded={userMenuOpen}
-                                            aria-haspopup="menu"
-                                            aria-label="Account menu"
-                                        >
-                                            <User size={20} />
-                                        </button>
-                                        {userMenuOpen && (
-                                            <div
-                                                role="menu"
-                                                className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg z-50"
-                                            >
-                                                {/* My Products – User only */}
-                                                {!isAdmin && (
-                                                    <Link
-                                                        to="/my-products"
-                                                        role="menuitem"
-                                                        onClick={() => setUserMenuOpen(false)}
-                                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
-                                                    >
-                                                        <Package size={16} />
-                                                        My products
-                                                    </Link>
-                                                )}
-                                                <button
-                                                    type="button"
-                                                    role="menuitem"
-                                                    onClick={handleLogout}
-                                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold hover:bg-muted cursor-pointer"
-                                                >
-                                                    <LogOut size={16} />
-                                                    Log out
-                                                </button>
-                                            </div>
-                                        )}
-                                    </>
-                                ) : (
-                                    <Link
-                                        to="/login"
-                                        className="flex items-center gap-1.5 px-3 py-2 border-[1.5px] border-primary/40 text-primary hover:bg-primary/5 rounded-[6px] text-[15px] font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 focus:ring-offset-background"
-                                    >
-                                        <svg className="h-[18px] w-[18px] stroke-[2.5px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <div className="flex items-center gap-4 sm:gap-5 flex-shrink-0">
+                                {/* Cart Icon */}
+                                {!isAdmin && (
+                                    <Link to="/cart" className="relative text-foreground hover:text-primary transition-colors p-1" aria-label="Cart">
+                                        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                         </svg>
-                                        Sign in
+                                        {cartItemCount > 0 && (
+                                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground">
+                                                {cartItemCount}
+                                            </span>
+                                        )}
                                     </Link>
                                 )}
-                            </div>
 
-                            {/* Mobile menu button */}
-                            <button
-                                onClick={handleMobileMenuButton}
-                                className={`${isAdminRoute ? 'lg:hidden' : 'md:hidden'} p-2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md transition-colors`}
-                                aria-expanded={isMobileMenuOpen}
-                                aria-label="Open navigation menu"
-                            >
-                                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            </button>
+                                {/* Dark / Light Mode Toggle */}
+                                <button
+                                    onClick={toggleDarkMode}
+                                    className="text-foreground/80 hover:text-primary transition-all p-2 rounded-lg hover:bg-muted cursor-pointer"
+                                    aria-label="Toggle theme"
+                                >
+                                    {isDark ? (
+                                        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+                                            <circle cx="12" cy="12" r="5" />
+                                            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                                        </svg>
+                                    ) : (
+                                        <svg className="h-5 w-5 fill-current" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+                                        </svg>
+                                    )}
+                                </button>
+
+                                {/* User profile / Sign in */}
+                                <div className="flex items-center" ref={userMenuRef}>
+                                    {accessToken ? (
+                                        <div className="relative">
+                                            <button
+                                                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                                                className="flex items-center justify-center w-9 h-9 text-primary hover:bg-primary/5 rounded-lg transition-colors cursor-pointer"
+                                            >
+                                                <User size={20} />
+                                            </button>
+                                            {userMenuOpen && (
+                                                <div className="absolute right-0 mt-2 w-48 rounded-xl border border-border bg-card py-1 shadow-lg z-50 overflow-hidden">
+                                                    {!isAdmin && (
+                                                        <Link to="/my-products" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2 px-4 py-2 text-sm font-semibold hover:bg-muted">
+                                                            <Package size={16} /> My products
+                                                        </Link>
+                                                    )}
+                                                    <button onClick={handleLogout} className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm font-semibold hover:bg-muted text-error">
+                                                        <LogOut size={16} /> Log out
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <Link
+                                            to="/login"
+                                            className="flex items-center gap-1.5 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-bold hover:bg-primary/90 transition-all shadow-sm"
+                                        >
+                                            Sign in
+                                        </Link>
+                                    )}
+                                </div>
+                                
+                                {/* Mobile menu button - inside Right Section but only visible on mobile */}
+                                <button
+                                    onClick={handleMobileMenuButton}
+                                    className={`${isAdminRoute ? 'lg:hidden' : 'md:hidden'} p-2 -mr-2 text-muted-foreground hover:text-foreground focus:outline-none rounded-md transition-colors`}
+                                    aria-expanded={isMobileMenuOpen}
+                                    aria-label="Open navigation menu"
+                                >
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

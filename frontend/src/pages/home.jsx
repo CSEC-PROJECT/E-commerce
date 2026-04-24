@@ -46,11 +46,11 @@ const HomeProductCard = ({ product }) => {
       {/* Content */}
       <div className="flex flex-col flex-grow px-1">
         <div className="flex justify-between items-start mb-1">
-          <span className="text-[10px] font-bold uppercase tracking-widest text-yellow-400text-primary">
+          <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
             {product.category || "New"}
           </span>
           <span className="text-xl font-black text-primary">
-            ETB {price?.toFixed(2)}
+            ETB {typeof price === 'number' ? price.toFixed(2) : '0.00'}
           </span>
         </div>
         
@@ -162,7 +162,6 @@ export default function Home() {
 
       <CuratedCategories />
 
-      {/* Product Selection Section using Card2 mapped from API */}
       <section className="bg-muted/30 py-28 px-4 md:px-8">
         <div className="container mx-auto max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-end mb-14">
@@ -213,7 +212,7 @@ export default function Home() {
 
       <Newsletter />
 
-      <AICurator />
+      <AICurator page="home" />
     </div>
   );
 }

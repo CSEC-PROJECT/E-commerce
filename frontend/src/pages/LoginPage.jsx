@@ -21,6 +21,8 @@ export default function LoginPage() {
     }
   }, [searchParams]);
 
+  const verifyNotice = searchParams.get("verifyNotice") === "true";
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -39,7 +41,7 @@ export default function LoginPage() {
 
       const role = result?.data?.role || "";
       const isAdmin = Array.isArray(role) ? role.includes("admin") : role === "admin";
-      
+
       const from = location.state?.from?.pathname || "/";
 
       if (isAdmin) {
@@ -63,6 +65,12 @@ export default function LoginPage() {
             </p>
           </div>
 
+          {verifyNotice && (
+            <div className="mb-4 p-3 rounded-md bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+              Please verify your email address — we sent a verification link to the email you provided. You must verify before signing in.
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6 mt-8 animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
             <div className="space-y-4">
               <div>
@@ -82,7 +90,7 @@ export default function LoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary h-11 transition-all"
+                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                     placeholder="name@example.com"
                   />
                 </div>
@@ -110,7 +118,7 @@ export default function LoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary h-11 transition-all"
+                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                     placeholder="••••••••"
                   />
                 </div>

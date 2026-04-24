@@ -34,6 +34,8 @@ const Spinner = () => (
 );
 
 const TransactionStatusPage = () => {
+        // Modal state for receipt
+        const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [searchParams] = useSearchParams();
     const { accessToken } = useAuthStore();
     const clearCart = useCartStore((s) => s.clearCart);
@@ -89,6 +91,53 @@ const TransactionStatusPage = () => {
         verify();
     }, [searchParams, accessToken]);
 
+    // Receipt modal component
+    const ReceiptModal = () => (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
+                <button
+                    className="absolute top-3 right-3 text-lg font-bold text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200"
+                    onClick={() => setShowReceiptModal(false)}
+                    aria-label="Close receipt"
+                >
+                    &times;
+                </button>
+                <h2 className="text-xl font-bold mb-4 text-center text-emerald-600">Payment Receipt</h2>
+                {txRef && (
+                    <div className="bg-muted/60 rounded-xl p-4 mb-4 text-left border border-border/50">
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                            Transaction Reference
+                        </p>
+                        <p className="font-mono text-sm text-foreground break-all">{txRef}</p>
+                    </div>
+                )}
+                {details?.amount && (
+                    <div className="flex items-center justify-center gap-2 bg-emerald-500/10 rounded-xl p-4 mb-4 border border-emerald-500/20">
+                        <span className="text-muted-foreground text-sm font-medium">Amount Paid</span>
+                        <span className="text-xl font-black text-emerald-500">
+                            {details.currency || 'ETB'} {Number(details.amount).toLocaleString()}
+                        </span>
+                    </div>
+                )}
+                {details?.email && (
+                    <div className="mb-2 text-sm text-muted-foreground">Email: <span className="font-mono text-foreground">{details.email}</span></div>
+                )}
+                {details?.customer_name && (
+                    <div className="mb-2 text-sm text-muted-foreground">Customer: <span className="font-mono text-foreground">{details.customer_name}</span></div>
+                )}
+                {details?.createdAt && (
+                    <div className="mb-2 text-sm text-muted-foreground">Date: <span className="font-mono text-foreground">{new Date(details.createdAt).toLocaleString()}</span></div>
+                )}
+                <div className="mt-6 flex justify-center">
+                    <button onClick={() => window.print()} className="flex-1 px-4 py-2 bg-foreground text-background rounded-lg font-bold hover:bg-foreground/90 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl">
+                        <Download className="w-5 h-5" />
+                        Save / Print
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+
     const renderContent = () => {
         switch (status) {
             case 'loading':
@@ -119,25 +168,14 @@ const TransactionStatusPage = () => {
                             Your payment was successful. Your order is now being processed and you'll receive a confirmation email shortly.
                         </p>
 
-                        {/* Transaction reference badge */}
-                        {txRef && (
-                            <div className="bg-muted/60 rounded-xl p-4 mb-4 text-left border border-border/50">
-                                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                    Transaction Reference
-                                </p>
-                                <p className="font-mono text-sm text-foreground break-all">{txRef}</p>
-                            </div>
-                        )}
-
-                        {/* Amount paid */}
-                        {details?.amount && (
-                            <div className="flex items-center justify-center gap-2 bg-emerald-500/10 rounded-xl p-4 mb-6 border border-emerald-500/20">
-                                <span className="text-muted-foreground text-sm font-medium">Amount Paid</span>
-                                <span className="text-xl font-black text-emerald-500">
-                                    {details.currency || 'ETB'} {Number(details.amount).toLocaleString()}
-                                </span>
-                            </div>
-                        )}
+                        <div className="flex flex-col items-center gap-3 mb-6">
+                            <button
+                                className="bg-emerald-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-emerald-600 transition-all shadow"
+                                onClick={() => setShowReceiptModal(true)}
+                            >
+                                View Payment Receipt
+                            </button>
+                        </div>
 
                         <div className="flex flex-col sm:flex-row gap-3 justify-center">
                             <Link
@@ -153,6 +191,7 @@ const TransactionStatusPage = () => {
                                 Go to Homepage
                             </Link>
                         </div>
+                        {showReceiptModal && <ReceiptModal />}
                     </>
                 );
 
@@ -236,11 +275,10 @@ const TransactionStatusPage = () => {
             {/* Subtle background glow */}
             <div className="fixed inset-0 pointer-events-none overflow-hidden">
                 <div
-                    className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-20 transition-colors duration-1000 ${
-                        status === 'success' ? 'bg-emerald-500' :
-                        status === 'failed' ? 'bg-red-500' :
-                        status === 'loading' ? 'bg-primary' : 'bg-amber-500'
-                    }`}
+                    className={`absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] rounded-full blur-3xl opacity-20 transition-colors duration-1000 ${status === 'success' ? 'bg-emerald-500' :
+                            status === 'failed' ? 'bg-red-500' :
+                                status === 'loading' ? 'bg-primary' : 'bg-amber-500'
+                        }`}
                 />
             </div>
 
