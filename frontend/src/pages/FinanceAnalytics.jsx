@@ -523,7 +523,7 @@ const FinanceAnalytics = ({ embedded = false }) => {
                   <div className={`w-11.5 h-11.5 rounded-[16px] flex items-center justify-center ${card.iconBg} bg-opacity-80`}>
                     <card.icon className={`w-5.5 h-5.5 ${card.iconColor}`} fill="none" strokeWidth={2.5} />
                   </div>
-                  <div className={`px-2.5 py-1 rounded-full text-[12px] font-bold flex items-center gap-1.5 ${isUp ? 'bg-chart-3 text-chart-5' : 'bg-chart-4 text-destructive-foreground'}`}>
+                  <div className={`px-2.5 py-1 rounded-full text-[12px] font-bold flex items-center gap-1.5 ${isUp ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300'}`}>
                     {isUp ? <TrendingUp className="w-3.5 h-3.5" strokeWidth={2.5} /> : <TrendingDown className="w-3.5 h-3.5" strokeWidth={2.5} />}
                     {card.change}
                   </div>
@@ -791,16 +791,16 @@ const FinanceAnalytics = ({ embedded = false }) => {
                 const isPending = s.label === 'Pending';
                 return (
                   <div className={`flex items-center gap-3 rounded-2xl px-5 py-4 ${
-                    isSuccess ? 'bg-green-500/10 border border-green-500/20' :
-                    isPending ? 'bg-yellow-500/10 border border-yellow-500/20' :
-                    'bg-red-500/10 border border-red-500/20'
+                    isSuccess ? 'bg-success/10 border border-success/20' :
+                    isPending ? 'bg-warning/10 border border-warning/20' :
+                    'bg-error/10 border border-error/20'
                   }`}>
                     {isSuccess ? (
-                      <CheckCircle2 className="w-7 h-7 text-green-500 shrink-0" />
+                      <CheckCircle2 className="w-7 h-7 text-success shrink-0" />
                     ) : isPending ? (
-                      <AlertCircle className="w-7 h-7 text-yellow-500 shrink-0" />
+                      <AlertCircle className="w-7 h-7 text-warning-foreground shrink-0" />
                     ) : (
-                      <XCircle className="w-7 h-7 text-red-500 shrink-0" />
+                      <XCircle className="w-7 h-7 text-error shrink-0" />
                     )}
                     <div>
                       <p className={`text-lg font-black ${s.textClass}`}>{s.label}</p>

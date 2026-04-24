@@ -180,7 +180,7 @@ const AdminDashboard = () => {
                 <span className="text-[11px] font-bold tracking-widest uppercase">LIVE NOW</span>
               </div>
               <h2 className="text-[48px] md:text-[56px] font-bold mt-4 leading-none">---</h2>
-              <p className="text-[14px] opacity-70 mb-10">Users browsing the store</p>
+              <p className="text-sm opacity-70 mb-10">Users browsing the store</p>
               <div className="flex gap-1.5 items-end h-16">
                 {[40, 25, 45, 90, 35, 40].map((h, i) => (
                   <div key={i} className={`flex-1 rounded-md ${i === 3 ? 'bg-card' : 'bg-card/30'}`} style={{ height: `${h}%` }} />

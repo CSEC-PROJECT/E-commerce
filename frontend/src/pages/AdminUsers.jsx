@@ -86,8 +86,7 @@ const AdminUsers = () => {
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
       <Sidebar />
       <main className="flex-1 p-6 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
-        {/* Search Bar - Custom Addition */}
-        <div className="mt-0 mb-4">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="relative max-w-md w-full">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
               <Search className="w-5 h-5" />
@@ -100,6 +99,13 @@ const AdminUsers = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          <button
+            onClick={handleExport}
+            className="cursor-pointer flex items-center gap-2 bg-primary/10 text-primary px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-primary/20 active:scale-95 transition-all shadow-sm"
+          >
+            <DownloadCloud size={18} />
+            Export Report
+          </button>
         </div>
 
         {/* Stat Cards */}
@@ -111,7 +117,7 @@ const AdminUsers = () => {
             trendingInfo="vs last month"
             icon={UserPlus}
             iconBg="bg-primary/10 dark:bg-primary/10"
-            iconColor="text-[#5542F6] dark:text-indigo-400"
+            iconColor="text-primary dark:text-primary"
           />
           <StatCard
             title="New Users"
@@ -119,8 +125,8 @@ const AdminUsers = () => {
             change=""
             trendingInfo="ACTIVE NOW"
             icon={UsersIcon}
-            iconBg="bg-green-50 dark:bg-green-500/10"
-            iconColor="text-green-500 dark:text-green-400"
+            iconBg="bg-success/10"
+            iconColor="text-success"
           />
           <StatCard
             title="Total Visits"
@@ -128,7 +134,7 @@ const AdminUsers = () => {
             change=""
             trendingInfo="Daily average"
             icon={MousePointerClick}
-            iconBg="bg-muted dark:bg-gray-500/10"
+            iconBg="bg-muted"
             iconColor="text-muted-foreground dark:text-muted-foreground"
           />
         </div>
