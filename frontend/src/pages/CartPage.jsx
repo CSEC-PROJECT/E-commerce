@@ -5,16 +5,21 @@ import CartItem from '../components/carts/CartItem';
 import OrderSummary from '../components/carts/OrderSummary';
 import useCartStore from '../store/cartStore';
 import { apiRequest } from '../lib/apiClient';
+import { useAuthStore } from '../store/authStore';
 
 const CartPage = () => {
     const { cart, getCart, updateQuantity, removeFromCart } = useCartStore();
+    const accessToken = useAuthStore((state) => state.accessToken);
+    const isLoggedIn = Boolean(accessToken);
     const [suggestions, setSuggestions] = useState([]);
 
     useEffect(() => {
-        getCart();
-    }, []);
+        if (accessToken) {
+            getCart();
+        }
+    }, [accessToken, getCart]);
 
-    const cartItems = cart?.items || [];
+    const cartItems = isLoggedIn ? (cart?.items || []) : [];
     
     // Fetch suggestions based on the first item's category
     useEffect(() => {
@@ -114,14 +119,16 @@ const CartPage = () => {
                         )}
                     </div>
 
-                    <div className="w-full lg:w-100">
-                        <OrderSummary 
-                            subtotal={subtotal} 
-                            tax={tax} 
-                            total={total} 
-                            cartItems={cartItems} 
-                        />
-                    </div>
+                    {isLoggedIn && (
+                        <div className="w-full lg:w-100">
+                            <OrderSummary 
+                                subtotal={subtotal} 
+                                tax={tax} 
+                                total={total} 
+                                cartItems={cartItems} 
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 

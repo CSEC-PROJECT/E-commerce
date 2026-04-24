@@ -1,22 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { User, Package, LogOut, LayoutDashboard } from 'lucide-react';
+import { User, Package, LogOut, LayoutDashboard, Lock } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import { useModalStore } from '../../store/modalStore';
 import toast from 'react-hot-toast';
 import useCartStore from '../../store/cartStore';
 import { useProductStore } from '../../store/productStore';
+import useThemeStore from '../../store/themeStore';
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isMobileCategoryOpen, setIsMobileCategoryOpen] = useState(false);
-    const [isDark, setIsDark] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        const saved = localStorage.getItem('theme');
-        const dark = saved === 'dark';
-        if (dark) document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
-        return dark;
-    });
+    const { theme, setTheme } = useThemeStore();
+    const isDark = theme === 'dark';
     const location = useLocation();
     const navigate = useNavigate();
     const accessToken = useAuthStore((state) => state.accessToken);
@@ -24,23 +20,24 @@ const NavBar = () => {
     const logout = useAuthStore((state) => state.logout);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const userMenuRef = useRef(null);
+    const { openChangePassword } = useModalStore();
 
     const products = useProductStore((state) => state.products);
-    
+
     // Standard backend categories as requested
     const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
-    
+
     // Dynamic categories from products (merging standard + any extra from DB)
     const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
     const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
-    
+
     const CATEGORIES = uniqueCategories.map(c => ({ label: c, value: c }));
 
     const [searchQuery, setSearchQuery] = useState('');
 
-    const isAdmin = Array.isArray(user?.role)
+    const isAdmin = !!accessToken && (Array.isArray(user?.role)
         ? user.role.includes('admin')
-        : user?.role === 'admin';
+        : user?.role === 'admin');
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -94,15 +91,7 @@ const NavBar = () => {
 
     // Dark mode toggle
     const toggleDarkMode = () => {
-        const newDark = !isDark;
-        setIsDark(newDark);
-        if (newDark) {
-            document.documentElement.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-        }
+        setTheme(isDark ? 'light' : 'dark');
     };
 
     // Prevent body scrolling when drawer is open
@@ -118,6 +107,11 @@ const NavBar = () => {
     }, [isMobileMenuOpen]);
 
     const isActive = (path) => location.pathname === path;
+    const isAdminRoute = location.pathname.startsWith('/admin');
+
+    const handleMobileMenuButton = () => {
+        setIsMobileMenuOpen(true);
+    };
 
     // Do not render NavBar on Login or Signup pages
     if (location.pathname === '/login' || location.pathname === '/signup') {
@@ -157,20 +151,19 @@ const NavBar = () => {
                                 {/* ── Admin links ── */}
                                 {isAdmin ? (
                                     <>
-                                        <Link to="/admin/dashboard" className={navLinkClass('/admin/dashboard')}>
-                                            Dashboard
-                                        </Link>
                                         <Link to="/" className={navLinkClass('/')}>
                                             Home
+                                        </Link>
+                                        <Link to="/cart" className={navLinkClass('/cart')}>
+                                            Collections
                                         </Link>
 
                                         {/* Admin Categories Dropdown */}
                                         <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
+                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${isCategoryActive
+                                                ? 'text-primary border-b-[2.5px] border-primary h-full'
+                                                : 'text-muted-foreground hover:text-primary'
+                                                }`}>
                                                 Categories
                                                 <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
@@ -184,11 +177,10 @@ const NavBar = () => {
                                                     <button
                                                         key={cat.value}
                                                         onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
+                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${activeCategory === cat.value
+                                                            ? 'text-primary bg-primary/8 font-semibold'
+                                                            : 'text-foreground hover:bg-muted hover:text-primary'
+                                                            }`}
                                                     >
                                                         {activeCategory === cat.value && (
                                                             <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -223,11 +215,10 @@ const NavBar = () => {
 
                                         {/* Categories Dropdown */}
                                         <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
+                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${isCategoryActive
+                                                ? 'text-primary border-b-[2.5px] border-primary h-full'
+                                                : 'text-muted-foreground hover:text-primary'
+                                                }`}>
                                                 Categories
                                                 <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
@@ -241,11 +232,10 @@ const NavBar = () => {
                                                     <button
                                                         key={cat.value}
                                                         onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
+                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${activeCategory === cat.value
+                                                            ? 'text-primary bg-primary/8 font-semibold'
+                                                            : 'text-foreground hover:bg-muted hover:text-primary'
+                                                            }`}
                                                     >
                                                         {activeCategory === cat.value && (
                                                             <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -267,6 +257,9 @@ const NavBar = () => {
                                         <Link to="/products" className={navLinkClass('/products')}>
                                             Products
                                         </Link>
+                                        <Link to="/cart" className={navLinkClass('/cart')}>
+                                            Collections
+                                        </Link>
                                         <Link to="/about" className={navLinkClass('/about')}>
                                             About Us
                                         </Link>
@@ -280,11 +273,10 @@ const NavBar = () => {
 
                                         {/* User Categories Dropdown */}
                                         <div className="relative group h-[72px] flex items-center">
-                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${
-                                                isCategoryActive
-                                                    ? 'text-primary border-b-[2.5px] border-primary h-full'
-                                                    : 'text-muted-foreground hover:text-primary'
-                                            }`}>
+                                            <button className={`flex items-center px-1 text-[15px] font-semibold transition-colors ${isCategoryActive
+                                                ? 'text-primary border-b-[2.5px] border-primary h-full'
+                                                : 'text-muted-foreground hover:text-primary'
+                                                }`}>
                                                 Categories
                                                 <svg className="ml-1.5 h-3.5 w-3.5 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
@@ -298,11 +290,10 @@ const NavBar = () => {
                                                     <button
                                                         key={cat.value}
                                                         onClick={() => handleCategoryNav(cat.value)}
-                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
-                                                            activeCategory === cat.value
-                                                                ? 'text-primary bg-primary/8 font-semibold'
-                                                                : 'text-foreground hover:bg-muted hover:text-primary'
-                                                        }`}
+                                                        className={`w-full text-left flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${activeCategory === cat.value
+                                                            ? 'text-primary bg-primary/8 font-semibold'
+                                                            : 'text-foreground hover:bg-muted hover:text-primary'
+                                                            }`}
                                                     >
                                                         {activeCategory === cat.value && (
                                                             <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -355,8 +346,8 @@ const NavBar = () => {
                                 />
                             </div>
 
-                            {/* Cart Icon – Logged-in User only */}
-                            {(!isAdmin && accessToken) && (
+                            {/* Cart Icon – visible for non-admin users */}
+                            {!isAdmin && (
                                 <Link to="/cart" className="relative text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md" aria-label="Cart">
                                     <svg className="h-[25px] w-[25px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -405,7 +396,7 @@ const NavBar = () => {
                                         {userMenuOpen && (
                                             <div
                                                 role="menu"
-                                                className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card py-1 shadow-lg z-50"
+                                                className="absolute right-0 mt-2 w-64 rounded-[22px] border border-border bg-card p-2 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-200 origin-top-right"
                                             >
                                                 {/* My Products – User only */}
                                                 {!isAdmin && (
@@ -413,19 +404,36 @@ const NavBar = () => {
                                                         to="/my-products"
                                                         role="menuitem"
                                                         onClick={() => setUserMenuOpen(false)}
-                                                        className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+                                                        className="flex items-center gap-3 px-4 py-3 text-[14px] font-bold text-foreground hover:bg-primary/5 hover:text-primary rounded-[14px] transition-all duration-200"
                                                     >
-                                                        <Package size={16} />
+                                                        <Package size={18} className="opacity-70" />
                                                         My products
                                                     </Link>
                                                 )}
+
+                                                {/* Change Password – User & Admin */}
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
+                                                    onClick={() => {
+                                                        setUserMenuOpen(false);
+                                                        openChangePassword();
+                                                    }}
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-foreground hover:bg-primary/5 hover:text-primary rounded-[14px] transition-all duration-200 cursor-pointer"
+                                                >
+                                                    <Lock size={18} className="opacity-70" />
+                                                    Change Password
+                                                </button>
+
+                                                <div className="h-[1px] bg-border my-1 mx-2 opacity-50" />
+
                                                 <button
                                                     type="button"
                                                     role="menuitem"
                                                     onClick={handleLogout}
-                                                    className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-semibold hover:bg-muted cursor-pointer"
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-[14px] transition-all duration-200 cursor-pointer"
                                                 >
-                                                    <LogOut size={16} />
+                                                    <LogOut size={18} className="opacity-100" />
                                                     Log out
                                                 </button>
                                             </div>
@@ -446,8 +454,8 @@ const NavBar = () => {
 
                             {/* Mobile menu button */}
                             <button
-                                onClick={() => setIsMobileMenuOpen(true)}
-                                className="md:hidden p-2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md transition-colors"
+                                onClick={handleMobileMenuButton}
+                                className={`${isAdminRoute ? 'lg:hidden' : 'md:hidden'} p-2 text-muted-foreground hover:text-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md transition-colors`}
                                 aria-expanded={isMobileMenuOpen}
                                 aria-label="Open navigation menu"
                             >
@@ -515,11 +523,11 @@ const NavBar = () => {
                         {/* ── Admin sidebar links ── */}
                         {isAdmin ? (
                             <>
-                                <Link to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/admin/dashboard')}>
-                                    Dashboard
-                                </Link>
                                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/')}>
                                     Home
+                                </Link>
+                                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
+                                    Collections
                                 </Link>
 
                                 {/* Collapsible Categories */}
@@ -545,11 +553,10 @@ const NavBar = () => {
                                                 <button
                                                     key={cat.value}
                                                     onClick={() => { handleCategoryNav(cat.value); setIsMobileMenuOpen(false); }}
-                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-                                                        activeCategory === cat.value
-                                                            ? 'text-primary bg-primary/10 font-semibold'
-                                                            : 'text-muted-foreground hover:text-primary hover:bg-muted'
-                                                    }`}
+                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${activeCategory === cat.value
+                                                        ? 'text-primary bg-primary/10 font-semibold'
+                                                        : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                                                        }`}
                                                 >
                                                     {activeCategory === cat.value && (
                                                         <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -605,11 +612,10 @@ const NavBar = () => {
                                                 <button
                                                     key={cat.value}
                                                     onClick={() => { handleCategoryNav(cat.value); setIsMobileMenuOpen(false); }}
-                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-                                                        activeCategory === cat.value
-                                                            ? 'text-primary bg-primary/10 font-semibold'
-                                                            : 'text-muted-foreground hover:text-primary hover:bg-muted'
-                                                    }`}
+                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${activeCategory === cat.value
+                                                        ? 'text-primary bg-primary/10 font-semibold'
+                                                        : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                                                        }`}
                                                 >
                                                     {activeCategory === cat.value && (
                                                         <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -630,6 +636,9 @@ const NavBar = () => {
 
                                 <Link to="/products" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/products')}>
                                     Products
+                                </Link>
+                                <Link to="/cart" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/cart')}>
+                                    Collections
                                 </Link>
                                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
                                     About Us
@@ -665,11 +674,10 @@ const NavBar = () => {
                                                 <button
                                                     key={cat.value}
                                                     onClick={() => { handleCategoryNav(cat.value); setIsMobileMenuOpen(false); }}
-                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${
-                                                        activeCategory === cat.value
-                                                            ? 'text-primary bg-primary/10 font-semibold'
-                                                            : 'text-muted-foreground hover:text-primary hover:bg-muted'
-                                                    }`}
+                                                    className={`w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-md transition-colors ${activeCategory === cat.value
+                                                        ? 'text-primary bg-primary/10 font-semibold'
+                                                        : 'text-muted-foreground hover:text-primary hover:bg-muted'
+                                                        }`}
                                                 >
                                                     {activeCategory === cat.value && (
                                                         <span className="w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0" />
@@ -705,12 +713,12 @@ const NavBar = () => {
                 {/* Drawer Bottom Actions */}
                 <div className="p-6 border-t border-border bg-muted/30">
                     <div className="flex flex-col gap-4">
-                        {/* Cart link – Logged-in User only */}
-                        {(!isAdmin && accessToken) && (
+                        {/* Cart link – visible for non-admin users */}
+                        {!isAdmin && (
                             <Link
                                 to="/cart"
                                 onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-between px-4 py-3 text-base font-medium text-foreground hover:bg-muted bg-background rounded-md border border-border transition-colors focus:outline-none shadow-sm"
+                                className={`flex items-center px-4 py-3 text-base font-medium text-foreground hover:bg-muted bg-background rounded-md border border-border transition-colors focus:outline-none shadow-sm ${cartItemCount > 0 ? 'justify-between' : 'justify-center'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <svg className="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -731,20 +739,31 @@ const NavBar = () => {
                                 {/* My Products – User only */}
                                 {!isAdmin && (
                                     <Link
-                                        to="/products"
+                                        to="/my-products"
                                         onClick={() => setIsMobileMenuOpen(false)}
-                                        className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-foreground border border-border bg-background hover:bg-muted rounded-md transition-colors"
+                                        className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-foreground border border-border bg-background hover:bg-muted rounded-xl transition-colors"
                                     >
-                                        <Package size={18} />
+                                        <Package size={20} />
                                         My products
                                     </Link>
                                 )}
+
+                                {/* Change Password – User & Admin */}
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsMobileMenuOpen(false); openChangePassword(); }}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-foreground border border-border bg-background hover:bg-muted rounded-xl transition-colors"
+                                >
+                                    <Lock size={20} />
+                                    Change Password
+                                </button>
+
                                 <button
                                     type="button"
                                     onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
-                                    className="flex items-center justify-center gap-2 w-full px-4 py-3 text-base font-medium text-destructive border border-destructive/30 bg-background hover:bg-destructive/10 rounded-md transition-colors"
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors mt-2"
                                 >
-                                    <LogOut size={18} />
+                                    <LogOut size={20} />
                                     Log out
                                 </button>
                             </div>

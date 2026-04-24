@@ -5,9 +5,9 @@ import Sidebar from '../components/Common/Sidebar';
 import { useProducts } from '../hooks/useProducts';
 
 const StatusBadge = ({ status }) => {
-  let bgColor = "bg-green-100 dark:bg-green-900/30";
-  let textColor = "text-green-600 dark:text-green-400";
-  const upperStatus = status?.toUpperCase() || '';
+  let bgColor = "bg-muted";
+  let textColor = "text-muted-foreground";
+  const normalizedStatus = String(status || '').toLowerCase();
 
   if (upperStatus === "SLIGHTLY USED") {
     bgColor = "bg-amber-100 dark:bg-amber-900/30";
@@ -19,13 +19,15 @@ const StatusBadge = ({ status }) => {
 
   return (
     <span className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-wider capitalize ${bgColor} ${textColor}`}>
-      {status || 'Unknown'}
+      {status || 'unknown'}
     </span>
   );
 };
 
 const AdminProducts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const mainRef = useRef(null);
 
   // State Declarations
   const [activeTab, setActiveTab] = useState('All Product');
@@ -37,6 +39,13 @@ const AdminProducts = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 5;
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    if (mainRef.current) {
+      mainRef.current.scrollTo({ top: 0, behavior: 'auto' });
+    }
+  }, [location.key, currentPage]);
 
   const { products, loading, error, totalPages, deleteProduct } = useProducts({
     searchQuery,
@@ -80,7 +89,7 @@ const AdminProducts = () => {
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans">
       <Sidebar />
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
+      <main ref={mainRef} className="flex-1 p-4 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
 
         {/* Header */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -255,7 +264,7 @@ const AdminProducts = () => {
                     <th className="py-4">Created Date</th>
                     <th className="py-4">Price</th>
                     <th className="py-4">Order</th>
-                    <th className="py-4 text-center">Stock Status</th>
+                    <th className="py-4 text-center">Product Status</th>
                     <th className="py-4 pr-6 text-right">Action</th>
                   </tr>
                 </thead>
@@ -277,7 +286,7 @@ const AdminProducts = () => {
                           <td className="py-4 font-bold text-foreground">{formattedPrice}</td>
                           <td className="py-4 text-muted-foreground font-medium">{product.order || '-'}</td>
                           <td className="py-4 text-center">
-                            <StatusBadge status={product.status || 'IN STOCK'} />
+                            <StatusBadge status={product.status || 'unknown'} />
                           </td>
                           <td className="py-4 pr-6">
                             <div className="flex justify-end gap-3 text-muted-foreground">

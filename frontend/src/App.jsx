@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import NavBar from './components/Common/NavBar'
 import Footer from './components/Common/Footer'
+import BottomNav from './components/Common/BottomNav'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import AdminRoute from './components/auth/AdminRoute'
 import { Toaster } from 'react-hot-toast'
@@ -9,8 +10,8 @@ import { useAuthStore } from './store/authStore'
 import ToastContainer from './components/Common/ToastContainer'
 import useThemeStore from './store/themeStore'
 import { useProductStore } from './store/productStore'
+import useCartStore from './store/cartStore'
 
-// Pages
 import Home from './pages/home'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
@@ -28,22 +29,28 @@ import AddProduct from './pages/AddProduct'
 import MyProducts from './pages/MyProducts'
 import ProductPreview from './pages/ProductPreviewPage'
 import TransactionStatusPage from './pages/TransactionStatusPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import UserChangePassword from './components/UserChangePassword'
+import { useModalStore } from './store/modalStore'
 
 function AppRoutes() {
   const location = useLocation()
-  const hideMainChrome = location.pathname.startsWith('/admin') || location.pathname === '/my-products'
+  
+  const hideMainChrome = ['/login', '/signup', '/forgot-password'].includes(location.pathname) || location.pathname.startsWith('/reset-password');
 
   return (
     <>
       {!hideMainChrome && <NavBar />}
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
@@ -63,11 +70,10 @@ function AppRoutes() {
         <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
       </Routes>
       {!hideMainChrome && <Footer />}
+      {!hideMainChrome && <BottomNav />}
     </>
   )
 }
-
-import useCartStore from './store/cartStore'
 
 const App = () => {
   const { initializeAuth } = useAuthStore()
@@ -98,6 +104,7 @@ const App = () => {
 
     <>
       <ToastContainer />
+      <UserChangePassword />
       <AppRoutes />
       <Toaster position="bottom-right" reverseOrder={false} />
     </>

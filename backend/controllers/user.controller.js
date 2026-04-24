@@ -100,8 +100,6 @@ export const register = async (req, res) => {
         const newUser = new User({
             name,
             email: normalizedEmail,
-            password,
-            verificationToken:verificationToken,
             isVerified: false,
             profilePic: req.file?.path || req.file?.secure_url || undefined,
             cloudinaryId: req.file?.filename || req.file?.public_id || undefined,
@@ -281,16 +279,45 @@ export const confirmPasswordReset = async (req, res) => {
         const user = await User.findOne({ passwordResetToken: tokenHash, passwordResetExpires: { $gt: Date.now() } });
         if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
 
-        user.password = newPassword;
+        user.password = newPassword; // This will be hashed by the pre-save hook
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
-        user.refreshTokenHash = undefined;
+        user.refreshTokenHash = undefined; // Also clear refresh token for security
         await user.save();
 
         res.json({ message: 'Password reset successful' });
     } catch (err) {
         console.error('ConfirmReset Error:', err);
         res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+export const changePassword = async (req, res) => {
+    const { userId } = req.user;
+    const { oldPassword, newPassword } = req.body;
+
+    try {
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({ message: "Old and new passwords are required" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Incorrect old password" });
+        }
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ message: "Password changed successfully" });
+    } catch (error) {
+        console.error("Change Password Error:", error);
+        res.status(500).json({ message: "Internal server error" });
     }
 };
 

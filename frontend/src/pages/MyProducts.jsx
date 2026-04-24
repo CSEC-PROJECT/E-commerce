@@ -52,6 +52,7 @@ const MyProducts = () => {
     const [activeTab, setActiveTab]         = useState('All Products');
     const [orders, setOrders]               = useState([]);
     const [productImages, setProductImages] = useState({});
+    const [productRatings, setProductRatings] = useState({});
     const [loading, setLoading]             = useState(true);
     const [error, setError]                 = useState(null);
 
@@ -89,13 +90,23 @@ const MyProducts = () => {
                     uniqueIds.map((id) => apiRequest(`/api/products/${id}`))
                 );
                 const images = {};
+                const ratings = {};
                 results.forEach((r, idx) => {
                     const img = r.value?.product?.coverImage || r.value?.coverImage;
                     if (r.status === 'fulfilled' && img) {
                         images[uniqueIds[idx]] = img;
                     }
+
+                    if (r.status === 'fulfilled') {
+                        const product = r.value?.product || r.value;
+                        ratings[uniqueIds[idx]] = {
+                            averageRating: Number(product?.averageRating ?? 0),
+                            reviewCount: Number(product?.reviewCount ?? 0),
+                        };
+                    }
                 });
                 setProductImages(images);
+                setProductRatings(ratings);
             }
         } catch (err) {
             setError(err.message || 'Failed to load orders');
@@ -145,18 +156,23 @@ const MyProducts = () => {
 
     const submitReview = async () => {
         if (reviewRating === 0) { setReviewError('Please select a star rating.'); return; }
+        if (!reviewText.trim()) { setReviewError('Please write your review before submitting.'); return; }
         setReviewSubmitting(true);
         setReviewError(null);
         try {
             await apiRequest(`/api/products/${reviewModal.productId}/reviews`, {
                 method: 'POST',
-                body: { rating: reviewRating, description: reviewText.trim(), orderId: reviewModal.orderId },
+                body: { rating: reviewRating, content: reviewText.trim(), orderId: reviewModal.orderId },
                 token: accessToken,
             });
             setReviewSuccess(true);
             setTimeout(closeReviewModal, 1800);
         } catch (err) {
-            setReviewError(err.message || 'Failed to submit review. Please try again.');
+            if (String(err.message || '').toLowerCase().includes('not found')) {
+                setReviewError('Reviews API route was not found. Make sure backend is running latest code and frontend API base URL points to it.');
+            } else {
+                setReviewError(err.message || 'Failed to submit review. Please try again.');
+            }
         } finally {
             setReviewSubmitting(false);
         }
@@ -231,6 +247,8 @@ const MyProducts = () => {
                         {filteredItems.map((item) => {
                             const { label, bg, color } = item.statusMeta;
                             const imgSrc = productImages[item.productId];
+                            const productRating = Number(productRatings[item.productId]?.averageRating ?? 0);
+                            const productReviewCount = Number(productRatings[item.productId]?.reviewCount ?? 0);
 
                             return (
                                 <div
@@ -260,7 +278,7 @@ const MyProducts = () => {
                                             </div>
                                         </div>
 
-                                        {/* Gold stars (decorative) */}
+                                        {/* Product rating from backend */}
                                         <div className="flex items-center gap-1.5 mt-6">
                                             <div className="flex">
                                                 {[...Array(5)].map((_, i) => (
@@ -269,12 +287,14 @@ const MyProducts = () => {
                                                         size={14}
                                                         style={{
                                                             color: '#F59E0B',
-                                                            fill:  '#F59E0B',
-                                                            filter: 'drop-shadow(0 0 2px #F59E0B66)',
+                                                            fill: i < Math.floor(productRating) ? '#F59E0B' : 'transparent',
+                                                            filter: i < Math.floor(productRating) ? 'drop-shadow(0 0 2px #F59E0B66)' : 'none',
                                                         }}
                                                     />
                                                 ))}
                                             </div>
+                                            <span className="text-xs font-semibold text-text-main">{productRating.toFixed(1)}</span>
+                                            <span className="text-xs text-text-muted">({productReviewCount})</span>
                                         </div>
                                     </div>
 
@@ -282,7 +302,7 @@ const MyProducts = () => {
                                     <div className="flex flex-col md:items-end justify-between min-w-[180px]">
                                         <div className="text-right space-y-1">
                                             <div className="text-3xl font-extrabold text-text-main">
-                                                ${item.price.toFixed(2)}
+                                                ETB{item.price.toFixed(2)}
                                             </div>
                                             <div className="text-[10px] text-text-muted font-bold uppercase">
                                                 Qty: {item.qty}

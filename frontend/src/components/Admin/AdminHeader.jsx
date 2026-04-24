@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, Sun, Moon } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 const AdminHeader = ({ title, subtitle, children }) => {
   return (

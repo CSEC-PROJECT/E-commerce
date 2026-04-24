@@ -93,6 +93,9 @@ const ProductDetail = ({ onCategoryLoad }) => {
     return <div className="max-w-7xl mx-auto p-12 text-center py-20 text-destructive">{error || "Product not found."}</div>;
   }
 
+  const productRating = Number(product.averageRating ?? 0);
+  const productReviewCount = Number(product.reviewCount ?? 0);
+
   const productGallery = [
     product.coverImage,
     ...(product.detailImages || [])
@@ -141,7 +144,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
             <span className="bg-primary/10 text-primary text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-tighter">
               {product.category || "New Arrival"}
             </span>
-            <span className="text-sm font-medium flex items-center gap-1">★ {product.rating || "4.9"} <span className="text-muted-foreground font-normal">({product.reviews || "88"} reviews)</span></span>
+            <span className="text-sm font-medium flex items-center gap-1">★ {productRating.toFixed(1)} <span className="text-muted-foreground font-normal">({productReviewCount} reviews)</span></span>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-6 leading-[0.95] text-foreground uppercase">
@@ -254,10 +257,10 @@ const ProductDetail = ({ onCategoryLoad }) => {
 };
 
 // 4. Review Item Component
-const ReviewItem = ({ author, date, title, content, verified }) => (
+const ReviewItem = ({ author, date, title, content, verified, rating = 5 }) => (
   <div className="py-8 border-b border-border last:border-0 transition-opacity">
     <div className="flex justify-between items-start mb-2">
-      <StarRating rating={5} />
+      <StarRating rating={rating} />
       <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">{date}</span>
     </div>
     <h4 className="text-lg font-black tracking-tight mb-3 text-foreground">{title}</h4>
@@ -273,51 +276,214 @@ const ReviewItem = ({ author, date, title, content, verified }) => (
 );
 
 // 5. Reviews Section
-const ReviewsSection = () => {
-  const tabs = ["Ratings & Reviews (86)", "Delivery & Returns", "Sustainability"];
-  const [activeTab, setActiveTab] = useState(tabs[0]);
+const ReviewsSection = ({ productId }) => {
+  const [activeTab, setActiveTab] = useState("reviews");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const user = useAuthStore(state => state.user);
+
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [summary, setSummary] = useState({ averageRating: 0, reviewCount: 0 });
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ rating: 5, title: "", content: "" });
+  const [canReview, setCanReview] = useState(false);
+
+  const loadEligibility = async () => {
+    if (!productId || !user) {
+      setCanReview(false);
+      return;
+    }
+
+    try {
+      const data = await apiRequest(`/api/products/${productId}/reviews/eligibility`);
+      setCanReview(Boolean(data?.canReview));
+    } catch (err) {
+      setCanReview(false);
+    }
+  };
+
+  const loadReviews = async () => {
+    if (!productId) return;
+    try {
+      setLoading(true);
+      const data = await apiRequest(`/api/products/${productId}/reviews`);
+      setReviews(data?.reviews || []);
+      setSummary(data?.summary || { averageRating: 0, reviewCount: 0 });
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadReviews();
+  }, [productId]);
+
+  useEffect(() => {
+    loadEligibility();
+  }, [productId, user]);
+
+  const handleWriteReviewClick = () => {
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+
+    if (!canReview) {
+      toast.error("You can only review products you have purchased and paid for.");
+      return;
+    }
+
+    setShowForm((prev) => !prev);
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      navigate(`/login?redirect=${encodeURIComponent(location.pathname)}`);
+      return;
+    }
+
+    if (!form.content.trim()) {
+      toast.error("Please write your review before submitting");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await apiRequest(`/api/products/${productId}/reviews`, {
+        method: "POST",
+        body: {
+          rating: Number(form.rating),
+          title: form.title,
+          content: form.content,
+        },
+      });
+
+      toast.success("Review saved successfully");
+      setShowForm(false);
+      setForm({ rating: 5, title: "", content: "" });
+      await loadReviews();
+    } catch (err) {
+      toast.error(err.message || "Failed to save review");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const dynamicTabs = [
+    { key: "reviews", label: `Ratings & Reviews (${summary.reviewCount || 0})` },
+    { key: "delivery", label: "Delivery & Returns" },
+    { key: "sustainability", label: "Sustainability" },
+  ];
 
   return (
     <section className="max-w-7xl mx-auto px-6 lg:px-12 py-16 font-sans">
       <div className="flex gap-10 border-b border-border mb-12 overflow-x-auto no-scrollbar">
-        {tabs.map((tab) => (
+        {dynamicTabs.map((tab) => (
           <button
-            key={tab}
+            key={tab.key}
             type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`pb-4 text-[11px] font-black uppercase tracking-[0.15em] transition-all relative whitespace-nowrap ${tab === activeTab ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
+            onClick={() => setActiveTab(tab.key)}
+            className={`pb-4 text-[11px] font-black uppercase tracking-[0.15em] transition-all relative whitespace-nowrap ${tab.key === activeTab ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'
               }`}
           >
-            {tab}
-            {tab === activeTab && (
-              <div className="absolute bottom-0 left-0 w-full h-[3px] bg-primary rounded-t-full" />
+            {tab.label}
+            {tab.key === activeTab && (
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-primary rounded-t-full" />
             )}
           </button>
         ))}
       </div>
 
+      {activeTab !== "reviews" && (
+        <div className="rounded-3xl border border-border bg-muted/20 p-8 text-sm text-muted-foreground leading-relaxed">
+          {activeTab === "delivery" && "Delivery takes 3-7 business days for most destinations, with hassle-free 30-day returns."}
+          {activeTab === "sustainability" && "Products are sourced with emphasis on durable materials and long lifecycle to reduce replacement frequency."}
+        </div>
+      )}
+
+      {activeTab === "reviews" && (
       <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-16 items-start">
         <div className="bg-muted/30 p-8 rounded-[32px] text-center border border-border">
-          <h2 className="text-7xl font-black tracking-tighter mb-4 text-foreground">4.9</h2>
+          <h2 className="text-7xl font-black tracking-tighter mb-4 text-foreground">{Number(summary.averageRating || 0).toFixed(1)}</h2>
           <div className="flex justify-center mb-2">
-            <StarRating rating={5} size="lg" />
+            <StarRating rating={Number(summary.averageRating || 0)} size="lg" />
           </div>
-          <p className="text-xs text-muted-foreground font-medium mb-8">Based on 86 verified reviews</p>
-          <button type="button" className="w-full bg-background text-foreground text-[10px] font-black uppercase tracking-[0.2em] py-4 rounded-xl shadow-sm border border-border hover:bg-muted transition-all">
-            Write a Review
+          <p className="text-xs text-muted-foreground font-medium mb-8">Based on {summary.reviewCount || 0} verified reviews</p>
+          <button type="button" onClick={handleWriteReviewClick} className="w-full bg-background text-foreground text-[10px] font-black uppercase tracking-[0.2em] py-4 rounded-xl shadow-sm border border-border hover:bg-muted transition-all">
+            {showForm ? "Cancel" : user ? (canReview ? "Write a Review" : "Purchase Required") : "Login to Review"}
           </button>
+
+          {user && !canReview && (
+            <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
+              You can read all reviews before buying. Posting a rating or review is available after a paid purchase.
+            </p>
+          )}
+
+          {showForm && (
+            <form onSubmit={handleReviewSubmit} className="mt-6 space-y-3 text-left">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Rating</label>
+              <select
+                value={form.rating}
+                onChange={(e) => setForm(prev => ({ ...prev, rating: Number(e.target.value) }))}
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+              >
+                {[5, 4, 3, 2, 1].map((value) => (
+                  <option key={value} value={value}>{value} Star{value > 1 ? "s" : ""}</option>
+                ))}
+              </select>
+
+              <input
+                value={form.title}
+                onChange={(e) => setForm(prev => ({ ...prev, title: e.target.value }))}
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm"
+                placeholder="Review title"
+              />
+
+              <textarea
+                value={form.content}
+                onChange={(e) => setForm(prev => ({ ...prev, content: e.target.value }))}
+                className="w-full rounded-xl border border-border bg-background px-3 py-2 text-sm min-h-28"
+                placeholder="Share your experience with this product"
+                required
+              />
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-xl bg-primary text-primary-foreground py-3 text-[10px] font-black uppercase tracking-[0.2em] disabled:opacity-60"
+              >
+                {submitting ? "Saving..." : "Submit Review"}
+              </button>
+            </form>
+          )}
         </div>
 
         <div>
-          <ReviewItem
-            author="James D."
-            date="March 12, 2024"
-            title="Sublime minimalist aesthetic"
-            content="The weight and finish of this object are exceptional. It feels truly premium and has become the centerpiece of my workspace."
-            verified={true}
-          />
+          {loading && <div className="py-10 text-sm text-muted-foreground">Loading reviews...</div>}
+          {!loading && reviews.length === 0 && (
+            <div className="py-10 text-sm text-muted-foreground">No reviews yet. Be the first to review this product.</div>
+          )}
+
+          {!loading && reviews.map((review) => (
+            <ReviewItem
+              key={review._id}
+              author={review.author}
+              date={review.date}
+              title={review.title || "Customer review"}
+              content={review.content}
+              verified={review.verified}
+              rating={review.rating}
+            />
+          ))}
         </div>
       </div>
+      )}
     </section>
   );
 };
@@ -353,7 +519,7 @@ const DetailRelatedCard = ({ product }) => {
         <div className="flex justify-between items-center mt-auto pt-2">
           <div className="flex items-center gap-1.5 text-base font-bold text-gray-900">
             <span className="text-amber-400">★</span>
-            <span>{product.averageRating?.toFixed(1) || product.rating?.toFixed(1) || "5.0"}</span>
+            <span>{Number(product.averageRating ?? 0).toFixed(1)}</span>
           </div>
           
           <div className="flex items-center gap-1.5 text-xs uppercase font-bold tracking-widest">
@@ -422,12 +588,13 @@ const RelatedProductsSection = ({ category }) => {
 
 // 7. Final Export Page
 const DetailsPage = () => {
+  const { id } = useParams();
   const [category, setCategory] = useState("");
   return (
   <main className="bg-background min-h-screen text-foreground selection:bg-primary selection:text-primary-foreground">
     <ProductDetail onCategoryLoad={setCategory} />
     <div className="border-t border-border">
-      <ReviewsSection />
+      <ReviewsSection productId={id} />
     </div>
     <div className="border-t border-border bg-muted/20">
       <RelatedProductsSection category={category} />
