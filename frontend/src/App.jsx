@@ -13,6 +13,7 @@ import { useProductStore } from './store/productStore'
 import useCartStore from './store/cartStore'
 
 import Home from './pages/home'
+import InstallPWAButton from './components/InstallPWAButton'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
 import CartPage from './pages/CartPage'
@@ -41,6 +42,7 @@ function AppRoutes() {
 
   return (
     <>
+      <InstallPWAButton />
       {!hideMainChrome && <NavBar />}
       <Routes>
         <Route path="/" element={<Home />} />

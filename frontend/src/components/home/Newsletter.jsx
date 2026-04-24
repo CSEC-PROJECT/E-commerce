@@ -8,7 +8,6 @@ export default function Newsletter() {
       <section className="bg-primary text-primary-foreground rounded-[2.5rem] p-8 md:p-16 shadow-2xl relative overflow-hidden">
         <div className="flex flex-col lg:flex-row items-center gap-16 relative z-10">
           
-          {/* Left Content */}
           <div className="flex-1 w-full max-w-xl">
             <span className="text-primary-foreground/60 text-xs font-bold tracking-widest uppercase mb-6 block">
               Join Our Atelier
@@ -28,19 +27,17 @@ export default function Newsletter() {
                 className="flex-1 bg-primary-foreground/10 border border-primary-foreground/20 rounded-xl px-6 py-5 text-primary-foreground placeholder:text-primary-foreground/40 focus:outline-none focus:border-white focus:ring-1 focus:ring-white transition-all text-lg"
                 required
               />
-              <Button className="bg-primary-foreground text-primary px-10 py-5 h-auto rounded-xl text-lg font-bold transition-transform duration-200 active:scale-95 shadow-lg shadow-black/10">
+              <Button className="bg-primary-foreground text-primary cursor-pointer px-10 py-5 h-auto rounded-xl text-lg font-bold transition-transform duration-200 active:scale-95 shadow-lg shadow-black/10">
                 Join Now
               </Button>
             </form>
           </div>
 
-          {/* Right Content - Visual */}
           <div className="flex-1 relative w-full lg:h-[450px] h-[350px] rounded-[2rem] overflow-hidden mt-8 lg:mt-0 shadow-2xl">
             <img src={Newssettler} alt="Store Interior" className="absolute inset-0 w-full h-full object-cover" />
             
-            <div className="absolute inset-0 bg-gradient-to-tr from-primary/80 via-transparent to-transparent"></div>
-
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-primary-foreground/10 backdrop-blur-xl border border-primary-foreground/10 p-6 rounded-2xl shadow-2xl">
+            
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-sm bg-black/60 border border-white/10 p-6 rounded-2xl shadow-2xl">
               <div className="flex items-start gap-5">
                 <div className="bg-primary-foreground/20 p-3.5 rounded-xl text-primary-foreground">
                   <ShieldCheck className="w-6 h-6" />

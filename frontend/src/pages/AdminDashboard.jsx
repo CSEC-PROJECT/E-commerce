@@ -283,50 +283,55 @@ const AdminDashboard = () => {
           )}
         </section>
 
-        {/* Row 4: Best Selling & Add Product */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-8">
           <div className="col-span-1 lg:col-span-8 bg-card p-6 md:p-8 rounded-[2rem] border border-border shadow-sm">
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-xl font-bold dark:text-primary">Best selling product</h3>
-              {/* <button className="flex items-center gap-2 bg-[#5CB85C] text-white px-5 py-2 rounded-xl text-sm font-bold cursor-pointer">
-                <Filter size={16} /> Filter
-              </button> */}
+              <h3 className="text-xl font-bold dark:text-primary">Bestselling Product Leaderboard</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[500px]">
                 <thead>
                   <tr className="bg-secondary text-[10px] text-muted-foreground dark:text-muted-foreground uppercase font-bold tracking-widest text-left">
-                    <th className="p-4 rounded-l-xl pl-6">Product</th>
-                    <th className="p-4">Total Order</th>
+                    <th className="p-4 rounded-l-xl pl-6 w-16">Rank</th>
+                    <th className="p-4">Product</th>
+                    <th className="p-4">Units Sold</th>
                     <th className="p-4">Status</th>
                     <th className="p-4 rounded-r-xl pr-6">Price</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {loadingBestSelling ? (
-                    <tr><td colSpan="4" className="py-10 text-center"><Loader2 className="animate-spin inline-block text-primary" size={24} /></td></tr>
+                    <tr><td colSpan="5" className="py-10 text-center"><Loader2 className="animate-spin inline-block text-primary" size={24} /></td></tr>
                   ) : bestSellingProducts.length > 0 ? (
                     bestSellingProducts.map((p, i) => {
                       const details = p.productDetails;
                       const isStocked = details?.stock > 0;
+                      const isTopThree = i < 3;
                       return (
-                        <tr key={i} className="hover:bg-muted/30">
-                          <td className="py-4 flex items-center gap-4 pl-2">
-                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-muted" />
-                            <span className="font-bold text-sm dark:text-primary">{details?.name || "Unknown Product"}</span>
-                          </td>
-                          <td className="py-4 text-sm font-bold dark:text-primary">{p.totalOrdered}</td>
-                          <td className="py-4">
-                            <span className={`flex items-center gap-2 font-bold text-xs ${isStocked ? 'text-success' : 'text-error'}`}>
-                              <span className="w-1.5 h-1.5 rounded-full bg-current" /> {isStocked ? 'Stock' : 'Stock out'}
+                        <tr key={i} className="hover:bg-muted/30 transition-colors">
+                          <td className="py-4 pl-6">
+                            <span className={`flex items-center justify-center w-8 h-8 rounded-lg text-xs font-black ${isTopThree ? 'bg-primary/10 text-primary border border-primary/20' : 'text-muted-foreground'}`}>
+                              #{i + 1}
                             </span>
                           </td>
-                          <td className="py-4 font-bold text-primary text-sm">ETB {details?.price?.toFixed(2) || "0.00"}</td>
+                          <td className="py-4 flex items-center gap-4">
+                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-muted border border-border shadow-sm" alt={details?.name} />
+                            <span className="font-bold text-sm dark:text-primary truncate max-w-[180px]">{details?.name || "Unknown Product"}</span>
+                          </td>
+                          <td className="py-4 text-sm font-black dark:text-primary">
+                            <span className="bg-success/5 text-success px-3 py-1 rounded-full border border-success/10">{p.totalOrdered}</span>
+                          </td>
+                          <td className="py-4">
+                            <span className={`flex items-center gap-2 font-bold text-[10px] uppercase tracking-tighter ${isStocked ? 'text-success' : 'text-error'}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${isStocked ? 'bg-success animate-pulse' : 'bg-error'}`} /> {isStocked ? 'In Stock' : 'Out of Stock'}
+                            </span>
+                          </td>
+                          <td className="py-4 font-bold text-primary text-sm">ETB {details?.price?.toLocaleString() || "0.00"}</td>
                         </tr>
                       )
                     })
                   ) : (
-                    <tr><td colSpan="4" className="py-6 text-center text-sm font-bold opacity-50">No best selling products recorded yet.</td></tr>
+                    <tr><td colSpan="5" className="py-6 text-center text-sm font-bold opacity-50">No bestselling products recorded yet.</td></tr>
                   )}
                 </tbody>
               </table>

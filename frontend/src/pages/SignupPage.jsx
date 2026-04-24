@@ -21,7 +21,7 @@ export default function SignupPage() {
       signupSchema.parse({ name, email, password, confirmPassword });
       await register({ name, email, password });
       toast.success("Account created. Please verify your email before login.");
-      navigate("/login");
+      navigate("/login?verifyNotice=true");
     } catch (err) {
       if (err instanceof z.ZodError) {
         toast.error(err.issues?.[0]?.message || "Please check your input.");

@@ -124,7 +124,7 @@ const getBestSellingProducts = asyncHandler(async (req, res) => {
       },
     },
     { $sort: { totalOrdered: -1 } },
-    { $limit: 5 },
+    { $limit: 10 },
     {
       $lookup: {
         from: "products",

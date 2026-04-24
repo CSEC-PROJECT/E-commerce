@@ -100,15 +100,16 @@ export const register = async (req, res) => {
         const newUser = new User({
             name,
             email: normalizedEmail,
+            password,
             isVerified: false,
+            verificationToken,
             profilePic: req.file?.path || req.file?.secure_url || undefined,
             cloudinaryId: req.file?.filename || req.file?.public_id || undefined,
-
         });
 
         await newUser.save();
-        
-        await sendVerificationEmail(email, verificationToken);
+
+        await sendVerificationEmail(normalizedEmail, verificationToken);
 
         const { password: _, ...userData } = newUser._doc;
 
@@ -143,7 +144,7 @@ export const verifyEmail = async (req, res) => {
         await user.save(); 
 
         console.log(`User ${user.email} verified successfully.`);
-        return res.redirect(`${frontendUrl}/login`);
+        return res.redirect(`${frontendUrl}/login?verified=true`);
     } catch (error) {
         console.error("Verify Error:", error);
         return res.status(500).json({ message: "Internal server error" });
@@ -279,10 +280,9 @@ export const confirmPasswordReset = async (req, res) => {
         const user = await User.findOne({ passwordResetToken: tokenHash, passwordResetExpires: { $gt: Date.now() } });
         if (!user) return res.status(400).json({ message: 'Invalid or expired token' });
 
-        user.password = newPassword; // This will be hashed by the pre-save hook
-        user.passwordResetToken = undefined;
+        user.password = newPassword; 
         user.passwordResetExpires = undefined;
-        user.refreshTokenHash = undefined; // Also clear refresh token for security
+        user.refreshTokenHash = undefined; 
         await user.save();
 
         res.json({ message: 'Password reset successful' });
@@ -293,7 +293,7 @@ export const confirmPasswordReset = async (req, res) => {
 };
 
 export const changePassword = async (req, res) => {
-    const { userId } = req.user;
+    const userId = req.user._id; 
     const { oldPassword, newPassword } = req.body;
 
     try {
@@ -301,7 +301,8 @@ export const changePassword = async (req, res) => {
             return res.status(400).json({ message: "Old and new passwords are required" });
         }
 
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("+password"); 
+        
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -312,6 +313,7 @@ export const changePassword = async (req, res) => {
         }
 
         user.password = newPassword;
+
         await user.save();
 
         res.json({ message: "Password changed successfully" });

@@ -20,8 +20,8 @@ const run = async () => {
 
     let user = await User.findOne({ email: String(email).toLowerCase().trim() });
     if (user) {
-      if (user.role !== "admin") {
-        user.role = "admin";
+      if (!user.role || !user.role.includes("admin")) {
+        user.role = Array.isArray(user.role) ? [...new Set([...(user.role || []), "admin"]) ] : ["admin"];
         user.isVerified = true;
         await user.save();
         console.log("Existing user promoted to admin:", user.email);

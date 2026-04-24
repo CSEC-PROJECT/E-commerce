@@ -115,3 +115,17 @@ export const productsApi = {
     return apiRequest(`/api/admin/products/${id}`, { method: 'DELETE' });
   }
 };
+
+export const ragApi = {
+  chat: async ({ message, productId, page, limit = 4 }) => {
+    return apiRequest("/api/rag/chat", {
+      method: "POST",
+      body: {
+        message,
+        productId,
+        page,
+        limit,
+      },
+    });
+  },
+};

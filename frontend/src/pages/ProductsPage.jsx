@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import Sidebar from '../components/Sidebar';
 import Pagination from '../components/Pagination';
+import AICurator from '../components/AICurator';
 import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
 import { useAuthStore } from '../store/authStore';
@@ -253,6 +254,7 @@ const ProductsPage = () => {
           </div>
         )}
       </main>
+      <AICurator page="products" />
     </div>
   );
 };
