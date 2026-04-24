@@ -85,8 +85,8 @@ const Pricing = ({ formData, handleChange }) => (
     icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" /><path d="M12 18V6" /></svg>}
   >
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-      <InputField name="price" value={formData.price} onChange={handleChange} label="Price ($)" type="number" placeholder="0.00" />
-      <InputField name="comparePrice" value={formData.comparePrice} onChange={handleChange} label="Compare at Price ($)" type="number" placeholder="0.00" />
+      <InputField name="price" value={formData.price} onChange={handleChange} label="Price (ETB)" type="number" placeholder="0.00" />
+      <InputField name="comparePrice" value={formData.comparePrice} onChange={handleChange} label="Compare at Price (ETB)" type="number" placeholder="0.00" />
     </div>
   </SectionContainer>
 );
@@ -138,6 +138,76 @@ const Shipping = ({ formData, handleChange }) => {
       {formData.shippingType === 'paid' && (
         <InputField name="shippingCost" value={formData.shippingCost} onChange={handleChange} label="Shipping Cost (ETB) / KM" type="number" placeholder="0.00" />
       )}
+    </SectionContainer>
+  );
+};
+
+const Colors = ({ formData, setFormData }) => {
+  const [colorInput, setColorInput] = useState('');
+
+  const addColor = () => {
+    if (colorInput.trim() && !formData.colors.includes(colorInput.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        colors: [...prev.colors, colorInput.trim()]
+      }));
+      setColorInput('');
+    }
+  };
+
+  const removeColor = (colorToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      colors: prev.colors.filter(c => c !== colorToRemove)
+    }));
+  };
+
+  return (
+    <SectionContainer
+      title="Colors"
+      icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.92 0 1.5-.58 1.5-1.5 0-.43-.17-.83-.44-1.14-.27-.31-.44-.71-.44-1.14 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8z"/></svg>}
+    >
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={colorInput}
+          onChange={(e) => setColorInput(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addColor())}
+          placeholder="e.g. Red, #FF0000"
+          className="flex-1 bg-muted text-foreground border border-border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all text-sm"
+        />
+        <button
+          type="button"
+          onClick={addColor}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-bold uppercase tracking-widest hover:opacity-90 transition-opacity"
+        >
+          Add
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {formData.colors.map((color, index) => (
+          <div
+            key={index}
+            className="flex items-center gap-2 px-3 py-1.5 bg-muted border border-border rounded-full text-xs font-medium"
+          >
+            <div 
+               className="w-3 h-3 rounded-full border border-border" 
+               style={{ backgroundColor: color.startsWith('#') ? color : color.toLowerCase() }}
+            />
+            <span>{color}</span>
+            <button
+              type="button"
+              onClick={() => removeColor(color)}
+              className="text-muted-foreground hover:text-destructive transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        ))}
+        {formData.colors.length === 0 && (
+          <p className="text-xs text-muted-foreground italic">No colors added yet.</p>
+        )}
+      </div>
     </SectionContainer>
   );
 };
@@ -231,7 +301,7 @@ const Organization = ({ formData, handleChange }) => (
     title="Organization"
     icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></svg>}
   >
-    <SelectField name="category" value={formData.category} onChange={handleChange} label="Product Category" options={["Electronics", "Footwear", "Clothing", "Accessories", "Home & Living"]} />
+    <SelectField name="category" value={formData.category} onChange={handleChange} label="Product Category" options={["Electronics", "Fashion", "Home & Living", "Beauty & Personal Care", "Sports & Outdoor", "Books & Education"]} />
   </SectionContainer>
 );
 
@@ -269,7 +339,8 @@ const defaultFormData = {
   madeIn: '',
   dimensions: '',
   weight: '',
-  deliveryTime: '3 Days'
+  deliveryTime: '3 Days',
+  colors: []
 };
 
 const AddProduct = () => {
@@ -308,6 +379,7 @@ const AddProduct = () => {
               dimensions: prod.dimensions || '',
               weight: prod.weight || '',
               deliveryTime: prod.deliveryTime || '3 Days',
+              colors: prod.colors || [],
               coverImageURL: prod.coverImage || prod.img || ''
             });
             // Not setting images here, user will have to re-upload if they want to change them.
@@ -364,7 +436,11 @@ const AddProduct = () => {
     try {
       const data = new FormData();
       Object.keys(formData).forEach(key => {
-        data.append(key, formData[key]);
+        if (key === 'colors') {
+          data.append(key, JSON.stringify(formData[key]));
+        } else {
+          data.append(key, formData[key]);
+        }
       });
       if (coverImage) data.append('coverImage', coverImage);
       
@@ -391,7 +467,7 @@ const AddProduct = () => {
   };
 
   return (
-    <div className="bg-background min-h-screen py-8 md:py-12 text-foreground font-sans selection:bg-primary selection:text-primary-foreground">
+    <div className="w-full">
       <ProductPreviewModal
         isOpen={isPreviewOpen}
         onClose={() => setIsPreviewOpen(false)}
@@ -400,7 +476,7 @@ const AddProduct = () => {
         coverImage={coverImage}
         isEditing={isEditing}
       />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full">
 
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
@@ -434,6 +510,7 @@ const AddProduct = () => {
             <BasicDetails formData={formData} handleChange={handleChange} />
             <Pricing formData={formData} handleChange={handleChange} />
             <Inventory formData={formData} handleChange={handleChange} />
+            <Colors formData={formData} setFormData={setFormData} />
             <Condition formData={formData} handleChange={handleChange} />
             <Shipping formData={formData} handleChange={handleChange} />
           </div>

@@ -45,6 +45,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeImage, setActiveImage] = useState("");
+  const [selectedColor, setSelectedColor] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -77,7 +78,8 @@ const ProductDetail = ({ onCategoryLoad }) => {
           await addToCart({
               product: product._id,
               quantity: quantity,
-              price: product.price
+              price: product.price,
+              color: selectedColor
           });
           toast.success("Added to cart successfully");
           
@@ -190,6 +192,33 @@ const ProductDetail = ({ onCategoryLoad }) => {
               {product.description || "A masterpiece of modern design and craftsmanship, crafted strictly from high-grade materials to deliver an exceptional experience tailored for the discerning eye."}
             </p>
           </section>
+
+          {product.colors && product.colors.length > 0 && (
+            <section className="mb-10">
+              <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4 text-muted-foreground">Available Colors</h3>
+              <div className="flex flex-wrap gap-3">
+                {product.colors.map((color, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedColor(color)}
+                    className={`group relative flex items-center justify-center w-10 h-10 rounded-full border-2 transition-all ${selectedColor === color ? 'border-primary scale-110 shadow-lg' : 'border-border hover:border-primary/40'}`}
+                    title={color}
+                  >
+                    <div 
+                      className="w-7 h-7 rounded-full shadow-inner" 
+                      style={{ backgroundColor: color.startsWith('#') ? color : color.toLowerCase() }}
+                    />
+                    {selectedColor === color && (
+                      <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-[9px] font-bold uppercase tracking-tighter text-primary">
+                        {color}
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           <section className="mb-10">
             <h3 className="text-[11px] font-bold uppercase tracking-[0.2em] mb-4 text-muted-foreground">Technical Details</h3>

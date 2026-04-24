@@ -34,6 +34,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import UserChangePassword from './components/UserChangePassword'
 import { useModalStore } from './store/modalStore'
+import AdminLayout from './components/Admin/AdminLayout'
 
 function AppRoutes() {
   const location = useLocation()
@@ -54,22 +55,24 @@ function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+        <Route path="/cart" element={<CartPage />} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<TransactionStatusPage success={true} />} />
         <Route path="/transaction/fail" element={<TransactionStatusPage success={false} />} />
 
-        <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="/admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-        <Route path="/admin/settings" element={<AdminRoute><AdminSettings /></AdminRoute>} />
-        <Route path="/admin/earnings" element={<AdminRoute><AdminEarnings /></AdminRoute>} />
-        <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-        <Route path="/admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
-        <Route path="/admin/addproduct" element={<AdminRoute><AddProduct /></AdminRoute>} />
-        <Route path="/admin/add-product" element={<AdminRoute><AddProduct /></AdminRoute>} />
-        <Route path="/admin/edit-product/:id" element={<AdminRoute><AddProduct /></AdminRoute>} />
-        <Route path="/admin/product-preview" element={<AdminRoute><ProductPreview /></AdminRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="earnings" element={<AdminEarnings />} />
+          <Route path="users" element={<AdminUsers />} />
+          <Route path="products" element={<AdminProducts />} />
+          <Route path="addproduct" element={<AddProduct />} />
+          <Route path="add-product" element={<AddProduct />} />
+          <Route path="edit-product/:id" element={<AddProduct />} />
+          <Route path="product-preview" element={<ProductPreview />} />
+        </Route>
       </Routes>
       {!hideMainChrome && <Footer />}
       {!hideMainChrome && <BottomNav />}

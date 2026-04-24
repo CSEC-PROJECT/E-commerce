@@ -59,7 +59,7 @@ const UserChangePassword = () => {
             await apiRequest("/api/auth/change-password", {
                 method: "POST",
                 body: {
-                    currentPassword: passwords.current,
+                    oldPassword: passwords.current,
                     newPassword: passwords.new,
                 },
             });

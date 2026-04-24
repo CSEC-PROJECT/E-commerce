@@ -24,14 +24,8 @@ const NavBar = () => {
 
     const products = useProductStore((state) => state.products);
 
-    // Standard backend categories as requested
-    const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
-
-    // Dynamic categories from products (merging standard + any extra from DB)
-    const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
-    const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
-
-    const CATEGORIES = uniqueCategories.map(c => ({ label: c, value: c }));
+    const STANDARD_CATEGORIES = ['Electronics', 'Fashion', 'Home & Living', 'Beauty & Personal Care', 'Sports & Outdoor', 'Books & Education'];
+    const CATEGORIES = STANDARD_CATEGORIES.map(c => ({ label: c, value: c }));
 
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -110,7 +104,11 @@ const NavBar = () => {
     const isAdminRoute = location.pathname.startsWith('/admin');
 
     const handleMobileMenuButton = () => {
-        setIsMobileMenuOpen(true);
+        if (isAdminRoute) {
+            window.dispatchEvent(new CustomEvent('admin-sidebar:toggle'));
+        } else {
+            setIsMobileMenuOpen(true);
+        }
     };
 
     // Do not render NavBar on Login or Signup pages
@@ -151,6 +149,9 @@ const NavBar = () => {
                                 {/* ── Admin links ── */}
                                 {isAdmin ? (
                                     <>
+                                        <Link to="/admin/dashboard" className={navLinkClass('/admin/dashboard')}>
+                                            Dashboard
+                                        </Link>
                                         <Link to="/" className={navLinkClass('/')}>
                                             Home
                                         </Link>
@@ -330,19 +331,22 @@ const NavBar = () => {
                         <div className="flex items-center justify-end gap-5 sm:gap-6 flex-1 pr-2 lg:pr-4">
 
                             {/* Search Bar */}
-                            <div className="hidden lg:block flex-1 max-w-[280px] xl:max-w-[340px] relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <svg className="h-[16px] w-[16px] text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="hidden lg:block flex-1 max-w-[280px] xl:max-w-[340px] relative group">
+                                <button 
+                                    onClick={() => handleSearchSubmit({ key: 'Enter' })}
+                                    className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer text-muted-foreground hover:text-primary transition-colors z-10"
+                                >
+                                    <svg className="h-[16px] w-[16px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
-                                </div>
+                                </button>
                                 <input
                                     type="text"
-                                    placeholder="Search..."
+                                    placeholder="Search products..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearchSubmit}
-                                    className="w-full pl-9 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted border border-transparent rounded-[8px] text-[15px] text-foreground placeholder-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
+                                    className="w-full pl-10 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted border border-transparent rounded-full text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
                                 />
                             </div>
 
@@ -411,19 +415,18 @@ const NavBar = () => {
                                                     </Link>
                                                 )}
 
-                                                {/* Change Password – User & Admin */}
-                                                <button
-                                                    type="button"
-                                                    role="menuitem"
-                                                    onClick={() => {
-                                                        setUserMenuOpen(false);
-                                                        openChangePassword();
-                                                    }}
-                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-foreground hover:bg-primary/5 hover:text-primary rounded-[14px] transition-all duration-200 cursor-pointer"
-                                                >
-                                                    <Lock size={18} className="opacity-70" />
-                                                    Change Password
-                                                </button>
+                                                {/* Admin Dashboard – Admin only */}
+                                                {isAdmin && (
+                                                    <Link
+                                                        to="/admin/dashboard"
+                                                        role="menuitem"
+                                                        onClick={() => setUserMenuOpen(false)}
+                                                        className="flex items-center gap-3 px-4 py-3 text-[14px] font-bold text-foreground hover:bg-primary/5 hover:text-primary rounded-[14px] transition-all duration-200"
+                                                    >
+                                                        <LayoutDashboard size={18} className="opacity-70" />
+                                                        Admin Dashboard
+                                                    </Link>
+                                                )}
 
                                                 <div className="h-[1px] bg-border my-1 mx-2 opacity-50" />
 
@@ -431,7 +434,7 @@ const NavBar = () => {
                                                     type="button"
                                                     role="menuitem"
                                                     onClick={handleLogout}
-                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-white bg-red-600 hover:bg-red-700 rounded-[14px] transition-all duration-200 cursor-pointer"
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-red-600 bg-white border border-red-100 hover:bg-red-50 rounded-[14px] transition-all duration-200 cursor-pointer"
                                                 >
                                                     <LogOut size={18} className="opacity-100" />
                                                     Log out
@@ -518,11 +521,40 @@ const NavBar = () => {
 
                 {/* Drawer Scrollable Content */}
                 <div className="flex-1 overflow-y-auto py-4">
+                    {/* Mobile Search Bar */}
+                    <div className="px-6 mb-6">
+                        <div className="relative">
+                            <button 
+                                onClick={() => { handleSearchSubmit({ key: 'Enter' }); setIsMobileMenuOpen(false); }}
+                                className="absolute inset-y-0 left-0 pl-3 flex items-center text-muted-foreground hover:text-primary transition-colors"
+                            >
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </button>
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleSearchSubmit(e);
+                                        setIsMobileMenuOpen(false);
+                                    }
+                                }}
+                                className="w-full pl-11 pr-4 py-3 bg-muted border border-transparent rounded-full text-base text-foreground focus:outline-none focus:bg-background focus:border-primary transition-all"
+                            />
+                        </div>
+                    </div>
                     <nav className="px-4 space-y-2">
 
                         {/* ── Admin sidebar links ── */}
                         {isAdmin ? (
                             <>
+                                <Link to="/admin/dashboard" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/admin/dashboard')}>
+                                    Dashboard
+                                </Link>
                                 <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/')}>
                                     Home
                                 </Link>
@@ -748,24 +780,15 @@ const NavBar = () => {
                                     </Link>
                                 )}
 
-                                {/* Change Password – User & Admin */}
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsMobileMenuOpen(false); openChangePassword(); }}
-                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-foreground border border-border bg-background hover:bg-muted rounded-xl transition-colors"
-                                >
-                                    <Lock size={20} />
-                                    Change Password
-                                </button>
-
                                 <button
                                     type="button"
                                     onClick={() => { setIsMobileMenuOpen(false); handleLogout(); }}
-                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors mt-2"
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-4 text-base font-bold text-red-600 border border-red-200 bg-white hover:bg-red-50 rounded-xl transition-colors mt-2 shadow-sm"
                                 >
                                     <LogOut size={20} />
                                     Log out
                                 </button>
+                                <div className="h-20" /> {/* Spacer for BottomNav */}
                             </div>
                         ) : (
                             <Link

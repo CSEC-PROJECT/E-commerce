@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, Bell, Grid, Plus, Edit2, Trash2, ChevronLeft, ChevronRight, Loader2, ChevronDown } from 'lucide-react';
-import Sidebar from '../components/Common/Sidebar';
 import { useProducts } from '../hooks/useProducts';
 
 const StatusBadge = ({ status }) => {
   let bgColor = "bg-muted";
   let textColor = "text-muted-foreground";
-  const normalizedStatus = String(status || '').toLowerCase();
+  const lowerStatus = String(status || '').toLowerCase();
+  const upperStatus = String(status || '').toUpperCase();
 
   if (upperStatus === "SLIGHTLY USED") {
     bgColor = "bg-amber-100 dark:bg-amber-900/30";
@@ -87,9 +87,7 @@ const AdminProducts = () => {
   const displayedProducts = products;
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans">
-      <Sidebar />
-      <main ref={mainRef} className="flex-1 p-4 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
+    <div className="w-full">
 
         {/* Header */}
         <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
@@ -134,19 +132,11 @@ const AdminProducts = () => {
                 className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
                 <option>All Categories</option>
                 <option>Electronics</option>
-                <option>Footwear</option>
-                <option>Accessories</option>
-                <option>Furniture</option>
-                <option>Home Decor</option>
-                <option>Clothing</option>
-                <option>Beauty</option>
-                <option>Sports</option>
-                <option>Toys</option>
-                <option>Books</option>
-                <option>Music</option>
-                <option>Movies</option>
-                <option>Games</option>
-                <option>Other</option>
+                <option>Fashion</option>
+                <option>Home & Living</option>
+                <option>Beauty & Personal Care</option>
+                <option>Sports & Outdoor</option>
+                <option>Books & Education</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             </div>
@@ -161,10 +151,10 @@ const AdminProducts = () => {
                 className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
                 <option>Any Price</option>
                 <option>Under ETB 50</option>
-                <option>ETB 50 - ETB 100</option>
-                <option>ETB 100 - ETB 200</option>
-                <option>ETB 200 - ETB 500</option>
-                <option>ETB 500+</option>
+                <option>ETB 100 - ETB 1000</option>
+                <option>ETB 1000 - ETB 6000</option>
+                <option>ETB 6000 - ETB 15000</option>
+                <option>ETB 15000+</option>
               </select>
               <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
             </div>
@@ -212,6 +202,13 @@ const AdminProducts = () => {
               className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'All Product' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
               All Product
+            </button>
+            <button
+              onClick={() => { setActiveTab('New'); setStatusFilter('New'); setCurrentPage(1); }}
+              disabled={loading}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'New' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              New
             </button>
             <button
               onClick={() => { setActiveTab('Slightly Used'); setStatusFilter('Slightly Used'); setCurrentPage(1); }}
@@ -341,8 +338,7 @@ const AdminProducts = () => {
           </div>
         )}
 
-      </main>
-    </div >
+    </div>
   );
 };
 

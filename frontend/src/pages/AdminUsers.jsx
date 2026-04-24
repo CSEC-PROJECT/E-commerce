@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { DownloadCloud, Users as UsersIcon, UserPlus, MousePointerClick, Search } from 'lucide-react';
-import Sidebar from '../components/Common/Sidebar';
 import AdminHeader from '../components/Admin/AdminHeader';
 import StatCard from '../components/Admin/StatCard';
 import UsersTable from '../components/Admin/UsersTable';
@@ -83,9 +82,7 @@ const AdminUsers = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans transition-colors duration-300">
-      <Sidebar />
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto w-full pb-24 lg:pb-10">
+    <div className="w-full">
         <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="relative max-w-md w-full">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
@@ -166,7 +163,6 @@ const AdminUsers = () => {
           confirmText="Yes, Delete User"
           isLoading={loading}
         />
-      </main>
     </div>
   );
 };

@@ -92,7 +92,7 @@ const SettingPage = () => {
     };
 
     // Select dropdown states
-    const [currency, setCurrency] = useState('USD ($)');
+    const [currency, setCurrency] = useState('Birr (ETB)');
     const [timezone, setTimezone] = useState('(GMT-08:00) Pacific');
     const [language, setLanguage] = useState('English (US)');
 
@@ -102,7 +102,6 @@ const SettingPage = () => {
 
     return (
         <div className="min-h-screen bg-background p-6 md:p-8 lg:p-10">
-            {/* Header Info */}
             <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold text-foreground mb-1">Settings</h1>
@@ -159,7 +158,7 @@ const SettingPage = () => {
                             <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Phone Number</label>
                             <input
                                 type="text"
-                                placeholder="+1 (555) 000-1234"
+                                placeholder="+251 900-00-00-00"
                                 className="w-full bg-muted text-foreground placeholder-muted-foreground rounded-lg px-3 py-2 text-sm border-none focus:outline-none focus:ring-1 focus:ring-primary"
                             />
                         </div>
@@ -177,7 +176,7 @@ const SettingPage = () => {
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Currency</label>
                                 <CustomSelect
-                                    options={['USD ($)', 'EUR (€)', 'GBP (£)']}
+                                    options={['Birr (ETB)', 'USD ($)', 'EUR (€)', 'GBP (£)']}
                                     value={currency}
                                     onChange={setCurrency}
                                 />
@@ -193,7 +192,7 @@ const SettingPage = () => {
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase mb-1.5 tracking-wide">Language</label>
                                 <CustomSelect
-                                    options={['English (US)', 'Spanish (ES)', 'French (FR)']}
+                                    options={['Amharic', 'English (US)', 'Oromo', 'Tigrigna']}
                                     value={language}
                                     onChange={setLanguage}
                                 />
