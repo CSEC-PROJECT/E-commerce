@@ -180,7 +180,7 @@ const AdminDashboard = () => {
                 <span className="text-[11px] font-bold tracking-widest uppercase">LIVE NOW</span>
               </div>
               <h2 className="text-[48px] md:text-[56px] font-bold mt-4 leading-none">---</h2>
-              <p className="text-[14px] opacity-70 mb-10">Users browsing the store</p>
+              <p className="text-sm opacity-70 mb-10">Users browsing the store</p>
               <div className="flex gap-1.5 items-end h-16">
                 {[40, 25, 45, 90, 35, 40].map((h, i) => (
                   <div key={i} className={`flex-1 rounded-md ${i === 3 ? 'bg-card' : 'bg-card/30'}`} style={{ height: `${h}%` }} />
@@ -312,7 +312,7 @@ const AdminDashboard = () => {
                       return (
                         <tr key={i} className="hover:bg-muted/30">
                           <td className="py-4 flex items-center gap-4 pl-2">
-                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-gray-100" />
+                            <img src={details?.coverImage || ''} className="w-10 h-10 rounded-lg object-cover bg-muted" />
                             <span className="font-bold text-sm dark:text-primary">{details?.name || "Unknown Product"}</span>
                           </td>
                           <td className="py-4 text-sm font-bold dark:text-primary">{p.totalOrdered}</td>
@@ -464,7 +464,7 @@ const RegionRow = ({ label, percent }) => (
 const TopProductItem = ({ name, price, id, img, onClick }) => (
   <div onClick={onClick} className="flex items-center justify-between group cursor-pointer">
     <div className="flex items-center gap-3">
-      <img src={img} className="w-11 h-11 rounded-lg object-cover bg-gray-100" />
+      <img src={img} className="w-11 h-11 rounded-lg object-cover bg-muted" />
       <div>
         <p className="text-sm font-bold dark:text-primary transition-colors group-hover:text-primary">{name}</p>
         <p className="text-[10px] text-muted-foreground dark:text-muted-foreground font-semibold mt-0.5">Item: {id}</p>

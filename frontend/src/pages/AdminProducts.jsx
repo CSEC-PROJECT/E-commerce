@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { Search, Bell, Grid, Plus, Edit2, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Search, Bell, Grid, Plus, Edit2, Trash2, ChevronLeft, ChevronRight, Loader2, ChevronDown } from 'lucide-react';
 import Sidebar from '../components/Common/Sidebar';
 import { useProducts } from '../hooks/useProducts';
 
@@ -9,15 +9,12 @@ const StatusBadge = ({ status }) => {
   let textColor = "text-muted-foreground";
   const normalizedStatus = String(status || '').toLowerCase();
 
-  if (normalizedStatus === 'new') {
-    bgColor = "bg-emerald-100 dark:bg-emerald-900/30";
-    textColor = "text-emerald-700 dark:text-emerald-400";
-  } else if (normalizedStatus === 'slightly used') {
-    bgColor = "bg-blue-100 dark:bg-blue-900/30";
-    textColor = "text-blue-700 dark:text-blue-400";
-  } else if (normalizedStatus === 'used') {
+  if (upperStatus === "SLIGHTLY USED") {
     bgColor = "bg-amber-100 dark:bg-amber-900/30";
-    textColor = "text-amber-700 dark:text-amber-400";
+    textColor = "text-amber-600 dark:text-amber-400";
+  } else if (upperStatus === "USED") {
+    bgColor = "bg-indigo-100 dark:bg-indigo-900/30";
+    textColor = "text-indigo-600 dark:text-indigo-400";
   }
 
   return (
@@ -33,12 +30,12 @@ const AdminProducts = () => {
   const mainRef = useRef(null);
 
   // State Declarations
-  const [activeTab, setActiveTab] = useState('All');
+  const [activeTab, setActiveTab] = useState('All Product');
   const [searchQuery, setSearchQuery] = useState('');
   const [tabSearchQuery, setTabSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All Categories');
   const [priceFilter, setPriceFilter] = useState('Any Price');
-  const [statusFilter, setStatusFilter] = useState('Any Status');
+  const [statusFilter, setStatusFilter] = useState('All Product');
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 5;
@@ -64,10 +61,10 @@ const AdminProducts = () => {
   const handleClearFilters = () => {
     setCategoryFilter('All Categories');
     setPriceFilter('Any Price');
-    setStatusFilter('Any Status');
+    setStatusFilter('All Product');
     setSearchQuery('');
     setTabSearchQuery('');
-    setActiveTab('All');
+    setActiveTab('All Product');
     setCurrentPage(1);
   };
 
@@ -111,8 +108,8 @@ const AdminProducts = () => {
             </div>
           </div>
           <div className="flex items-center gap-4 self-end sm:self-auto">
-            <button className="text-muted-foreground hover:text-primary transition-colors p-2"><Bell size={20} /></button>
-            <button className="text-muted-foreground hover:text-primary transition-colors p-2"><Grid size={20} /></button>
+            {/* <button className="text-muted-foreground hover:text-primary transition-colors p-2"><Bell size={20} /></button>
+            <button className="text-muted-foreground hover:text-primary transition-colors p-2"><Grid size={20} /></button> */}
             <button onClick={() => navigate('/admin/add-product')} disabled={loading} className="cursor-pointer flex items-center gap-2 bg-primary text-primary-foreground px-5 py-3 rounded-xl text-sm font-bold shadow-sm hover:brightness-110 transition-all disabled:opacity-50">
               <Plus size={18} /> Add Product
             </button>
@@ -129,64 +126,72 @@ const AdminProducts = () => {
         <section className="flex flex-wrap gap-4 mb-8">
           <div className="flex-1 min-w-[200px]">
             <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Category</label>
-            <select
-              value={categoryFilter}
-              onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
-              disabled={loading}
-              className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
-              <option>All Categories</option>
-              <option>Electronics</option>
-              <option>Footwear</option>
-              <option>Accessories</option>
-              <option>Furniture</option>
-              <option>Home Decor</option>
-              <option>Clothing</option>
-              <option>Beauty</option>
-              <option>Sports</option>
-              <option>Toys</option>
-              <option>Books</option>
-              <option>Music</option>
-              <option>Movies</option>
-              <option>Games</option>
-              <option>Other</option>
-            </select>
+            <div className="relative">
+              <select
+                value={categoryFilter}
+                onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
+                disabled={loading}
+                className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
+                <option>All Categories</option>
+                <option>Electronics</option>
+                <option>Footwear</option>
+                <option>Accessories</option>
+                <option>Furniture</option>
+                <option>Home Decor</option>
+                <option>Clothing</option>
+                <option>Beauty</option>
+                <option>Sports</option>
+                <option>Toys</option>
+                <option>Books</option>
+                <option>Music</option>
+                <option>Movies</option>
+                <option>Games</option>
+                <option>Other</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            </div>
           </div>
           <div className="flex-1 min-w-[200px]">
             <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Price Range</label>
-            <select
-              value={priceFilter}
-              onChange={(e) => { setPriceFilter(e.target.value); setCurrentPage(1); }}
-              disabled={loading}
-              className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
-              <option>Any Price</option>
-              <option>Under ETB 50</option>
-              <option>ETB 50 - ETB 100</option>
-              <option>ETB 100 - ETB 200</option>
-              <option>ETB 200 - ETB 500</option>
-              <option>ETB 500+</option>
-            </select>
+            <div className="relative">
+              <select
+                value={priceFilter}
+                onChange={(e) => { setPriceFilter(e.target.value); setCurrentPage(1); }}
+                disabled={loading}
+                className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
+                <option>Any Price</option>
+                <option>Under ETB 50</option>
+                <option>ETB 50 - ETB 100</option>
+                <option>ETB 100 - ETB 200</option>
+                <option>ETB 200 - ETB 500</option>
+                <option>ETB 500+</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            </div>
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Product Status</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => { 
-                const val = e.target.value;
-                setStatusFilter(val); 
-                if (val === 'new') setActiveTab('New');
-                else if (val === 'slightly used') setActiveTab('SlightlyUsed');
-                else if (val === 'used') setActiveTab('Used');
-                else if (val === 'Any Status') setActiveTab('All');
-                else setActiveTab('');
-                setCurrentPage(1); 
-              }}
-              disabled={loading}
-              className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
-              <option>Any Status</option>
-              <option value="new">new</option>
-              <option value="slightly used">slightly used</option>
-              <option value="used">used</option>
-            </select>
+            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2 block">Stock Status</label>
+            <div className="relative">
+              <select
+                value={statusFilter}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setStatusFilter(val);
+                  if (val === 'All Product') setActiveTab('All Product');
+                  else if (val === 'New') setActiveTab('New');
+                  else if (val === 'Slightly Used') setActiveTab('Slightly Used');
+                  else if (val === 'Used') setActiveTab('Used');
+                  setCurrentPage(1);
+                }}
+                disabled={loading}
+                className="w-full bg-muted border border-border rounded-xl py-3 px-4 text-sm font-semibold text-foreground appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50 transition-colors disabled:opacity-50">
+                <option>All Product</option>
+                <option>New</option>
+                <option>Slightly Used</option>
+                <option>Used</option>
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+            </div>
           </div>
           <div className="flex-1 min-w-[200px] flex items-end">
             <button
@@ -202,28 +207,21 @@ const AdminProducts = () => {
         <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
           <div className="flex bg-muted rounded-2xl p-1.5 w-full sm:w-auto border border-border">
             <button
-              onClick={() => { setActiveTab('All'); setStatusFilter('Any Status'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('All Product'); setStatusFilter('All Product'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'All' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'All Product' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
               All Product
             </button>
             <button
-              onClick={() => { setActiveTab('New'); setStatusFilter('new'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('Slightly Used'); setStatusFilter('Slightly Used'); setCurrentPage(1); }}
               disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'New' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              New
-            </button>
-            <button
-              onClick={() => { setActiveTab('SlightlyUsed'); setStatusFilter('slightly used'); setCurrentPage(1); }}
-              disabled={loading}
-              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'SlightlyUsed' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
+              className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Slightly Used' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
               Slightly Used
             </button>
             <button
-              onClick={() => { setActiveTab('Used'); setStatusFilter('used'); setCurrentPage(1); }}
+              onClick={() => { setActiveTab('Used'); setStatusFilter('Used'); setCurrentPage(1); }}
               disabled={loading}
               className={`cursor-pointer px-6 py-2 rounded-xl text-sm font-bold transition-all disabled:opacity-50 ${activeTab === 'Used' ? 'bg-card shadow-sm text-primary border border-border/50' : 'text-muted-foreground hover:text-foreground'}`}
             >
@@ -344,7 +342,7 @@ const AdminProducts = () => {
         )}
 
       </main>
-    </div>
+    </div >
   );
 };
 
