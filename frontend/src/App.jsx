@@ -31,6 +31,8 @@ import ProductPreview from './pages/ProductPreviewPage'
 import TransactionStatusPage from './pages/TransactionStatusPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
+import UserChangePassword from './components/UserChangePassword'
+import { useModalStore } from './store/modalStore'
 
 function AppRoutes() {
   const location = useLocation()
@@ -51,7 +53,7 @@ function AppRoutes() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-        <Route path="/cart" element={<CartPage />} />
+        <Route path="/cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><SettingPage /></ProtectedRoute>} />
         <Route path="/my-products" element={<MyProducts />} />
         <Route path="/transaction/success" element={<TransactionStatusPage success={true} />} />
@@ -102,6 +104,7 @@ const App = () => {
 
     <>
       <ToastContainer />
+      <UserChangePassword />
       <AppRoutes />
       <Toaster position="bottom-right" reverseOrder={false} />
     </>

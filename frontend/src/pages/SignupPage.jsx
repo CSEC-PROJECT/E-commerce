@@ -60,7 +60,7 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
-      <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-10 md:px-10 bg-background">
+      <div className="flex-1 w-full md:w-1/2 flex items-center justify-center px-6 py-10 md:px-10 bg-background">
         <div className="w-full max-w-lg space-y-8 rounded-2xl border border-border/60 bg-card/60 p-8 shadow-sm backdrop-blur-sm">
           <div className="text-center lg:text-left animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <h1 className="text-4xl font-black tracking-tight bg-gradient-to-r from-primary to-indigo-400 bg-clip-text text-transparent">Create account</h1>
