@@ -294,6 +294,7 @@ export const confirmPasswordReset = async (req, res) => {
 
 export const changePassword = async (req, res) => {
     const userId = req.user._id; 
+    console.log("Change Password Request Body:", req.body);
     const { oldPassword, newPassword } = req.body;
 
     try {

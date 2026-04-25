@@ -110,6 +110,20 @@ export default function ProductPreviewModal({ isOpen, onClose, onPublish, formDa
                 </p>
               )}
 
+              {/* Colors preview */}
+              {formData.colors && formData.colors.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {formData.colors.map((color, i) => (
+                    <div 
+                      key={i} 
+                      className="w-4 h-4 rounded-full border border-border" 
+                      style={{ backgroundColor: color.startsWith('#') ? color : color.toLowerCase() }}
+                      title={color}
+                    />
+                  ))}
+                </div>
+              )}
+
               {/* Meta chips */}
               <div className="flex flex-wrap gap-2 pt-1">
                 {formData.status && (

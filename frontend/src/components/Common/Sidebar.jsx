@@ -72,6 +72,16 @@ const Sidebar = () => {
           ))}
         </nav>
 
+        <div className="mt-auto border-t border-border p-4">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-4 px-4 py-3 rounded-xl text-red-600 bg-white border border-red-100 font-bold hover:bg-red-50 transition-all"
+          >
+            <LogOut size={20} />
+            Log out
+          </button>
+        </div>
       </aside>
 
       {isAdminRoute && (
@@ -124,20 +134,19 @@ const Sidebar = () => {
               ))}
             </nav>
 
-            <div className="border-t border-border p-3">
+            <div className="mt-auto border-t border-border p-4 pb-24">
               <button
                 type="button"
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-destructive text-destructive font-semibold hover:bg-destructive/10 transition-colors"
+                className="w-full flex items-center justify-center gap-3 px-4 py-4 rounded-xl bg-white text-red-600 font-bold hover:bg-red-50 transition-all shadow-sm border border-red-200"
               >
-                <LogOut size={17} />
+                <LogOut size={20} />
                 Log out
               </button>
             </div>
           </aside>
         </>
       )}
-
     </>
   );
 };

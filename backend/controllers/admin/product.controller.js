@@ -6,7 +6,16 @@ const createProduct = async(req,res) =>{
     console.log("Body:", req.body);
     console.log("Files:", req.files);
 
-    const { name, description, price, discount, category, stock, status, madeIn, material } = req.body;
+    let { name, description, price, discount, category, stock, status, madeIn, material, colors } = req.body;
+
+    if (colors && typeof colors === 'string') {
+        try {
+            colors = JSON.parse(colors);
+        } catch (e) {
+            colors = colors.split(',').map(c => c.trim());
+        }
+    }
+
     const coverImage = req.body.coverImage || (req.files && req.files.coverImage && req.files.coverImage[0] && req.files.coverImage[0].path);
     const detailImages = [];
     if (req.files && req.files.detailImages) {
@@ -45,6 +54,7 @@ const createProduct = async(req,res) =>{
             status,
             madeIn,
             material,
+            colors: colors || [],
             coverImage,
             detailImages,
         });
@@ -68,6 +78,15 @@ const updateProduct = async(req,res) =>{
             return res.status(400).json({message:"Invalid product ID"})
         }
         const updateData = { ...req.body };
+        
+        if (updateData.colors && typeof updateData.colors === 'string') {
+            try {
+                updateData.colors = JSON.parse(updateData.colors);
+            } catch (e) {
+                updateData.colors = updateData.colors.split(',').map(c => c.trim());
+            }
+        }
+
         Object.keys(updateData).forEach(key => {
             if (updateData[key] === "" || updateData[key] === null) {
                 delete updateData[key];

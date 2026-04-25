@@ -8,7 +8,6 @@ import { useProductStore } from '../store/productStore';
 import { useToastStore } from '../store/toastStore';
 import { useAuthStore } from '../store/authStore';
 
-// Skeleton — only shown on the very first load (no cached data yet)
 const SkeletonCard = () => (
   <div className="flex flex-col w-full animate-pulse">
     <div className="w-full aspect-[4/5] bg-muted rounded-[1.5rem]" />
@@ -34,7 +33,7 @@ const ProductsPage = () => {
     products,
     filteredProducts,
     totalProducts,
-    loading,       // true only when grid is empty (first paint)
+    loading,       
     error,
     fetchProducts,
     applyFilters,
@@ -59,7 +58,6 @@ const ProductsPage = () => {
     setSearchInput(searchQuery);
   }, [searchQuery]);
 
-  // Apply filters locally whenever searchParams or products change
   useEffect(() => {
     applyFilters({
       category,
@@ -92,11 +90,8 @@ const ProductsPage = () => {
 
   const hasActiveFilters = category || searchQuery || minPrice || maxPrice;
 
-  // Grid content decision:
-  //  loading=true  → show skeletons (no data at all)
   const showSkeletons = loading && products.length === 0;
 
-  // Frontend Pagination
   const limit = 12;
   const productsToDisplay = filteredProducts.slice((page - 1) * limit, page * limit);
 
@@ -109,7 +104,6 @@ const ProductsPage = () => {
 
           <div className="flex-1">
 
-            {/* ── Search bar + status ── */}
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
               <div className="relative w-full max-w-md">
                 <input
@@ -136,7 +130,6 @@ const ProductsPage = () => {
               </div>
             </div>
 
-            {/* ── Active filter chips ── */}
             {hasActiveFilters && (
               <div className="flex flex-wrap gap-2 mb-6">
                 {category && (
@@ -178,7 +171,6 @@ const ProductsPage = () => {
               </div>
             )}
 
-            {/* ── Product grid ── */}
             <div
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-10 transition-opacity duration-200"
             >
@@ -223,7 +215,6 @@ const ProductsPage = () => {
               )}
             </div>
 
-            {/* ── Pagination ── */}
             {!loading && filteredProducts.length > 0 && (
               <div className="mt-16 border-t border-border pt-8">
                 <Pagination

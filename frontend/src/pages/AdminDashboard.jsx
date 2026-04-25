@@ -2,7 +2,6 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { MoreVertical, Filter, Search, Plus, Loader2 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../components/Common/Sidebar';
 import { useAdminStore } from '../store/adminStore';
 import { useProductStore } from '../store/productStore';
 
@@ -86,9 +85,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-background text-foreground font-sans">
-      <Sidebar />
-      <main className="flex-1 p-4 md:p-10 overflow-y-auto space-y-6 md:space-y-10 pb-24 lg:pb-10">
+    <div className="space-y-6 md:space-y-10">
 
         {/* Row 1: Top Stats */}
         <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8">
@@ -114,11 +111,11 @@ const AdminDashboard = () => {
               />
               <StatCard
                 isDouble
-                title="Pending & Canceled"
+                title="Success & Failed"
                 value={stats?.pendingOrders || 0}
                 value2={stats?.cancelledOrders || 0}
-                sub1="Pending"
-                sub2="Canceled"
+                sub1="Success"
+                sub2="Failed"
                 onClick={() => document.getElementById('recent-transactions')?.scrollIntoView({ behavior: 'smooth' })}
               />
             </>
@@ -384,14 +381,14 @@ const AdminDashboard = () => {
               </button>
               <h4 className="font-bold text-lg dark:text-primary">Add New Product</h4>
               <p className="text-xs text-muted-foreground dark:text-muted-foreground mt-2 mb-6 px-4">Select a category below to start listing your next best-seller</p>
-              <div className="flex gap-3">
-                <button onClick={() => navigate('/admin/add-product?category=Electronics')} className="px-5 py-2 bg-card border border-border dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-primary">Electronics</button>
-                <button onClick={() => navigate('/admin/add-product?category=Fashion')} className="px-5 py-2 bg-card border border-border dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-primary">Fashion</button>
+              <div className="flex flex-wrap gap-2">
+                {["Electronics", "Fashion", "Home & Living", "Beauty & Personal Care", "Sports & Outdoor", "Books & Education"].map(cat => (
+                  <button key={cat} onClick={() => navigate(`/admin/add-product?category=${encodeURIComponent(cat)}`)} className="px-4 py-2 bg-card border border-border dark:border-border rounded-xl text-[10px] font-bold uppercase shadow-sm cursor-pointer hover:border-primary transition-all active:scale-95">{cat}</button>
+                ))}
               </div>
             </div>
           </div>
         </section>
-      </main>
     </div>
   );
 };

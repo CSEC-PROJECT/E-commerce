@@ -48,7 +48,8 @@ const useCartStore = create((set, get) => ({
       const cleanItems = items.map(i => ({
         product: resolveProductId(i),
         quantity: i.quantity,
-        price: i.price
+        price: i.price,
+        color: i.color
       })).filter(i => i.product);
       const totalPrice = cleanItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 
@@ -75,7 +76,8 @@ const useCartStore = create((set, get) => ({
       const cleanItems = items.map(i => ({
         product: resolveProductId(i),
         quantity: i.quantity,
-        price: i.price
+        price: i.price,
+        color: i.color
       })).filter(i => i.product);
       const totalPrice = cleanItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
 

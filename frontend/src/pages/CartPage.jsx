@@ -112,7 +112,11 @@ const CartPage = () => {
                                 </svg>
                                 <h3 className="text-2xl font-bold text-foreground mb-2">Your shopping bag is empty</h3>
                                 <p className="text-muted-foreground mb-8 max-w-sm">Looks like you haven't added anything to your bag yet. Explore our collections and find something you love.</p>
-                                <Link to="/products" className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background">
+                                <Link 
+                                    to={isLoggedIn ? "/products" : "/login"} 
+                                    state={!isLoggedIn ? { from: { pathname: "/products" } } : undefined}
+                                    className="bg-primary text-white px-8 py-3 rounded-xl font-bold hover:bg-primary/90 hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
+                                >
                                     Start Shopping
                                 </Link>
                             </div>

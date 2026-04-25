@@ -29,6 +29,7 @@ const productSchema = new mongoose.Schema({
     category:{
         type:String,
         required: true,
+        enum: ["Electronics", "Fashion", "Home & Living", "Beauty & Personal Care", "Sports & Outdoor", "Books & Education"],
         trim: true
     },
     madeIn: {
@@ -68,6 +69,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         min: 0,
+    },
+    colors: {
+        type: [String],
+        default: [],
     },
 
 },{timestamps:true});
