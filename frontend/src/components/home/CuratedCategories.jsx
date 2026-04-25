@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Catagory1 from "../../assets/ImagesForHome/Catagories1.jpg"
-import Catagory2 from "../../assets/ImagesForHome/Catagories2.png"
+import Catagory2 from "../../assets/ImagesForHome/Catagories2.jpg"
 import Catagory3 from "../../assets/ImagesForHome/Catagories3.jpg"
 import { useProductStore } from "../../store/productStore";
 
@@ -11,8 +11,8 @@ export default function CuratedCategories() {
   const uniqueCategories = [...new Set(products.filter(p => p.category).map(p => p.category))];
   
   const baseCategories = [
-    { action: "Step into your best day", image: Catagory1 },
-    { action: "Elevate every outfit", image: Catagory2 },
+    { action: "Step into your best day", image: Catagory2 },
+    { action: "Elevate every outfit", image: Catagory1 },
     { action: "Life is your runway", image: Catagory3 },
   ];
 
@@ -24,8 +24,8 @@ export default function CuratedCategories() {
   }));
 
   const displayCategories = dynamicCategories.length > 0 ? dynamicCategories : [
-    { id: 1, title: "Electronics", action: "Discover latest gadgets", image: Catagory1 },
-    { id: 2, title: "Fashion", action: "Step into your best day", image: Catagory2 },
+    { id: 1, title: "Electronics", action: "Discover latest gadgets", image: Catagory2 },
+    { id: 2, title: "Fashion", action: "Step into your best day", image: Catagory1 },
     { id: 3, title: "Beauty", action: "Enhance your natural glow", image: Catagory3 },
   ];
 
