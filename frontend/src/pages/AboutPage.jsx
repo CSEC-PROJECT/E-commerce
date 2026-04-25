@@ -5,7 +5,7 @@ const STATS_DATA = [
   { value: '10K+', label: 'Customers' },
   { value: '500+', label: 'Products' },
   { value: '4.8 ★', label: 'Rating' },
-  { value: 'Worldwide', label: 'Shipping' },
+  { value: 'NationalWide', label: 'Shipping' },
 ];
 
 const FEATURES_DATA = [
@@ -80,7 +80,7 @@ const OurStorySection = () => (
       </h2>
       <div className="space-y-4 text-muted-foreground text-[16px] leading-relaxed">
         <p>
-          Founded in 2024, Mesob Market was born from a desire to bridge the gap between artisanal craftsmanship and the convenience of modern technology.
+          Founded in 2026, Mesob Market was born from a desire to bridge the gap between artisanal craftsmanship and the convenience of modern technology.
           We spent years scouting for partners who share our obsession with detail.
         </p>
         <p>

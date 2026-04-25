@@ -46,8 +46,9 @@ export async function apiRequest(path, options = {}) {
   let data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 && !path.includes("/api/auth/refresh")) {
       try {
+
         const refreshResult = await useAuthStore.getState().refresh();
         if (refreshResult?.accessToken) {
           const retryResponse = await fetch(buildUrl(path), {

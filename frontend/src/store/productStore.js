@@ -84,11 +84,7 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
-  // ── fetchLatestProducts ────────────────────────────────────────────────────
-  /**
-   * Derive latest 8 products from the `products` array locally.
-   * Ensures products are fetched if not yet available.
-   */
+
   fetchLatestProducts: async () => {
     const state = get();
     let currentProducts = state.products;

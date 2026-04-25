@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+
 import { Eye, EyeOff, ArrowRight, CheckCircle, X, Loader2 } from "lucide-react";
 import { useModalStore } from "../store/modalStore";
 import { apiRequest } from "../lib/apiClient";
@@ -67,8 +69,10 @@ const UserChangePassword = () => {
             closeChangePassword();
             setPasswords({ current: "", new: "", confirm: "" });
         } catch (error) {
+            console.error("Change Password Error:", error);
             toast.error(error.message || "Failed to update password");
         } finally {
+
             setLoading(false);
         }
     };
@@ -126,13 +130,14 @@ const UserChangePassword = () => {
                                 {showCurrent ? <EyeOff size={20} /> : <Eye size={20} />}
                             </button>
                         </div>
-                        <button 
-                            type="button" 
-                            onClick={() => window.open(`${import.meta.env.VITE_API_BASE_URL || "https://e-commerce-he4h.onrender.com"}/api/auth/forgot-password`, "_blank")}
+                        <Link 
+                            to="/forgot-password"
+                            onClick={closeChangePassword}
                             className="text-primary text-[13px] font-bold mt-1 px-1 hover:underline underline-offset-4 tracking-tight transition-all"
                         >
                             Forgot Current Password? Click here
-                        </button>
+                        </Link>
+
                     </div>
 
                     {/* New Password */}
