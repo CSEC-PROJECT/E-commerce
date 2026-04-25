@@ -8,7 +8,7 @@ import { useUserStore } from '../store/userStore';
 import toast from 'react-hot-toast';
 
 const AdminUsers = () => {
-  const { users, fetchUsers, deleteUser, totalUsers, totalPages, loading, error } = useUserStore();
+  const { users, fetchUsers, deleteUser, toggleBanUser, totalUsers, totalPages, loading, error } = useUserStore();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -44,8 +44,8 @@ const AdminUsers = () => {
     }
   };
 
-  const handleBanUser = (id) => {
-    toast("Ban user logic not implemented in backend.", { icon: 'ℹ️' });
+  const handleBanUser = async (id) => {
+    await toggleBanUser(id);
   };
 
   const handleExport = () => {

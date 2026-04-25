@@ -16,6 +16,8 @@ import successMessage from './routes/payCheck.route.js';
 import dashboardAdminRoutes from "./routes/admin/dashboard.route.js";
 import financeAdminRoutes from "./routes/admin/finance.route.js";
 import ragRoutes from "./routes/rag.route.js";
+import communityRoutes from "./routes/communityPost.route.js";
+
 
 
 import swaggerUi from "swagger-ui-express";
@@ -79,6 +81,8 @@ app.use("/checkout",successMessage)
 app.use("/api/admin/dashboard", dashboardAdminRoutes);
 app.use("/api/admin/finance", financeAdminRoutes);
 app.use("/api/rag", ragRoutes);
+app.use("/api/community", communityRoutes);
+
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

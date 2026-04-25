@@ -39,7 +39,16 @@ const userSchema = new mongoose.Schema({
         type: Date,
     },
     profilePic: String,
-    cloudinaryId: String
+    cloudinaryId: String,
+    reportCount: {
+        type: Number,
+        default: 0
+    },
+    isBanned: {
+        type: Boolean,
+        default: false
+    }
+
 
 },
     {timestamps: true}

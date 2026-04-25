@@ -35,6 +35,8 @@ import ResetPasswordPage from './pages/ResetPasswordPage'
 import UserChangePassword from './components/UserChangePassword'
 import { useModalStore } from './store/modalStore'
 import AdminLayout from './components/Admin/AdminLayout'
+import CommunityPage from './pages/CommunityPage'
+
 
 function AppRoutes() {
   const location = useLocation()
@@ -50,6 +52,8 @@ function AppRoutes() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<DetailsPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />

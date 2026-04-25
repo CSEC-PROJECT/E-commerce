@@ -9,8 +9,10 @@ import {
     Users, 
     Wallet, 
     Settings,
-    Info
+    Info,
+    Users as UsersIcon
 } from 'lucide-react';
+
 import { useAuthStore } from '../../store/authStore';
 import useCartStore from '../../store/cartStore';
 
@@ -35,6 +37,8 @@ const BottomNav = () => {
         { id: 'cart', icon: ShoppingCart, to: '/cart', label: 'Cart', badge: cartItemCount },
         { id: 'about', icon: Info, to: '/about', label: 'About' },
         { id: 'settings', icon: User, to: '/settings', label: 'Account' },
+
+
     ];
 
     const userItems = [
@@ -42,7 +46,9 @@ const BottomNav = () => {
         { id: 'products', icon: ShoppingBag, to: '/products', label: 'Shop' },
         { id: 'cart', icon: ShoppingCart, to: '/cart', label: 'Cart', badge: cartItemCount },
         { id: 'about', icon: Info, to: '/about', label: 'About' },
+        { id: 'community', icon: UsersIcon, to: '/community', label: 'Community' },
         { id: 'settings', icon: User, to: '/settings', label: 'Account' },
+
     ];
 
     const items = isAdmin ? adminItems : userItems;

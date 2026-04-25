@@ -78,4 +78,33 @@ const deleteUser = async(req,res) =>{
     }
 }
 
-export {getAllUsers,getUserById,deleteUser}
+const toggleBanUser = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid user ID" })
+        }
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" })
+        }
+
+        user.isBanned = !user.isBanned;
+        if (user.isBanned === false) {
+            user.reportCount = 0; // Reset report count when unbanning
+        }
+        await user.save();
+
+        return res.status(200).json({ 
+            message: `User ${user.isBanned ? 'banned' : 'unbanned'} successfully`,
+            user: { _id: user._id, isBanned: user.isBanned, reportCount: user.reportCount }
+        });
+    } catch (error) {
+        console.error("Error toggling ban:", error);
+        return res.status(500).json({ message: "Server Error" });
+    }
+}
+
+
+export { getAllUsers, getUserById, deleteUser, toggleBanUser }
