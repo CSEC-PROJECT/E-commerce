@@ -4,7 +4,17 @@ import Review from "../models/review.model.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Fuse from "fuse.js";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+let genAIInstance = null;
+const getGenAI = () => {
+  if (!genAIInstance) {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not defined in environment variables");
+    }
+    genAIInstance = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  }
+  return genAIInstance;
+};
+
 
 const retryGeminiCall = async (generateContentFn, maxRetries = 2, perAttemptTimeoutMs = 15000) => {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -145,8 +155,9 @@ export const ragChat = async (req, res) => {
       return res.status(400).json({ message: "Message is required" });
     }
 
-    const intentModel = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+    const intentModel = getGenAI().getGenerativeModel({
+      model: "gemini-1.5-flash",
+
       systemInstruction: "You are a helpful and conversational e-commerce AI shopping assistant. Your job is to determine what the user wants. If they are just greeting, asking about you, or making small talk, categorize as 'chitchat' and provide a friendly response. If they are asking for products, checking stock, asking for comparisons, or asking about reviews, extract a highly concise 'searchQuery' (1-2 words maximum) to search the database, and set the correct intent. Do not provide a reply if it is not chitchat.",
       generationConfig: {
         responseMimeType: "application/json",
@@ -233,8 +244,9 @@ export const ragChat = async (req, res) => {
 
     const enrichedProducts = mapProductsWithContext(pickedProducts.map(withDiscountedPrice), reviewMap);
 
-    const finalModel = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
+    const finalModel = getGenAI().getGenerativeModel({
+      model: "gemini-1.5-flash",
+
       systemInstruction: "You are an expert e-commerce shopping assistant.",
       generationConfig: {
         responseMimeType: "application/json",

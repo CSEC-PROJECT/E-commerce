@@ -440,6 +440,17 @@ const NavBar = () => {
                                                 <button
                                                     type="button"
                                                     role="menuitem"
+                                                    onClick={() => { openChangePassword(); setUserMenuOpen(false); }}
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-foreground hover:bg-primary/5 hover:text-primary rounded-[14px] transition-all duration-200 cursor-pointer"
+                                                >
+                                                    <Lock size={18} className="opacity-70" />
+                                                    Change Password
+                                                </button>
+
+
+                                                <button
+                                                    type="button"
+                                                    role="menuitem"
                                                     onClick={handleLogout}
                                                     className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-red-600 bg-white border-red-100 hover:bg-red-50 rounded-[14px] transition-all duration-200 cursor-pointer"
                                                 >
@@ -797,6 +808,16 @@ const NavBar = () => {
                                         My products
                                     </Link>
                                 )}
+
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsMobileMenuOpen(false); openChangePassword(); }}
+                                    className="flex items-center justify-center gap-2 w-full px-4 py-3.5 text-base font-bold text-foreground border border-border bg-background hover:bg-muted rounded-xl transition-colors"
+                                >
+                                    <Lock size={20} />
+                                    Change Password
+                                </button>
+
 
                                 <button
                                     type="button"

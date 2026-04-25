@@ -113,7 +113,7 @@ const ProductDetail = ({ onCategoryLoad }) => {
 
         {/* Gallery Section */}
         <div className="space-y-4">
-          <div className="aspect-[4/5] w-full bg-muted rounded-3xl overflow-hidden relative border border-border">
+          <div className="aspect-[6/7] w-full bg-muted rounded-3xl overflow-hidden relative border border-border">
             <img
               src={activeImage}
               alt={product.name}

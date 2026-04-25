@@ -4,7 +4,9 @@ import { toast } from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 import { loginSchema } from "../lib/authValidation";
 import { z } from "zod";
+import { Eye, EyeOff } from "lucide-react";
 import authHeroBg from "../assets/auth_hero_bg.png";
+
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
 
   useEffect(() => {
     if (searchParams.get("verified") === "true") {
@@ -114,13 +118,21 @@ export default function LoginPage() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    className="flex h-11 w-full rounded-md border border-input bg-background pl-10 pr-10 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                     placeholder="••••••••"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+
                 </div>
               </div>
 

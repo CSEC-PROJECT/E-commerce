@@ -177,23 +177,6 @@ const CommunityPage = () => {
                     {/* Main Content: Post Creation & Feed */}
                     <div className="lg:col-span-9 space-y-8">
 
-                        {/* Search & Actions Bar */}
-                        <div className="flex flex-col sm:flex-row gap-4 items-center">
-                            <div className="relative flex-1 w-full">
-                                <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                                <input
-                                    type="text"
-                                    placeholder="Search the community..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    className="w-full pl-12 pr-6 py-4 bg-card/80 backdrop-blur-md border border-border/50 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm"
-                                />
-                            </div>
-                            <button className="h-[52px] px-8 bg-foreground text-background rounded-full text-[13px] font-black uppercase tracking-wider hover:opacity-90 active:scale-95 transition-all shadow-lg whitespace-nowrap hidden sm:flex items-center gap-2">
-                                <Plus className="w-4 h-4" /> Start Discussion
-                            </button>
-                        </div>
-
                         {/* Restored Creation Suite */}
                         <div className="bg-card rounded-[40px] p-8 shadow-xl shadow-black/[0.03] relative overflow-hidden group transition-all hover:shadow-2xl hover:shadow-primary/[0.05]">
                             <div className="absolute top-0 right-0 p-8 opacity-[0.02] pointer-events-none group-focus-within:opacity-10 transition-opacity">

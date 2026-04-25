@@ -1,9 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import Catagory1 from "../../assets/ImagesForHome/Catagories1.png"
+import Catagory1 from "../../assets/ImagesForHome/Catagories1.jpg"
 import Catagory2 from "../../assets/ImagesForHome/Catagories2.png"
-import Catagory3 from "../../assets/ImagesForHome/Catagories3.png"
-
+import Catagory3 from "../../assets/ImagesForHome/Catagories3.jpg"
 import { useProductStore } from "../../store/productStore";
 
 export default function CuratedCategories() {
