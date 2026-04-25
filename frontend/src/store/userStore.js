@@ -57,4 +57,26 @@ export const useUserStore = create((set) => ({
       return false;
     }
   },
+
+  toggleBanUser: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await apiRequest(`/api/admin/users/${id}/toggle-ban`, {
+        method: "POST",
+      });
+
+      set((state) => ({
+        users: state.users.map((u) =>
+          u._id === id ? { ...u, isBanned: response.user.isBanned, reportCount: response.user.reportCount } : u
+        ),
+        loading: false,
+      }));
+      toast.success(response.message);
+      return true;
+    } catch (error) {
+      set({ error: error.message || "Failed to toggle ban", loading: false });
+      toast.error(error.message || "Failed to toggle ban");
+      return false;
+    }
+  },
 }));

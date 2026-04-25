@@ -88,7 +88,6 @@ const NavBar = () => {
         setTheme(isDark ? 'light' : 'dark');
     };
 
-    // Prevent body scrolling when drawer is open
     useEffect(() => {
         if (isMobileMenuOpen) {
             document.body.style.overflow = 'hidden';
@@ -155,9 +154,6 @@ const NavBar = () => {
                                         <Link to="/" className={navLinkClass('/')}>
                                             Home
                                         </Link>
-                                        <Link to="/cart" className={navLinkClass('/cart')}>
-                                            Collections
-                                        </Link>
 
                                         {/* Admin Categories Dropdown */}
                                         <div className="relative group h-[72px] flex items-center">
@@ -206,6 +202,9 @@ const NavBar = () => {
                                         <Link to="/about" className={navLinkClass('/about')}>
                                             About Us
                                         </Link>
+
+
+
                                     </>
                                 ) : !accessToken ? (
                                     /* ── Landing Page (Not logged in) links ── */
@@ -264,6 +263,10 @@ const NavBar = () => {
                                         <Link to="/about" className={navLinkClass('/about')}>
                                             About Us
                                         </Link>
+                                        <Link to="/community" className={navLinkClass('/community')}>
+                                            Community
+                                        </Link>
+
                                     </>
                                 ) : (
                                     /* ── User links ── */
@@ -322,6 +325,10 @@ const NavBar = () => {
                                         <Link to="/about" className={navLinkClass('/about')}>
                                             About Us
                                         </Link>
+                                        <Link to="/community" className={navLinkClass('/community')}>
+                                            Community
+                                        </Link>
+
                                     </>
                                 )}
                             </div>
@@ -346,7 +353,7 @@ const NavBar = () => {
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onKeyDown={handleSearchSubmit}
-                                    className="w-full pl-10 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted border border-transparent rounded-full text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
+                                    className="w-full pl-10 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted  rounded-full text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
                                 />
                             </div>
 
@@ -434,7 +441,7 @@ const NavBar = () => {
                                                     type="button"
                                                     role="menuitem"
                                                     onClick={handleLogout}
-                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-red-600 bg-white border border-red-100 hover:bg-red-50 rounded-[14px] transition-all duration-200 cursor-pointer"
+                                                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-[14px] font-bold text-red-600 bg-white border-red-100 hover:bg-red-50 rounded-[14px] transition-all duration-200 cursor-pointer"
                                                 >
                                                     <LogOut size={18} className="opacity-100" />
                                                     Log out
@@ -613,6 +620,9 @@ const NavBar = () => {
                                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
                                     About Us
                                 </Link>
+
+
+
                             </>
                         ) : !accessToken ? (
                             /* ── Landing Page (Not logged in) sidebar links ── */
@@ -675,6 +685,10 @@ const NavBar = () => {
                                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
                                     About Us
                                 </Link>
+                                <Link to="/community" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/community')}>
+                                    Community
+                                </Link>
+
                             </>
                         ) : (
                             /* ── User sidebar links ── */
@@ -737,6 +751,10 @@ const NavBar = () => {
                                 <Link to="/about" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/about')}>
                                     About Us
                                 </Link>
+                                <Link to="/community" onClick={() => setIsMobileMenuOpen(false)} className={mobileNavLinkClass('/community')}>
+                                    Community
+                                </Link>
+
                             </>
                         )}
                     </nav>

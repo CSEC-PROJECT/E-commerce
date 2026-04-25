@@ -11,7 +11,6 @@ import { useToastStore } from "../store/toastStore";
 import { useProductStore } from "../store/productStore";
 import { ShoppingCart, Star, Sparkles, X } from "lucide-react";
 
-/* ─── Home Product Card ─── */
 const HomeProductCard = ({ product }) => {
   const { user } = useAuthStore();
   const addToCart = useCartStore((state) => state.addToCart);
@@ -34,7 +33,6 @@ const HomeProductCard = ({ product }) => {
 
   return (
     <Link to={`/product/${product._id}`} className="group bg-card rounded-[2rem] p-4 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col">
-      {/* Image */}
       <div className="w-full aspect-square bg-muted rounded-[1.5rem] overflow-hidden mb-5">
         <img 
           src={product.coverImage} 

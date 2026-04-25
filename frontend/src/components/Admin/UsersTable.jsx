@@ -38,6 +38,7 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
               <th className="py-4 pl-6">Customer ID</th>
               <th className="py-4">User Identity</th>
               <th className="py-4">Role</th>
+              <th className="py-4">Reports</th>
               <th className="py-4">Status</th>
               <th className="py-4 pr-6 text-right">Actions</th>
             </tr>
@@ -55,22 +56,32 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
                 <td className="py-4 text-[14px] text-foreground font-bold capitalize">
                   {Array.isArray(user.role) ? user.role.join(", ") : (user.role || 'User')}
                 </td>
+                <td className="py-4 text-[14px] font-bold">
+                  <span className={`${(user.reportCount || 0) >= 5 ? 'text-red-500' : (user.reportCount || 0) > 0 ? 'text-amber-500' : 'text-muted-foreground'}`}>
+                    {user.reportCount || 0} Reports
+                  </span>
+                </td>
                 <td className="py-4">
-                  {user.isVerified ? (
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider bg-green-500/10 text-green-500">VERIFIED</span>
-                  ) : (
-                    <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wider bg-gray-500/10 text-gray-500">UNVERIFIED</span>
-                  )}
+                  <div className="flex flex-col gap-1">
+                    {user.isVerified ? (
+                      <span className="px-3 py-1 rounded-full text-[8px] font-black tracking-wider bg-green-500/10 text-green-500 text-center">VERIFIED</span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-full text-[8px] font-black tracking-wider bg-gray-500/10 text-gray-500 text-center">UNVERIFIED</span>
+                    )}
+                    {user.isBanned && (
+                      <span className="px-3 py-1 rounded-full text-[8px] font-black tracking-wider bg-red-500 text-white text-center">BANNED</span>
+                    )}
+                  </div>
                 </td>
                 <td className="py-4 pr-6">
                   <div className="flex justify-end gap-3 text-muted-foreground">
-                    {/* <button
+                    <button
                       onClick={() => onBan && onBan(user._id)}
-                      className={`cursor-pointer transition-all active:scale-90 hover:bg-muted hover:text-foreground p-1.5 rounded-lg`}
-                      title="Ban User"
+                      className={`cursor-pointer transition-all active:scale-90 p-1.5 rounded-lg ${user.isBanned ? 'text-green-500 bg-green-500/10 hover:bg-green-500/20' : 'hover:bg-muted hover:text-foreground'}`}
+                      title={user.isBanned ? "Unban User" : "Ban User"}
                     > 
-                    <Ban size={18} />
-                  </button> */}
+                      <Ban size={18} />
+                    </button>
                     <button
                       onClick={() => onDelete && onDelete(user._id)}
                       className="cursor-pointer hover:text-red-500 hover:bg-red-500/10 p-1.5 rounded-lg transition-all active:scale-90"
@@ -80,6 +91,7 @@ const UsersTable = ({ users = [], currentPage, setCurrentPage, totalPages = 1, t
                     </button>
                   </div>
                 </td>
+
               </tr>
             ))}
             {(!users || users.length === 0) && (

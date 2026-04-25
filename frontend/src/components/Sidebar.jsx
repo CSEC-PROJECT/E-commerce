@@ -164,7 +164,7 @@ const Sidebar = () => {
   const products = useProductStore((state) => state.products);
   
   // Standard categories from screenshot
-  const STANDARD_CATEGORIES = ['Electronics', 'Footwear', 'Accessories', 'Apparel'];
+  const STANDARD_CATEGORIES = ['Electronics', 'Fashion', 'Home & Living', 'Beauty & Personal Care','Sports & Outdoor','Books & Education'];
   const dbCategories = [...new Set(products.filter(p => !!p.category).map(p => p.category))];
   const uniqueCategories = [...new Set([...STANDARD_CATEGORIES, ...dbCategories])];
   
