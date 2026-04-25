@@ -40,7 +40,7 @@ const HeroSection = () => (
           Crafting<br />Timeless<br />Digital<br />Commerce
         </h1>
         <p className="text-indigo-100 text-base lg:text-lg leading-relaxed mb-8 max-w-md">
-          At E-Shop, we believe shopping is an art form. We curate exceptional products with a focus on quality, sustainability, and unparalleled design.
+          At Mesob Market, we believe shopping is an art form. We curate exceptional products with a focus on quality, sustainability, and unparalleled design.
         </p>
         <Link
           to="/products"
@@ -80,7 +80,7 @@ const OurStorySection = () => (
       </h2>
       <div className="space-y-4 text-muted-foreground text-[16px] leading-relaxed">
         <p>
-          Founded in 2024, E-Shop was born from a desire to bridge the gap between artisanal craftsmanship and the convenience of modern technology.
+          Founded in 2024, Mesob Market was born from a desire to bridge the gap between artisanal craftsmanship and the convenience of modern technology.
           We spent years scouting for partners who share our obsession with detail.
         </p>
         <p>
@@ -114,7 +114,7 @@ const WhySection = () => (
     <div className="bg-muted/50 p-8 lg:pb-20 pb-10">
       <div className="flex flex-col items-center text-center mb-16">
         <h2 className="text-3xl font-black tracking-tight text-foreground">
-          Why E-Shop?
+          Why Mesob Market?
         </h2>
         <div className="mt-3 h-1 w-10 rounded-full bg-primary" />
       </div>
@@ -158,7 +158,7 @@ const CTASection = () => (
     <div className="bg-[#3b2dd3] dark:bg-[#2a1fa8] py-20 px-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden text-center mt-16">
       <div className="max-w-2xl mx-auto relative z-10">
         <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-6">
-          Join the E-Shop Experience
+          Join the Mesob Market Experience
         </h2>
         <p className="text-indigo-100 text-sm lg:text-base leading-relaxed mb-10">
           Elevate your daily rituals with our curated collections.

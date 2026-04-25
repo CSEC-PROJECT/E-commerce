@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 import useCartStore from '../../store/cartStore';
 import { useProductStore } from '../../store/productStore';
 import useThemeStore from '../../store/themeStore';
+import BrandLogo from './BrandLogo';
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -131,20 +132,19 @@ const NavBar = () => {
     return (
         <>
             <nav className="bg-background border-b border-border sticky top-0 z-40">
-                <div className="w-full px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-[72px]">
+                <div className="flex items-center justify-between h-16 md:h-18 px-4 md:px-6 lg:px-10 w-full mx-auto">
 
-                        {/* Left Section: Logo & Nav Links */}
-                        <div className="flex items-center gap-8 lg:gap-14 pl-2 lg:pl-4">
-                            {/* Logo */}
-                            <Link to="/" className="flex items-center outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
-                                <span className="text-[26px] font-black tracking-tight text-foreground whitespace-nowrap">
-                                    E-Shop
-                                </span>
+                    {/* Left Section: Logo & Nav Links */}
+                    <div className="flex items-center gap-8 lg:gap-14">
+                        {/* Logo section */}
+                        <div className="flex items-center shrink-0">
+                            <Link to="/" className="flex items-center group outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
+                                <BrandLogo />
                             </Link>
+                        </div>
 
-                            {/* Desktop Nav */}
-                            <div className="hidden md:flex space-x-6 lg:space-x-8 items-center h-full">
+                        {/* Desktop Nav */}
+                        <div className="hidden md:flex space-x-6 lg:space-x-8 items-center h-full">
 
                                 {/* ── Admin links ── */}
                                 {isAdmin ? (
@@ -466,7 +466,6 @@ const NavBar = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                             </button>
-                        </div>
                     </div>
                 </div>
             </nav>
