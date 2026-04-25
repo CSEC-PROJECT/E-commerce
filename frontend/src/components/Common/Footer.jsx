@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Logo from './Logo';
 
 const Footer = () => {
     const location = useLocation();
@@ -18,8 +19,8 @@ const Footer = () => {
 
                     {/* Left Section: Brand & About */}
                     <div className="md:col-span-4 flex flex-col">
-                        <Link to="/" className="inline-block">
-                            <h2 className="text-3xl font-bold text-foreground mb-4">E-Shop</h2>
+                        <Link to="/" className="inline-block mb-4">
+                            <Logo size="lg" />
                         </Link>
                         <p className="text-muted-foreground leading-relaxed mb-8 max-w-sm text-[15px]">
                             The Digital Atelier. Where curated aesthetics meet modern functionality in every piece we offer.
