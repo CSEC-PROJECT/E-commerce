@@ -104,10 +104,11 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
     });
-  } catch (err) {
-    console.error('Failed to start server:', err);
+
+  } catch (error) {
+    console.error("Database connection error:", error);
     process.exit(1);
   }
 };
 
-startServer();
+startServer();

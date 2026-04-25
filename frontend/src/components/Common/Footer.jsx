@@ -117,7 +117,7 @@ const Footer = () => {
                 <div className="pt-8 border-t border-border/80 flex flex-col sm:flex-row justify-between items-center gap-6">
 
                     <p className="text-[13px] text-muted-foreground">
-                        © 2024 Digital Atelier. All rights reserved.
+                        © 2026 Digital Atelier. All rights reserved.
                     </p>
 
                     {/* Payment/Trust Icons */}

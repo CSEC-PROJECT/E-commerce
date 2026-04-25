@@ -28,7 +28,8 @@ const NavBar = () => {
     const STANDARD_CATEGORIES = ['Electronics', 'Fashion', 'Home & Living', 'Beauty & Personal Care', 'Sports & Outdoor', 'Books & Education'];
     const CATEGORIES = STANDARD_CATEGORIES.map(c => ({ label: c, value: c }));
 
-    const [searchQuery, setSearchQuery] = useState('');
+
+
 
     const isAdmin = !!accessToken && (Array.isArray(user?.role)
         ? user.role.includes('admin')
@@ -74,15 +75,8 @@ const NavBar = () => {
         navigate(`/products?category=${encodeURIComponent(value)}`);
     };
 
-    const handleSearchSubmit = (e) => {
-        if (e.key === 'Enter') {
-            if (searchQuery.trim()) {
-                navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
-            } else {
-                navigate(`/products`);
-            }
-        }
-    };
+
+
 
     // Dark mode toggle
     const toggleDarkMode = () => {
@@ -134,7 +128,8 @@ const NavBar = () => {
                 <div className="flex items-center justify-between h-16 md:h-18 px-4 md:px-6 lg:px-10 w-full mx-auto">
 
                     {/* Left Section: Logo & Nav Links */}
-                    <div className="flex items-center gap-8 lg:gap-14">
+                    <div className="flex items-center gap-4 lg:gap-8">
+
                         {/* Logo section */}
                         <div className="flex items-center shrink-0">
                             <Link to="/" className="flex items-center group outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
@@ -143,7 +138,8 @@ const NavBar = () => {
                         </div>
 
                         {/* Desktop Nav */}
-                        <div className="hidden md:flex space-x-6 lg:space-x-8 items-center h-full">
+                        <div className="hidden md:flex space-x-3 lg:space-x-5 items-center h-full">
+
 
                                 {/* ── Admin links ── */}
                                 {isAdmin ? (
@@ -337,26 +333,6 @@ const NavBar = () => {
                         {/* Right Section: Actions */}
                         <div className="flex items-center justify-end gap-5 sm:gap-6 flex-1 pr-2 lg:pr-4">
 
-                            {/* Search Bar */}
-                            <div className="hidden lg:block flex-1 max-w-[280px] xl:max-w-[340px] relative group">
-                                <button 
-                                    onClick={() => handleSearchSubmit({ key: 'Enter' })}
-                                    className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer text-muted-foreground hover:text-primary transition-colors z-10"
-                                >
-                                    <svg className="h-[16px] w-[16px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                </button>
-                                <input
-                                    type="text"
-                                    placeholder="Search products..."
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    onKeyDown={handleSearchSubmit}
-                                    className="w-full pl-10 pr-4 py-[9px] bg-[#f5f6f8] dark:bg-muted  rounded-full text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:bg-background focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200 font-medium"
-                                />
-                            </div>
-
                             {/* Cart Icon – visible for non-admin users */}
                             {!isAdmin && (
                                 <Link to="/cart" className="relative text-foreground hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md" aria-label="Cart">
@@ -538,32 +514,8 @@ const NavBar = () => {
 
                 {/* Drawer Scrollable Content */}
                 <div className="flex-1 overflow-y-auto py-4">
-                    {/* Mobile Search Bar */}
-                    <div className="px-6 mb-6">
-                        <div className="relative">
-                            <button 
-                                onClick={() => { handleSearchSubmit({ key: 'Enter' }); setIsMobileMenuOpen(false); }}
-                                className="absolute inset-y-0 left-0 pl-3 flex items-center text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </button>
-                            <input
-                                type="text"
-                                placeholder="Search products..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter') {
-                                        handleSearchSubmit(e);
-                                        setIsMobileMenuOpen(false);
-                                    }
-                                }}
-                                className="w-full pl-11 pr-4 py-3 bg-muted border border-transparent rounded-full text-base text-foreground focus:outline-none focus:bg-background focus:border-primary transition-all"
-                            />
-                        </div>
-                    </div>
+
+
                     <nav className="px-4 space-y-2">
 
                         {/* ── Admin sidebar links ── */}
